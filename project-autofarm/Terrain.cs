@@ -2,11 +2,13 @@ using System;
 
 namespace ProjectAutofarm;
 
-class Map
+class Terrain
 {
-    public Tile[,]? Grid {get; set => CreateMap();} = new Tile[_maxSizeX,_maxSizeY];
-    private const int _maxSizeX = 20;
-    private const int _maxSizeY = 20;
+    public Tile[,]? Grid {get; private set;} = new Tile[_maxSizeX,_maxSizeY];
+    public const int MaxSizeX = 20;
+    public const int MaxSizeY = 20;
+
+    //public (int xMax, int yMax) GetMaxSize() => (_maxSizeX, _maxSizeY);
 
     public void CreateMap()
     {
@@ -19,7 +21,7 @@ class Map
         {
             for (int x = 0; x < _maxSizeY; x++)
             {
-                Grid![x,y] = new Tile("grass");
+                Grid![x,y] = new Tile("bot_dirt1",(x,y));
             }
         }
     }

@@ -1,20 +1,12 @@
 using System;
-using System.Reflection.PortableExecutable;
 
 namespace ProjectAutofarm;
 
-class Tile(string typeKey)
+class Tile(string typeKey, (int x, int y) position)
 {
-    public Dictionary<string, char> TypeDict {get; private set => SetDict();} = new Dictionary<string, char>();
-    public char Type {get; set => SetType(typeKey);}
-    //public Position Position {get; set;}
-
-    private Dictionary<string, char> SetDict()
-    {
-        TypeDict.Add("dirt",' ');
-        TypeDict.Add("grass",'░');
-
-        return TypeDict;
-    }
-    private char SetType(string typeKey) => TypeDict[typeKey];
+    public char Texture {get; private set;} = Textures.GetTexture(typeKey);
+    public Position Position {get; set;} = new Position(position.x, position.y);
+    
+    public void SetTexture(string typeKey) => Texture = Textures.List[typeKey];
+    
 }
