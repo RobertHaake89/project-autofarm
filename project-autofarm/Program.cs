@@ -11,17 +11,19 @@ class Program
 
         Console.WriteLine("\n\tPROJECT AUTOFARM\n");
 
-        Textures.LoadTextures(Textures.List,"Ressources/Textures.sc");
+        var terrain = new Terrain();
+        terrain.CreateMap();
 
-        Console.WriteLine($"Textures loaded: {Textures.List.Count}");
-        Console.WriteLine($"bot_dirt1 texture: {Textures.GetTexture("bot_grass1")}");
+        Texture.LoadTextures(Texture.List,"Ressources/Textures.sc");
 
-        var map = new Terrain();
-        map.CreateMap();
+        Console.WriteLine($"Textures loaded: {Texture.List.Count}");
+        //Console.WriteLine($"bot_dirt1 texture");
 
-        Console.WriteLine(map.Grid![0,0].Texture);
+        
+
+        Console.WriteLine(terrain.Grid![0,0].Texture);
         Console.ReadKey();
 
-        Display.TestScreen(map);
+        Display.TestScreen(terrain);
     }
 }

@@ -3,11 +3,13 @@ using System.IO;
 
 namespace ProjectAutofarm;
 
-static class Textures
+class Texture
 {
-    public static Dictionary<string, char> List {get;} = new Dictionary<string, char>();
+    public string TextureName {get; set;} = "";
+    public char Icon => List[TextureName];
+    public Dictionary<string, char> List {get;} = new();
 
-    public static Dictionary<string, char> LoadTextures(Dictionary<string, char> dictionary,string filePath)
+    public Dictionary<string, char> LoadTextures(Dictionary<string, char> dictionary,string filePath)
     {
         string[] text = ReadTextureFile(filePath);
         string[] parts;
@@ -28,8 +30,8 @@ static class Textures
         return dictionary;
     }
 
-    private static string[] ReadTextureFile(string targetDirectory) => File.ReadAllLines(targetDirectory)[1..];
+    private string[] ReadTextureFile(string targetDirectory) => File.ReadAllLines(targetDirectory)[1..];
 
-    public static char GetTexture(string typeKey) => List[typeKey];
+    //public char SetTexture(string typeKey) => Icon = List[typeKey];
     
 }
