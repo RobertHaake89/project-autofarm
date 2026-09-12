@@ -7,9 +7,9 @@ class Texture
 {
     public string TextureName {get; set;} = "";
     public char Icon => List[TextureName];
-    public Dictionary<string, char> List {get;} = new();
+    public static Dictionary<string, char> List {get;} = new();
 
-    public Dictionary<string, char> LoadTextures(Dictionary<string, char> dictionary,string filePath)
+    public static Dictionary<string, char> LoadTextures(Dictionary<string, char> dictionary,string filePath)
     {
         string[] text = ReadTextureFile(filePath);
         string[] parts;
@@ -30,7 +30,7 @@ class Texture
         return dictionary;
     }
 
-    private string[] ReadTextureFile(string targetDirectory) => File.ReadAllLines(targetDirectory)[1..];
+    private static string[] ReadTextureFile(string targetDirectory) => File.ReadAllLines(targetDirectory)[1..];
 
     //public char SetTexture(string typeKey) => Icon = List[typeKey];
     

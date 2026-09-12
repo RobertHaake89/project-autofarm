@@ -21,7 +21,7 @@ class Terrain
         {
             for (int x = 0; x < _maxSizeY; x++)
             {
-                Grid![x,y] = new Tile("bot_dirt1",(x,y));
+                Grid![x,y] = new Tile((x,y));
             }
         }
     }

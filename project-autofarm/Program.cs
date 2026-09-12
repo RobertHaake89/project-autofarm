@@ -16,7 +16,7 @@ class Program
 
         Texture.LoadTextures(Texture.List,"Ressources/Textures.sc");
 
-        Console.WriteLine($"Textures loaded: {Texture.List.Count}");
+        //Console.WriteLine($"Textures loaded: {Texture.List.Count}");
         //Console.WriteLine($"bot_dirt1 texture");
 
         

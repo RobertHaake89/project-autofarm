@@ -4,14 +4,15 @@ namespace ProjectAutofarm;
 
 class Display
 {
-    public static void TestScreen(Terrain terrain)
+    public static void TestScreen(Terrain terrain) // 20 is magic number, connect to terrain
     {
-        for (int y = 0; y < terrain.MaxSizeX; y++)
+        for (int y = 0; y < 20; y++)
         {
-            for (int x = 0; x < terrain.GetMaxSize().yMax; x++)
+            if (y % 10 == 0) Console.WriteLine("");
+            for (int x = 0; x < 20; x++)
             {
-                if (x == terrain.GetMaxSize().xMax) Console.WriteLine();
-                Console.Write(terrain.Grid[x,y].Texture);
+                
+                Console.Write(terrain.Grid[x,y].Texture.ToString());
             }
         }
     }
