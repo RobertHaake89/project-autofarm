@@ -8,21 +8,20 @@ class Program
     {
         Console.BackgroundColor = ConsoleColor.Black;
         Console.ForegroundColor = ConsoleColor.Green;
+        Console.Clear();
 
         Console.WriteLine("\n\tPROJECT AUTOFARM\n");
+
+        Texture.LoadTextures(Texture.List,"Ressources/Textures.sc");
 
         var terrain = new Terrain();
         terrain.CreateMap();
 
-        Texture.LoadTextures(Texture.List,"Ressources/Textures.sc");
+        /* Console.WriteLine($"Textures loaded: {Texture.List.Count}");
+        Console.WriteLine($"texture: {terrain.Grid[0,0].Texture.Icon}"); */
 
-        //Console.WriteLine($"Textures loaded: {Texture.List.Count}");
-        //Console.WriteLine($"bot_dirt1 texture");
-
-        
-
-        Console.WriteLine(terrain.Grid![0,0].Texture);
-        Console.ReadKey();
+        //Console.WriteLine(terrain.Grid![0,0].Texture);
+        //Console.ReadKey();
 
         Display.TestScreen(terrain);
     }

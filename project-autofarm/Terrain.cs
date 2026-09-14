@@ -4,27 +4,27 @@ namespace ProjectAutofarm;
 
 class Terrain
 {
-    public Tile[,]? Grid {get; private set;} = new Tile[_maxSizeX,_maxSizeY];
-    private const int _maxSizeX = 20;
-    private const int _maxSizeY = 20;
+    public Tile[,]? Grid {get; private set;} = new Tile[MaxSizeX, MaxSizeY];
+    public const int MaxSizeX = 70;
+    public const int MaxSizeY = 20;
 
     //public (int xMax, int yMax) GetMaxSize() => (_maxSizeX, _maxSizeY);
 
     public void CreateMap()
     {
-        CreateBottom();
+        CreateTiles();
     }
 
-    private void CreateBottom()
+    private void CreateTiles()
     {
-        for (int y = 0; y < _maxSizeX; y++)
+        for (int y = 0; y < MaxSizeY; y++)
         {
-            for (int x = 0; x < _maxSizeY; x++)
+            for (int x = 0; x < MaxSizeX; x++)
             {
-                Grid![x,y] = new Tile((x,y));
+                Grid![x,y] = new Tile("bot_grass1",(x,y));
             }
         }
     }
-        
+    
     
 }

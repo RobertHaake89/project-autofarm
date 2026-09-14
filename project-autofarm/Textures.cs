@@ -3,9 +3,9 @@ using System.IO;
 
 namespace ProjectAutofarm;
 
-class Texture
+class Texture(string textureName)
 {
-    public string TextureName {get; set;} = "";
+    public string TextureName {get; set;} = textureName;
     public char Icon => List[TextureName];
     public static Dictionary<string, char> List {get;} = new();
 
