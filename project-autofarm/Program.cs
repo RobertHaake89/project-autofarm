@@ -10,7 +10,7 @@ class Program
         Console.ForegroundColor = ConsoleColor.Green;
         Console.Clear();
 
-        Console.WriteLine("\n\tPROJECT AUTOFARM\n");
+        Console.WriteLine("\n\t\tPROJECT AUTOFARM\n");
 
         Texture.LoadTextures(Texture.List,"Ressources/Textures.sc");
 

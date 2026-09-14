@@ -7,7 +7,7 @@ class Tile
     public Texture Texture {get; set;}// = new Texture();
     public Position Position {get; set;}/*  = new Position(position.x, position.y);
  */
-    public Tile(string textureName, (int x, int y) position)
+    public Tile((int x, int y) position, string textureName = "empty")
     {
         Texture = new Texture(textureName);
         Position = new Position(position.x, position.y);

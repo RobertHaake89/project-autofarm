@@ -3,10 +3,11 @@ using System.IO;
 
 namespace ProjectAutofarm;
 
-class Texture(string textureName)
+class Texture(string textureName = "empty")
 {
     public string TextureName {get; set;} = textureName;
-    public char Icon => List[TextureName];
+    //public char Icon => List[TextureName];
+    public char Icon {get => List[TextureName];}
     public static Dictionary<string, char> List {get;} = new();
 
     public static Dictionary<string, char> LoadTextures(Dictionary<string, char> dictionary,string filePath)
