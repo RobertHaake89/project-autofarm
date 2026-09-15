@@ -1,4 +1,6 @@
 using System;
+using System.Net;
+using System.Threading.Tasks.Dataflow;
 using System.Xml.Serialization;
 using Microsoft.VisualBasic;
 
@@ -49,13 +51,16 @@ class Terrain
 
         for (int incY = OffsetMin.Y; incY < OffsetMax.Y; incY++)
         {
-            NoiseGenerator(in OffsetMin, out OffsetMin.Y, out OffsetMax.Y);
-
             for (int incX = OffsetMin.X; incX < OffsetMax.X; incX++)
             {
-                NoiseGenerator(in OffsetMin, out OffsetMin.X, out OffsetMax.X);
-
+                //NoiseGenerator(ref incY, in OffsetMin.Y, in OffsetMax.Y);
+                NoiseGenerator(incX, incY, in OffsetMin, in OffsetMax);
+                Console.WriteLine($"incX {incX}");
+                
+                
                 Grid![incX,incY].Texture.TextureName = "bot_grass1";
+
+                if (incX >= OffsetMax.X) incX = OffsetMin.X;
             }
         }
     }
@@ -74,7 +79,44 @@ class Terrain
         }
     }
 
-    private static void NoiseGenerator(in (int x, int y) position, out int randomMin, out int randomMax)
+    private static void NoiseGenerator(int incrementX, int incrementY, in (int x, int y) offsetMin, in (int x, int y) offsetMax)
+    {
+        //if (incrementX < offsetMin.x || incrementX > offsetMax.x) return;
+        
+        int midIncrementX = (offsetMin.x + offsetMax.x) / 2;
+        int midIncrementY = (offsetMin.y + offsetMax.y) / 2;
+        //int subIncrementX = offsetMin.x + (incrementX - offsetMin.x);
+        //int subIncrementY = offsetMin.y + (incrementY - offsetMin.y);
+
+        Console.WriteLine($"IncrementX {incrementX}");
+        Console.WriteLine($"IncrementY {incrementY}");
+        Console.WriteLine($"midIncrementX {midIncrementX}");
+        Console.WriteLine($"midIncrementY {midIncrementY}\n");
+        //Console.WriteLine($"subIncrementX {subIncrementX}");
+        //Console.WriteLine($"subIncrementY {subIncrementY}\n");
+        //Console.ReadKey();
+
+        if (incrementX < midIncrementX && incrementY < midIncrementY) incrementX = incrementX + (midIncrementX - incrementY * 3);
+        else if (incrementX > midIncrementX && incrementY < midIncrementY)
+        {
+            incrementX = incrementX - (midIncrementX - midIncrementY * 3);
+        } 
+        
+        //else if (incrementX == incrementX) return;
+        //else if (incrementX > midIncrementX + midIncrementY * 2) return; //incrementX = incrementX + (midIncrementX - subIncrementY*2);
+
+        int randomizer = Random.Shared.Next(0,6);
+
+
+
+        /* if (randomizer == 0) increment -= 2;
+        if (randomizer < 2) increment--;
+
+        else if (randomizer > 4) increment++;
+        else if (randomizer == 6) increment += 2;  */
+    }
+
+    /* private static void NoiseGenerator(in (int x, int y) position, out int randomMin, out int randomMax)
     {
         int randomFactor = Random.Shared.Next(1,5);
         randomMin = position.x * randomFactor/10;
@@ -82,5 +124,5 @@ class Terrain
 
         Console.Write($"{randomMin} ");
         Console.WriteLine(randomMax);
-    }
+    } */
 }
