@@ -6,11 +6,13 @@ class Program
 {
     public static void Main()
     {
+        Console.OutputEncoding = System.Text.Encoding.UTF8;
+        Console.CursorVisible = false;
         Console.BackgroundColor = ConsoleColor.Black;
         Console.ForegroundColor = ConsoleColor.Green;
         Console.Clear();
 
-        Console.WriteLine("\n\t\tPROJECT AUTOFARM\n");
+        Console.WriteLine("\n\t\t\tPROJECT AUTOFARM\n");
 
         Texture.LoadTextures(Texture.List,"Ressources/Textures.sc");
 
