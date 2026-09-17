@@ -32,7 +32,6 @@ class Texture(string textureName = "empty")
     }
 
     private static string[] ReadTextureFile(string targetDirectory) => File.ReadAllLines(targetDirectory)[1..];
-
-    //public char SetTexture(string typeKey) => Icon = List[typeKey];
+    
     
 }

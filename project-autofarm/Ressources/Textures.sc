@@ -5,8 +5,11 @@ bot_grass1,░
 water_wave1,~
 water_wave2,≈
 water_wave3,≋
-field_blank,▒
-field_blankWet,▓
+acre_empty, 
+acre_wheat_sown, 
+acre_wheat_growing,░
+acre_wheat_mature,▒
+acre_wheat_ripe,▓
 obj_stone1,˙
 obj_stone2,·
 obj_stone3,.

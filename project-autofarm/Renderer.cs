@@ -2,11 +2,12 @@ using System;
 
 namespace ProjectAutofarm;
 
-class Display
+class Renderer
 {
-    public static void TestScreen(Terrain terrain)
+    public static void Screen(Terrain terrain)
     {
         //Console.Clear();
+        Console.SetCursorPosition(0, 0);
         /* Console.WriteLine(Terrain.MaxSizeX);
         Console.WriteLine(Terrain.MaxSizeY); */
 
@@ -18,7 +19,7 @@ class Display
             if(y > 0) Console.Write("\n");
             for (int x = 0; x < Terrain.MaxSizeX; x++)
             {
-                
+                //terrain.Grid![x,y].TextureRefresher();
                 Console.Write(terrain.Grid![x,y].Texture.Icon);
             }
         }

@@ -9,7 +9,7 @@ class Program
         Console.OutputEncoding = System.Text.Encoding.UTF8;
         Console.CursorVisible = false;
         Console.BackgroundColor = ConsoleColor.Black;
-        Console.ForegroundColor = ConsoleColor.Green;
+        Console.ForegroundColor = ConsoleColor.Yellow;
         Console.Clear();
 
         Console.WriteLine("\n\t\t\tPROJECT AUTOFARM\n");
@@ -25,6 +25,6 @@ class Program
         //Console.WriteLine(terrain.Grid![0,0].Texture);
         //Console.ReadKey();
 
-        Display.TestScreen(terrain);
+        General.MainLoop(terrain);
     }
 }

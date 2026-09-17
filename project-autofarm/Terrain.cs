@@ -72,7 +72,9 @@ class Terrain
         {
             for (int incX = OffsetMin.X; incX < OffsetMax.X; incX++)
             {
-                Grid![incX,incY].Texture.TextureName = "field_blankWet";
+                Grid![incX,incY].Ressource = new Wheat(Ressources.GrowthProcess.Sown);
+                //Console.WriteLine(Grid![incX, incY].Ressource.Status);
+                //Grid![incX,incY].Texture.TextureName = "empty";
             }
         }
     }
@@ -154,7 +156,7 @@ class Terrain
             {"struct_roof2", "struct_roof1", "struct_roof2","struct_roof1", "struct_roof2", "struct_roof1", "struct_beam_diagonal", "struct_beam_vert2","empty"},
             {"struct_beam_vert1","struct_beam_horz1","struct_window1","struct_door1", "empty","struct_beam_horz1", "struct_beam_vert1", "struct_beam_diagonal", "empty"},
             {"struct_floor1", "struct_floor1", "struct_floor1", "struct_floor1", "struct_floor1", "struct_floor1", "struct_floor1","empty", "empty"},
-            {"empty", "empty", "empty", "struct_stairs1", "empty", "empty", "empty", "empty", "empty"}
+            /* {"empty", "empty", "empty", "struct_stairs1", "empty", "empty", "empty", "empty", "empty"} */
         };
 
         int distX = 0; // twisted coords, needs rework!

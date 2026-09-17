@@ -5,7 +5,7 @@ namespace ProjectAutofarm;
 
 class Structure
 {
-    public string Name {get; set;}
+    //public string Name {get; set;} = "";
 
     public static void CreateFarmHouse()
     {
