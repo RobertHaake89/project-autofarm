@@ -1,4 +1,5 @@
 using System;
+using System.Security.Cryptography.X509Certificates;
 
 namespace ProjectAutofarm;
 
@@ -16,12 +17,17 @@ class Terrain
         CreateDirtFoundation();
         CreateGrassPatch(60,0,100,100,radius:8);
         CreateGrassPatch(40,50,80,100,radius:5);
+        CreateGrassPatch(50,0,100,40,radius:5);
         CreateFoliage(0,0,100,100,factor:150);
         CreateSingleGrass(0,0,100,100,factor:200);
         CreateStones(0,0,100,100,factor:100);
         CreateField(70,35,90,80);
+
+        int quantityPine = Random.Shared.Next(4, 8);
+        for (int i = 0; i < quantityPine; i++) CreatePineTree(xMin:30, xMax:80, yMin: 0, yMax: 3);
         
-        CreateFarmHouse();
+        
+        CreateFarmHouse(5,0);
     }
 
     private void CreateTiles()
@@ -73,8 +79,6 @@ class Terrain
             for (int incX = OffsetMin.X; incX < OffsetMax.X; incX++)
             {
                 Grid![incX,incY].Ressource = new Wheat(Ressources.GrowthProcess.Sown);
-                //Console.WriteLine(Grid![incX, incY].Ressource.Status);
-                //Grid![incX,incY].Texture.TextureName = "empty";
             }
         }
     }
@@ -86,13 +90,6 @@ class Terrain
 
         dx = (incrementX - midPointX)/3;
         dy = incrementY - midPointY;
-
-        /* Console.WriteLine($"OffsetMin {offsetMin}");
-        Console.WriteLine($"OffsetMax {offsetMax}");
-        Console.WriteLine($"IncrementX {incrementX}");
-        Console.WriteLine($"IncrementY {incrementY}");
-        Console.WriteLine($"midPointX {midPointX}");
-        Console.WriteLine($"midPointY {midPointY}\n"); */
     }
 
     private void CreateFoliage(int xMin, int yMin, int xMax, int yMax, int factor)
@@ -146,9 +143,40 @@ class Terrain
         }
     }
 
-    private static int GetSimpleNoise(int min, int max) => Random.Shared.Next(min, max + 1);
+    private void CreatePineTree(int xMin, int xMax, int yMin, int yMax)
+    {
+        string[,] PineArray =
+        {
+            {"skip", "skip", "skip", "tree_pine_top", "skip", "skip", "skip"},
+            {"skip", "skip", "tree_pine_side_left", "tree_pine_centre", "tree_pine_side_right", "skip", "skip"},
+            {"skip", "tree_pine_side_left", "tree_pine_centre", "tree_pine_centre", "tree_pine_centre", "tree_pine_side_right", "skip"},
+            {"skip", "skip", "skip","tree_pine_stem", "skip", "skip", "skip"},
+        };
+
+        int posX = Random.Shared.Next(xMin, xMax + 1);
+        int posY = Random.Shared.Next(yMin, yMax + 1);
+        
+
+        /* int distX = randomCoordX; // twisted coords, needs rework!
+        int distY = randomCoordY; */
+
+        for (int incY = 0; incY < PineArray.GetLength(0); incY++)
+        {
+            for (int incX = 0; incX < PineArray.GetLength(1); incX++)
+            {
+                if (PineArray[incY,incX] != "skip")
+                Grid![incX + posX,incY + posY].Texture.TextureName = PineArray[incY,incX];
+
+                /*   ⋀
+                    /^\
+                   /^^^\
+                   /^^^\
+                     █ */
+            }
+        }
+    }
     
-    private void CreateFarmHouse()
+    private void CreateFarmHouse(int posX, int posY)
     {
         string[,] farmHouseArray =
         {
@@ -156,18 +184,19 @@ class Terrain
             {"struct_roof2", "struct_roof1", "struct_roof2","struct_roof1", "struct_roof2", "struct_roof1", "struct_beam_diagonal", "struct_beam_vert2","empty"},
             {"struct_beam_vert1","struct_beam_horz1","struct_window1","struct_door1", "empty","struct_beam_horz1", "struct_beam_vert1", "struct_beam_diagonal", "empty"},
             {"struct_floor1", "struct_floor1", "struct_floor1", "struct_floor1", "struct_floor1", "struct_floor1", "struct_floor1","empty", "empty"},
-            /* {"empty", "empty", "empty", "struct_stairs1", "empty", "empty", "empty", "empty", "empty"} */
         };
 
-        int distX = 0; // twisted coords, needs rework!
-        int distY = 5;
+        int distX = posX; // twisted coords, needs rework!
+        int distY = posY;
 
-        for (int incY = 0; incY < farmHouseArray.GetLength(1); incY++)
+        for (int incY = 0; incY < farmHouseArray.GetLength(0); incY++)
         {
-            for (int incX = 0; incX < farmHouseArray.GetLength(0); incX++)
+            for (int incX = 0; incX < farmHouseArray.GetLength(1); incX++)
             {
-                Grid![incY + distY,incX + distX].Texture.TextureName = farmHouseArray[incX,incY];
+                Grid![incX + distX,incY + distY].Texture.TextureName = farmHouseArray[incY,incX];
             }
         }
     }
+
+    private static int GetSimpleNoise(int min, int max) => Random.Shared.Next(min, max + 1);
 }
