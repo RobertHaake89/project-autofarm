@@ -18,14 +18,18 @@ class Terrain
         CreateGrassPatch(60,0,100,100,radius:8);
         CreateGrassPatch(40,50,80,100,radius:5);
         CreateGrassPatch(50,0,100,40,radius:5);
-        CreateFoliage(0,0,100,100,factor:150);
-        CreateSingleGrass(0,0,100,100,factor:200);
+        CreateFoliage(0,0,100,100,factor:80);
+        CreateGrassShafts(0,0,100,100,factor:200);
         CreateStones(0,0,100,100,factor:100);
         CreateField(70,35,90,80);
 
-        int quantityPine = Random.Shared.Next(4, 8);
-        for (int i = 0; i < quantityPine; i++) CreatePineTree(xMin:30, xMax:80, yMin: 0, yMax: 3);
-        
+        int quantityoak = Random.Shared.Next(5, 8);
+        for (int i = 0; i < quantityoak; i++)
+        CreatePineTree(xMin:30, xMax:83, yMin: 0, yMax: 4);
+
+        CreateOakTree(xMin:5, xMax:20, yMin: 13, yMax: 15);
+
+        CreateMushrooms(0,0,95,30,factor:60);
         
         CreateFarmHouse(5,0);
     }
@@ -126,7 +130,7 @@ class Terrain
         }
     }
 
-    private void CreateSingleGrass(int xMin, int yMin, int xMax, int yMax, int factor)
+    private void CreateGrassShafts(int xMin, int yMin, int xMax, int yMax, int factor)
     {
         var OffsetMin = (X:MaxSizeX * xMin/100, Y:MaxSizeY * yMin/100);
         var OffsetMax = (X:MaxSizeX * xMax/100, Y:MaxSizeY * yMax/100);
@@ -145,7 +149,7 @@ class Terrain
 
     private void CreatePineTree(int xMin, int xMax, int yMin, int yMax)
     {
-        string[,] PineArray =
+        string[,] pineArray =
         {
             {"skip", "skip", "skip", "tree_pine_top", "skip", "skip", "skip"},
             {"skip", "skip", "tree_pine_side_left", "tree_pine_centre", "tree_pine_side_right", "skip", "skip"},
@@ -153,25 +157,70 @@ class Terrain
             {"skip", "skip", "skip","tree_pine_stem", "skip", "skip", "skip"},
         };
 
-        int posX = Random.Shared.Next(xMin, xMax + 1);
-        int posY = Random.Shared.Next(yMin, yMax + 1);
-        
+        int posX = Random.Shared.Next(xMin, xMax);
+        int posY = Random.Shared.Next(yMin, yMax);
 
-        /* int distX = randomCoordX; // twisted coords, needs rework!
-        int distY = randomCoordY; */
-
-        for (int incY = 0; incY < PineArray.GetLength(0); incY++)
+        for (int incY = 0; incY < pineArray.GetLength(0); incY++)
         {
-            for (int incX = 0; incX < PineArray.GetLength(1); incX++)
+            for (int incX = 0; incX < pineArray.GetLength(1); incX++)
             {
-                if (PineArray[incY,incX] != "skip")
-                Grid![incX + posX,incY + posY].Texture.TextureName = PineArray[incY,incX];
+                if (pineArray[incY,incX] != "skip")
+                Grid![incX + posX,incY + posY].Texture.TextureName = pineArray[incY,incX];
+            }
+        }
 
-                /*   ⋀
-                    /^\
-                   /^^^\
-                   /^^^\
-                     █ */
+        /*    ⋀
+             /^\
+            /^^^\
+            /^^^\
+              █   */
+    }
+
+    private void CreateOakTree(int xMin, int xMax, int yMin, int yMax)
+    {
+        string[,] oakArray =
+        {
+            {"skip", "skip", "skip", "skip", "tree_oak_top", "tree_oak_top", "tree_oak_top", "tree_oak_top", "skip", "skip", "skip"},
+            {"skip", "skip", "tree_oak_top", "tree_oak_top", "tree_oak_top", "tree_oak_top", "tree_oak_top", "tree_oak_top", "tree_oak_top", "skip", "skip"},
+            {"skip", "skip", "tree_oak_top", "tree_oak_top", "tree_oak_top", "tree_oak_top", "tree_oak_top", "tree_oak_top", "tree_oak_top", "tree_oak_top", "skip"},
+            {"skip", "skip", "skip", "skip", "tree_oak_branch_left", "tree_oak_stem", "skip", "tree_oak_top", "tree_oak_top", "tree_oak_top", "skip"},
+            {"skip", "skip", "skip", "skip", "skip", "tree_oak_stem", "tree_oak_branch_right", "skip", "skip", "skip", "skip"},
+            {"skip", "skip", "skip", "skip", "skip", "tree_oak_stem", "skip", "skip", "skip", "skip", "skip"},
+        };
+
+        int posX = Random.Shared.Next(xMin, xMax);
+        int posY = Random.Shared.Next(yMin, yMax);
+
+        for (int incY = 0; incY < oakArray.GetLength(0); incY++)
+        {
+            for (int incX = 0; incX < oakArray.GetLength(1); incX++)
+            {
+                if (oakArray[incY,incX] != "skip")
+                Grid![incX + posX,incY + posY].Texture.TextureName = oakArray[incY,incX];
+            }
+        }
+
+        /*    @@@@
+            @@@@@@@@
+            @@@@@@@@@
+              \█ @@@
+               █/  
+               █*/
+    }
+
+    private void CreateMushrooms(int xMin, int yMin, int xMax, int yMax, int factor)
+    {
+        var OffsetMin = (X:MaxSizeX * xMin/100, Y:MaxSizeY * yMin/100);
+        var OffsetMax = (X:MaxSizeX * xMax/100, Y:MaxSizeY * yMax/100);
+
+        string[] mushroomArray = {"forage_mushroom1", "forage_mushroom2"};
+
+        for (int incY = OffsetMin.Y; incY < OffsetMax.Y; incY++)
+        {
+            for (int incX = OffsetMin.X; incX < OffsetMax.X; incX++)
+            {
+                if (1 == GetSimpleNoise(1,factor) && Grid![incX,incY].Texture.TextureName == "bot_grass1")
+                Grid![incX,incY].Texture.TextureName = mushroomArray[Random.Shared.Next(0,mushroomArray.Length)];
             }
         }
     }

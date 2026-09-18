@@ -7,7 +7,7 @@ acre_wheat_sown,
 acre_wheat_growing,░
 acre_wheat_mature,▒
 acre_wheat_ripe,▓
-crop_carot,❦
+acre_carot,❦
 forage_mushroom1,♣
 forage_mushroom2,♧
 forage_acorn,❧
@@ -38,6 +38,10 @@ struct_floor1,║
 struct_door1,▯
 struct_window1,⊞
 struct_stairs1,▤
+tree_oak_top,@
+tree_oak_branch_left,\
+tree_oak_branch_right,/
+tree_oak_stem,█
 tree_pine_top,⋀
 tree_pine_side_left,/
 tree_pine_side_right,\
