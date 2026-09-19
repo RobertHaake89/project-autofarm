@@ -12,5 +12,5 @@ This Project will be an automated farm.
 15-09-26 Several Problems with grasspattern forming and noise creation
 16-09-26 Finished primal terrain generation, added random objects (flowers, stones, etc) ... and a Farmhouse!
 17-09-26 Finished farm mechanic with independently growing crops
-18-09-26 Fixed flickering while running and added random pine trees at top and an oak at bottom.
-19-09-26 Finally fixed flickering! General cleanup, turned growth factor into a switch expression.
+18-09-26 Added random pine trees and mushrooms at top and an oak at bottom.
+19-09-26 Finally fixed flickering (sneaky WriteLine, only using \n, within nested render loops cause the flicker-jumps)! General cleanup, turned growth factor into a switch expression.
