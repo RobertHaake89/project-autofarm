@@ -23,9 +23,7 @@ abstract class Ressources
     public RessourceType Type {get; set;} = RessourceType.None;
     public string? Name => Type.ToString();
     public int Yield {get; set;} = 1;
-    public GrowthProcess Status {get; set;}// = GrowthProcess.Ripe;
-    //private int Process {get; set;} = 0;
-    //public bool IsRipe {get; set;} = false;
+    public GrowthProcess Status {get; set;}
 
     public Ressources(RessourceType type, GrowthProcess status)
     {
@@ -33,14 +31,20 @@ abstract class Ressources
         Status = status;
     }
 
-    public virtual void GiveGrowthChance(int factor = 10)
+    public virtual void GiveGrowthChance()
     {
+        int factor = Type switch
+        {
+            RessourceType.Wheat => 10,
+            RessourceType.Mushrooms => 20,
+            _ => 10
+        };
+
         int RandomNumber = Random.Shared.Next(0,factor + 1);
 
         if (Status == GrowthProcess.Ripe) return;
-        else if (RandomNumber == 0)
+        else if (RandomNumber == factor)
         {
-            //Console.WriteLine("test");
             if (Status == GrowthProcess.Sown) Status = GrowthProcess.Young;
             else if (Status == GrowthProcess.Young) Status = GrowthProcess.Mature;
             else if (Status == GrowthProcess.Mature) Status = GrowthProcess.Ripe;

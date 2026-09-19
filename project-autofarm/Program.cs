@@ -19,12 +19,6 @@ class Program
         var terrain = new Terrain();
         terrain.CreateMap();
 
-        /* Console.WriteLine($"Textures loaded: {Texture.List.Count}");
-        Console.WriteLine($"texture: {terrain.Grid[0,0].Texture.Icon}"); */
-
-        //Console.WriteLine(terrain.Grid![0,0].Texture);
-        //Console.ReadKey();
-
         General.MainLoop(terrain);
     }
 }

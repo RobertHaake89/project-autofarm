@@ -1,15 +1,12 @@
 using System;
-using System.Security.Cryptography.X509Certificates;
 
 namespace ProjectAutofarm;
 
-class Terrain
+partial class Terrain // Data and Parameters
 {
     public Tile[,]? Grid {get; private set;} = new Tile[MaxSizeX, MaxSizeY];
     public const int MaxSizeX = 90;
     public const int MaxSizeY = MaxSizeX * (16/9) / 4;
-
-    //public (int xMax, int yMax) GetMaxSize() => (_maxSizeX, _maxSizeY);
 
     public void CreateMap() // xMin, yMin, xMax, yMax, radius?
     {
@@ -23,17 +20,21 @@ class Terrain
         CreateStones(0,0,100,100,factor:100);
         CreateField(70,35,90,80);
 
-        int quantityoak = Random.Shared.Next(5, 8);
-        for (int i = 0; i < quantityoak; i++)
-        CreatePineTree(xMin:30, xMax:83, yMin: 0, yMax: 4);
+        int quantityOak = Random.Shared.Next(5, 8);
+        for (int i = 0; i < quantityOak; i++)
+        CreatePineTree(xMin:30, yMin:0, xMax: 83, yMax: 4);
 
-        CreateOakTree(xMin:5, xMax:20, yMin: 13, yMax: 15);
+        CreateOakTree(xMin:5, yMin:13, xMax: 20, yMax: 15);
 
         CreateMushrooms(0,0,95,30,factor:60);
         
         CreateFarmHouse(5,0);
     }
 
+}
+
+partial class Terrain // Creation Methods
+{
     private void CreateTiles()
     {
         for (int y = 0; y < MaxSizeY; y++)
@@ -147,7 +148,7 @@ class Terrain
         }
     }
 
-    private void CreatePineTree(int xMin, int xMax, int yMin, int yMax)
+    private void CreatePineTree(int xMin, int yMin, int xMax, int yMax)
     {
         string[,] pineArray =
         {
@@ -176,7 +177,7 @@ class Terrain
               █   */
     }
 
-    private void CreateOakTree(int xMin, int xMax, int yMin, int yMax)
+    private void CreateOakTree(int xMin, int yMin, int xMax, int yMax)
     {
         string[,] oakArray =
         {

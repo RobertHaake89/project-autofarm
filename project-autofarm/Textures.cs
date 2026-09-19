@@ -6,7 +6,6 @@ namespace ProjectAutofarm;
 class Texture(string textureName = "empty")
 {
     public string TextureName {get; set;} = textureName;
-    //public char Icon => List[TextureName];
     public char Icon {get => List[TextureName];}
     public static Dictionary<string, char> List {get;} = new();
 
@@ -14,24 +13,16 @@ class Texture(string textureName = "empty")
     {
         string[] text = ReadTextureFile(filePath);
         string[] parts;
-        /* int key = 0;
-        int type = 1; */
-
 
         foreach (string line in text) 
         { 
             parts = line.Split(',');
 
             dictionary.Add(parts[0], char.Parse(parts[1]));
-
-            /* key++;
-            type++; */
         }
 
         return dictionary;
     }
 
     private static string[] ReadTextureFile(string targetDirectory) => File.ReadAllLines(targetDirectory)[1..];
-    
-    
 }
