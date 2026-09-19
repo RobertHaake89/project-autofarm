@@ -13,3 +13,4 @@ This Project will be an automated farm.
 16-09-26 Finished primal terrain generation, added random objects (flowers, stones, etc) ... and a Farmhouse!
 17-09-26 Finished farm mechanic with independently growing crops
 18-09-26 Fixed flickering while running and added random pine trees at top and an oak at bottom.
+19-09-26 General cleanup, turned growth factor into a switch expression
