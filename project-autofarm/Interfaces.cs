@@ -2,9 +2,19 @@ using System;
 
 namespace ProjectAutofarm;
 
-/* public interface IHarvestable
+interface ITargetable
 {
-    public string Name {get; set;}
-    public int GrowthTime {get; set;}
-    private int Current
-} */
+    public RessourceType Type {get; set;}
+}
+
+interface IHarvestable
+{
+    public RessourceType Type {get; set;}
+    public int Yield {get; set;}
+    public GrowthProcess Status {get; set;}
+
+    public void GiveGrowthChance()
+    {
+        
+    }
+}

@@ -83,7 +83,7 @@ partial class Terrain // Creation Methods
         {
             for (int incX = OffsetMin.X; incX < OffsetMax.X; incX++)
             {
-                Grid![incX,incY].Ressource = new Wheat(Ressources.GrowthProcess.Sown);
+                Grid![incX,incY].Ressource = new Wheat(GrowthProcess.Sown);
             }
         }
     }

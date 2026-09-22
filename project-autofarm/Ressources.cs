@@ -2,9 +2,7 @@ using System;
 
 namespace ProjectAutofarm;
 
-abstract class Ressources
-{
-    public enum RessourceType
+public enum RessourceType
     {
         None = 0,
         Wheat,
@@ -19,6 +17,8 @@ abstract class Ressources
         Ripe,
         Harvested
     }
+abstract class Ressources : ITargetable, IHarvestable
+{
 
     public RessourceType Type {get; set;} = RessourceType.None;
     public string? Name => Type.ToString();
