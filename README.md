@@ -116,4 +116,5 @@ This project is licensed under the MIT License.
 * **17-09-26** — Finished farm mechanic with independently growing crops
 * **18-09-26** — Added random pine trees and mushrooms at the top and an oak at the bottom
 * **19-09-26** — Finally fixed flickering (sneaky `WriteLine` — only using `\n` within nested render loops caused the flicker jumps)! General cleanup; turned growth factor into a switch expression. Added proper `README.md` with image.
-* **22-09-26** — Add: abstract entity class incl movement & terrain scanning, ITargetable & IMovable, 
+* **22-09-26** — Add: abstract entity class incl movement & terrain scanning, ITargetable & Harvestable WIP
+* **23-09-26** Refac: Tile TextureRefresher to switch-expression. Scanner for resources WIP

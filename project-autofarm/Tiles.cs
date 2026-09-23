@@ -2,30 +2,33 @@ using System;
 
 namespace ProjectAutofarm;
 
-class Tile
+class Tile : ITargetable
 {
     public Texture Texture {get; set;}
     public Position Position {get; set;}
-    public Ressources Ressource {get; set;} = new Wheat(GrowthProcess.None);
+    public Resource Resource {get; set;}
     public Tile((int x, int y) position, string textureName = "empty")
     {
         Texture = new Texture(textureName);
         Position = new Position(position.x, position.y);
+        Resource = new Resource(ResourceType.None, GrowthProcess.None, (position.x,position.y));
     }
 
     public void TextureRefresher()
     {
-        //Console.WriteLine("Test");
-
-        if (Ressource != null)
+        if (Resource != null)
         {
-            if (Ressource.Type == RessourceType.Wheat)
+            if (Resource.Type == ResourceType.Wheat)
             {
-                if (Ressource.Status == GrowthProcess.Harvested) Texture.TextureName = "acre_empty";
-                if (Ressource.Status == GrowthProcess.Sown) Texture.TextureName = "acre_wheat_sown";
-                if (Ressource.Status == GrowthProcess.Young) Texture.TextureName = "acre_wheat_growing";
-                if (Ressource.Status == GrowthProcess.Mature) Texture.TextureName = "acre_wheat_mature";
-                if (Ressource.Status == GrowthProcess.Ripe) Texture.TextureName = "acre_wheat_ripe";
+                Texture.TextureName = Resource.Status switch
+                {
+                    GrowthProcess.Harvested => "acre_empty",
+                    GrowthProcess.Sown => "acre_wheat_sown",
+                    GrowthProcess.Young => "acre_wheat_growing",
+                    GrowthProcess.Mature => "acre_wheat_mature",
+                    GrowthProcess.Ripe => "acre_wheat_ripe",
+                    _ => "acre_empty"
+                };
             }
         }
 

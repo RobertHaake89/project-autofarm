@@ -26,7 +26,7 @@ class General
             //if(y > 0) Console.Write("\n");
             for (int x = 0; x < Terrain.MaxSizeX; x++)
             {
-                terrain.Grid![x,y].Ressource.GiveGrowthChance();
+                terrain.Grid![x,y].Resource.GiveGrowthChance();
 
                 terrain.Grid![x,y].TextureRefresher();
             }

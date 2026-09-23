@@ -4,12 +4,12 @@ namespace ProjectAutofarm;
 
 interface ITargetable
 {
-    public RessourceType Type {get; set;}
+    public Position Position {get; set;}
 }
 
 interface IHarvestable
 {
-    public RessourceType Type {get; set;}
+    public ResourceType Type {get; set;}
     public int Yield {get; set;}
     public GrowthProcess Status {get; set;}
 

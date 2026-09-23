@@ -1,7 +1,4 @@
 using System;
-using System.Diagnostics.Tracing;
-using System.Reflection.Metadata;
-using System.Xml.Serialization;
 
 namespace ProjectAutofarm;
 
@@ -16,38 +13,33 @@ enum Status
 {
     Idle = 0,
     Working,
+    Resting,
     Sleeping,
     Chatting
 }
 
-abstract class Entity
+abstract class Entity : ITargetable
 {
     public string Name {get; set;} = "none";
-    public const int StaminaMax = 100;
-    public int Stamina {get; set;} = StaminaMax;
+    public char Icon {get; set;}
     public Position Position {get; set;}
+    public Status Status {get; set;} = Status.Idle;
     public List<Position> TargetMemory {get; set;} = new List<Position>();
-    private Profession _profession {get; set;} = Profession.None;
-    //private RessourceType _targetRessource {get; set;} = RessourceType.None;
-    private Status Status {get; set;} = Status.Idle;
 
-    public Entity(Position position, Profession profession)
+    public Entity(Position position)
     {
         Position = position;
-        _profession = profession;
     }
 
     public void ScanFor(Terrain terrain, ITargetable target)
-    {   
-        //new List<(int, int)>();
-        
+    {           
         int x = 0;
         int y = 0;
 
-        for (; y < terrain.Grid!.GetLength(0); y++)
-        for (; x < terrain.Grid.GetLength(1); x++)
+        for (; y < Terrain.MaxSizeY; y++)
+        for (; x < Terrain.MaxSizeX; x++)
         {
-            if (terrain.Grid[x,y].Ressource.Type == target.Type)
+            if (terrain.Grid![x,y].Position == target.Position)
             {
                 TargetMemory.Add(new Position(terrain.Grid[x,y].Position.X, terrain.Grid[x,y].Position.Y));
             }
@@ -66,5 +58,18 @@ abstract class Entity
     public void Work()
     {
         
+    }
+}
+
+class Human : Entity
+{
+    public const int StaminaMax = 100;
+    public int Stamina {get; set;} = StaminaMax;
+    public Profession Profession {get; set;} = Profession.None;
+
+    public Human(Position position, Profession profession) : base(position)
+    {
+        Profession = profession;
+        Position = position;
     }
 }
