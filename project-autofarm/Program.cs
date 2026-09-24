@@ -19,6 +19,9 @@ class Program
         var terrain = new Terrain();
         terrain.CreateMap();
 
-        General.MainLoop(terrain);
+        // ♟ ♙ 
+        var human1 = new Human("Hans", '♟', new Position(12,4), Profession.Farmer);
+
+        General.MainLoop(terrain, human1);
     }
 }

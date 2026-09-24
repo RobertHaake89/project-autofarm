@@ -4,7 +4,7 @@ namespace ProjectAutofarm;
 
 class General
 {
-    public static void MainLoop(Terrain terrain)
+    public static void MainLoop(Terrain terrain, Human human1)
     {
         Console.Clear();
 
@@ -12,7 +12,7 @@ class General
         {
             UpdateGame(terrain);
 
-            Renderer.Screen(terrain);
+            Renderer.Screen(terrain, human1);
 
             //Console.ReadKey();
             Thread.Sleep(1000);

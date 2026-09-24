@@ -22,13 +22,24 @@ abstract class Entity : ITargetable
 {
     public string Name {get; set;} = "none";
     public char Icon {get; set;}
+    public Position SpawnPoint {get; set;}
     public Position Position {get; set;}
+    public Position TargetPosition {get; set;}
     public Status Status {get; set;} = Status.Idle;
-    public List<Position> TargetMemory {get; set;} = new List<Position>();
+    private List<Position> _targetMemory {get; set;} = new List<Position>();
 
-    public Entity(Position position)
+    public Entity(string name, char icon, Position position)
     {
+        Name = name;
+        Icon = icon;
         Position = position;
+    }
+
+    public virtual void RunSchedule(Terrain terrain, ITargetable target)
+    {
+        ScanFor(terrain, target);
+        Move(target.Position);
+        
     }
 
     public void ScanFor(Terrain terrain, ITargetable target)
@@ -41,7 +52,7 @@ abstract class Entity : ITargetable
         {
             if (terrain.Grid![x,y].Position == target.Position)
             {
-                TargetMemory.Add(new Position(terrain.Grid[x,y].Position.X, terrain.Grid[x,y].Position.Y));
+                _targetMemory.Add(new Position(terrain.Grid[x,y].Position.X, terrain.Grid[x,y].Position.Y));
             }
         }
     }
@@ -54,22 +65,30 @@ abstract class Entity : ITargetable
         if (Position.X > targetPos.X) new Position(Position.X - 1, Position.X);
         else if (Position.Y > targetPos.Y) new Position(Position.Y - 1, Position.Y);
     }
-
-    public void Work()
-    {
-        
-    }
 }
 
 class Human : Entity
 {
     public const int StaminaMax = 100;
     public int Stamina {get; set;} = StaminaMax;
+    private bool _isExhausted {get; set;} = false;
     public Profession Profession {get; set;} = Profession.None;
 
-    public Human(Position position, Profession profession) : base(position)
+    public Human(string name, char icon, Position position, Profession profession) : base(name, icon, position)
     {
         Profession = profession;
         Position = position;
+    }
+
+    public override void RunSchedule(Terrain terrain, ITargetable target)
+    {
+        ScanFor(terrain, target);
+        Move(target.Position);
+        ExecuteWork();
+    }
+
+    public void ExecuteWork()
+    {
+        
     }
 }

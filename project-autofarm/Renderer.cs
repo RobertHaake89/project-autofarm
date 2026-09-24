@@ -5,7 +5,7 @@ namespace ProjectAutofarm;
 
 class Renderer
 {
-    public static void Screen(Terrain terrain)
+    public static void Screen(Terrain terrain, Entity human1)
     {
         Console.SetCursorPosition(0, 0);
 
@@ -27,5 +27,14 @@ class Renderer
         output.AppendLine();
 
         Console.Write(output);
+
+        RenderEntity(human1);
+    }
+
+    public static void RenderEntity(Entity entity)
+    {
+        Console.SetCursorPosition(entity.Position.X, entity.Position.Y);
+        Console.Write(entity.Icon);
+        Console.SetCursorPosition(0,0);
     }
 }
