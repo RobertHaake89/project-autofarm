@@ -5,7 +5,7 @@ namespace ProjectAutofarm;
 
 class Renderer
 {
-    public static void Screen(Terrain terrain, Entity human1)
+    public static void Screen(Terrain terrain, Dictionary<string, Entity> entityDict)
     {
         Console.SetCursorPosition(0, 0);
 
@@ -28,7 +28,8 @@ class Renderer
 
         Console.Write(output);
 
-        RenderEntity(human1);
+        RenderEntity(entityDict["human1"]);
+        RenderEntity (entityDict["human2"]);
     }
 
     public static void RenderEntity(Entity entity)

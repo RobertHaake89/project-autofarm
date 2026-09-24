@@ -24,6 +24,7 @@ abstract class Entity : ITargetable
     public char Icon {get; set;}
     public Position SpawnPoint {get; set;}
     public Position Position {get; set;}
+    public ITargetable TargetType {get; set;}
     public Position TargetPosition {get; set;}
     public Status Status {get; set;} = Status.Idle;
     private List<Position> _targetMemory {get; set;} = new List<Position>();
@@ -32,18 +33,13 @@ abstract class Entity : ITargetable
     {
         Name = name;
         Icon = icon;
+        SpawnPoint = position;
         Position = position;
     }
 
-    public virtual void RunSchedule(Terrain terrain, ITargetable target)
-    {
-        ScanFor(terrain, target);
-        Move(target.Position);
-        
-    }
+    public virtual void ScanFor(Terrain terrain, ITargetable target)
+    {   
 
-    public void ScanFor(Terrain terrain, ITargetable target)
-    {           
         int x = 0;
         int y = 0;
 
@@ -80,12 +76,28 @@ class Human : Entity
         Position = position;
     }
 
-    public override void RunSchedule(Terrain terrain, ITargetable target)
+    public void RunSchedule(Terrain terrain, ITargetable target)
     {
         ScanFor(terrain, target);
         Move(target.Position);
         ExecuteWork();
     }
+
+    /* public override void ScanFor(Terrain terrain, in ITargetable target)
+    {
+        if (target == typeof(Resource))
+        {
+            TargetType = Profession switch
+            {
+                Profession.Farmer => ResourceType.Wheat,
+                Profession.Forager => ResourceType.Mushrooms,
+                _ => ResourceType.None
+            }
+        }
+        
+
+        base.ScanFor(terrain, TargetType);
+    } */
 
     public void ExecuteWork()
     {

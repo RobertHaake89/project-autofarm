@@ -118,3 +118,4 @@ This project is licensed under the MIT License.
 * **19-09-26** — Finally fixed flickering (sneaky `WriteLine` — only using `\n` within nested render loops caused the flicker jumps)! General cleanup; turned growth factor into a switch expression. Added proper `README.md` with image.
 * **22-09-26** — Add: abstract entity class incl movement & terrain scanning, ITargetable & Harvestable WIP
 * **23-09-26** Refac: Tile TextureRefresher to switch-expression. Scanner for resources WIP
+* **23-09-26** WIP: Human's scanner needs compatibility with ITargetable

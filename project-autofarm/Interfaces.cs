@@ -4,6 +4,7 @@ namespace ProjectAutofarm;
 
 interface ITargetable
 {
+    //public Resource TargetType {get; set;}
     public Position Position {get; set;}
 }
 
