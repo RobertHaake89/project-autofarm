@@ -23,10 +23,9 @@ abstract partial class Entity : ITargetable
     public string Name {get; set;} = "none";
     public char Icon {get; set;} = ' ';
     public Position SpawnPoint {get; set;}
-    private Position _position;
-    public Position Position {get => _position; set
+    public Position Position {get => field; set
         {
-            _position = new Position(
+            field = new Position(
                 Math.Clamp(value.X, 0, Terrain.MaxSizeX),
                 Math.Clamp(value.Y, 0, Terrain.MaxSizeY));
         }}
@@ -42,59 +41,24 @@ abstract partial class Entity : ITargetable
     }
 }
 
-class Human : Entity
+partial class Human : Entity
 {
     public const int StaminaMax = 100;
-    public int Stamina {get; set
+    public int Stamina {get => field; set
         {
-            if (Stamina < 0) Stamina = 0;
-            else if (Stamina > StaminaMax) Stamina = StaminaMax;
-        }} = StaminaMax;
-    private bool IsExhausted {get; set
+            if (field < 0) field = 0;
+            else if (field > StaminaMax) field = StaminaMax;
+        }}
+    public bool IsExhausted {get => field; set
         {
-            if (Stamina == 0) IsExhausted = true;
-            else if (Stamina == StaminaMax) IsExhausted = false;
-        }} = false;
+            if (Stamina == 0) field = true;
+            else if (Stamina == StaminaMax) field = false;
+        }}
     public Profession Profession {get; set;} = Profession.None;
 
     public Human(string name, char icon, Position position, Profession profession) : base(name, icon, position)
     {
         Profession = profession;
         Position = position;
-    }
-
-    public void RunSchedule(Terrain terrain, ITargetable target)
-    {
-        if (!IsExhausted)
-        {
-            ScanFor(terrain, target);
-            Move(target.Position);
-            ExecuteWork();
-        }
-    }
-
-    /* public override void ScanFor(Terrain terrain, out ITargetable target)
-    {
-        if (target is Resource resource)
-        {
-            TargetType = Profession switch
-            {
-                Profession.Farmer => ResourceType.Wheat,
-                Profession.Forager => ResourceType.Mushrooms,
-                _ => ResourceType.None
-            }
-        }
-        else if (target is Entity entity)
-        {
-            
-        }
-        
-
-        base.ScanFor(terrain, TargetType);
-    } */
-
-    public void ExecuteWork()
-    {
-        
     }
 }

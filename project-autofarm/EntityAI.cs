@@ -20,12 +20,29 @@ partial class Entity // AI
         }
     }
 
-    public virtual void Move(Position targetPos)
+    public virtual void MoveTo(Position targetPos)
     {
         if (Position.X < targetPos.X) new Position(Position.X + 1, Position.X);
         else if (Position.Y < targetPos.Y) new Position(Position.Y + 1, Position.Y);
 
         if (Position.X > targetPos.X) new Position(Position.X - 1, Position.X);
         else if (Position.Y > targetPos.Y) new Position(Position.Y - 1, Position.Y);
+    }
+}
+
+partial class Human : Entity
+{
+    public void RunSchedule(Terrain terrain, ITargetable target)
+    {
+        if (!IsExhausted)
+        {
+            ScanFor(terrain, target);
+            MoveTo(target.Position);
+            ExecuteWork();
+        }
+    }
+    public void ExecuteWork()
+    {
+        
     }
 }
