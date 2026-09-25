@@ -18,14 +18,18 @@ enum Status
     Chatting
 }
 
-abstract class Entity : ITargetable
+abstract partial class Entity : ITargetable
 {
     public string Name {get; set;} = "none";
-    public char Icon {get; set;}
+    public char Icon {get; set;} = ' ';
     public Position SpawnPoint {get; set;}
-    public Position Position {get; set;}
-    public ITargetable TargetType {get; set;}
-    public Position TargetPosition {get; set;}
+    private Position _position;
+    public Position Position {get => _position; set
+        {
+            _position = new Position(
+                Math.Clamp(value.X, 0, Terrain.MaxSizeX),
+                Math.Clamp(value.Y, 0, Terrain.MaxSizeY));
+        }}
     public Status Status {get; set;} = Status.Idle;
     private List<Position> _targetMemory {get; set;} = new List<Position>();
 
@@ -36,38 +40,21 @@ abstract class Entity : ITargetable
         SpawnPoint = position;
         Position = position;
     }
-
-    public virtual void ScanFor(Terrain terrain, ITargetable target)
-    {   
-
-        int x = 0;
-        int y = 0;
-
-        for (; y < Terrain.MaxSizeY; y++)
-        for (; x < Terrain.MaxSizeX; x++)
-        {
-            if (terrain.Grid![x,y].Position == target.Position)
-            {
-                _targetMemory.Add(new Position(terrain.Grid[x,y].Position.X, terrain.Grid[x,y].Position.Y));
-            }
-        }
-    }
-
-    public virtual void Move(Position targetPos)
-    {
-        if (Position.X < targetPos.X) new Position(Position.X + 1, Position.X);
-        else if (Position.Y < targetPos.Y) new Position(Position.Y + 1, Position.Y);
-
-        if (Position.X > targetPos.X) new Position(Position.X - 1, Position.X);
-        else if (Position.Y > targetPos.Y) new Position(Position.Y - 1, Position.Y);
-    }
 }
 
 class Human : Entity
 {
     public const int StaminaMax = 100;
-    public int Stamina {get; set;} = StaminaMax;
-    private bool _isExhausted {get; set;} = false;
+    public int Stamina {get; set
+        {
+            if (Stamina < 0) Stamina = 0;
+            else if (Stamina > StaminaMax) Stamina = StaminaMax;
+        }} = StaminaMax;
+    private bool IsExhausted {get; set
+        {
+            if (Stamina == 0) IsExhausted = true;
+            else if (Stamina == StaminaMax) IsExhausted = false;
+        }} = false;
     public Profession Profession {get; set;} = Profession.None;
 
     public Human(string name, char icon, Position position, Profession profession) : base(name, icon, position)
@@ -78,14 +65,17 @@ class Human : Entity
 
     public void RunSchedule(Terrain terrain, ITargetable target)
     {
-        ScanFor(terrain, target);
-        Move(target.Position);
-        ExecuteWork();
+        if (!IsExhausted)
+        {
+            ScanFor(terrain, target);
+            Move(target.Position);
+            ExecuteWork();
+        }
     }
 
-    /* public override void ScanFor(Terrain terrain, in ITargetable target)
+    /* public override void ScanFor(Terrain terrain, out ITargetable target)
     {
-        if (target == typeof(Resource))
+        if (target is Resource resource)
         {
             TargetType = Profession switch
             {
@@ -93,6 +83,10 @@ class Human : Entity
                 Profession.Forager => ResourceType.Mushrooms,
                 _ => ResourceType.None
             }
+        }
+        else if (target is Entity entity)
+        {
+            
         }
         
 
