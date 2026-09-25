@@ -2,10 +2,29 @@ using System;
 
 namespace ProjectAutofarm;
 
-partial class Entity // AI
+partial class Entity : ITargetable // AI
 {
-    public void ScanFor(Terrain terrain, ITargetable target)
-    {   
+    public void MoveTo()
+    {
+        
+    }
+}
+
+partial class Human : Entity
+{
+    public void RunSchedule(Terrain terrain)
+    {
+        if (!IsExhausted)
+        {
+            if(_targetMemory.Any() == false) ScanFor(terrain);
+            MoveTo();
+            ExecuteWork();
+        }
+    }
+
+    public virtual void ScanFor(Terrain terrain)
+    {
+        Resource target = _targetResource;
 
         int x = 0;
         int y = 0;
@@ -20,27 +39,19 @@ partial class Entity // AI
         }
     }
 
-    public virtual void MoveTo(Position targetPos)
+    public virtual Position MoveTo()
     {
-        if (Position.X < targetPos.X) new Position(Position.X + 1, Position.X);
-        else if (Position.Y < targetPos.Y) new Position(Position.Y + 1, Position.Y);
+        Position chosenTarget = _targetMemory[0];
 
-        if (Position.X > targetPos.X) new Position(Position.X - 1, Position.X);
-        else if (Position.Y > targetPos.Y) new Position(Position.Y - 1, Position.Y);
-    }
-}
+        if (Position.X < chosenTarget.X) return new Position(Position.X + 1, Position.X);
+        else if (Position.Y < chosenTarget.Y) return new Position(Position.Y + 1, Position.Y);
 
-partial class Human : Entity
-{
-    public void RunSchedule(Terrain terrain, ITargetable target)
-    {
-        if (!IsExhausted)
-        {
-            ScanFor(terrain, target);
-            MoveTo(target.Position);
-            ExecuteWork();
-        }
+        if (Position.X > chosenTarget.X) return new Position(Position.X - 1, Position.X);
+        else if (Position.Y > chosenTarget.Y) return new Position(Position.Y - 1, Position.Y);
+
+        return Position;
     }
+
     public void ExecuteWork()
     {
         

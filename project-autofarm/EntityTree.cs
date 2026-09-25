@@ -30,7 +30,6 @@ abstract partial class Entity : ITargetable
                 Math.Clamp(value.Y, 0, Terrain.MaxSizeY));
         }}
     public Status Status {get; set;} = Status.Idle;
-    private List<Position> _targetMemory {get; set;} = new List<Position>();
 
     public Entity(string name, char icon, Position position)
     {
@@ -48,13 +47,24 @@ partial class Human : Entity
         {
             if (field < 0) field = 0;
             else if (field > StaminaMax) field = StaminaMax;
-        }}
+        }} = StaminaMax;
     public bool IsExhausted {get => field; set
         {
             if (Stamina == 0) field = true;
             else if (Stamina == StaminaMax) field = false;
-        }}
+        }} = false;
     public Profession Profession {get; set;} = Profession.None;
+    private Resource _targetResource {get => field; set
+        {
+            field.Type = Profession switch
+            {
+                Profession.Farmer => ResourceType.Wheat,
+                Profession.Forager => ResourceType.Mushrooms,
+                Profession.None => ResourceType.None,
+                _ => ResourceType.None
+            };
+        }}
+    private List<Position> _targetMemory {get; set;} = new List<Position>();
 
     public Human(string name, char icon, Position position, Profession profession) : base(name, icon, position)
     {
