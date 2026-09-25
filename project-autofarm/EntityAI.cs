@@ -43,11 +43,11 @@ partial class Human : Entity
     {
         Position chosenTarget = _targetMemory[0];
 
-        if (Position.X < chosenTarget.X) return new Position(Position.X + 1, Position.X);
-        else if (Position.Y < chosenTarget.Y) return new Position(Position.Y + 1, Position.Y);
+        if (Position.X < chosenTarget.X) return new Position(Position.X + 1, Position.Y);
+        else if (Position.Y < chosenTarget.Y) return new Position(Position.X, Position.Y + 1);
 
-        if (Position.X > chosenTarget.X) return new Position(Position.X - 1, Position.X);
-        else if (Position.Y > chosenTarget.Y) return new Position(Position.Y - 1, Position.Y);
+        if (Position.X > chosenTarget.X) return new Position(Position.X - 1, Position.Y);
+        else if (Position.Y > chosenTarget.Y) return new Position(Position.X, Position.Y - 1);
 
         return Position;
     }

@@ -4,7 +4,7 @@
 
 ## About
 
-A C# console-based farming simulation featuring procedural terrain generation, crops, resources, and (later) autonomous NPCs.
+Project Autofarm is a C# console-based farming simulation built from scratch. It combines procedural world generation, data-driven character textures, resource growth simulation, real-time console rendering, and an evolving NPC system.
 
 ## Features
 
@@ -117,5 +117,6 @@ This project is licensed under the MIT License.
 * **18-09-26** — Added random pine trees and mushrooms at the top and an oak at the bottom
 * **19-09-26** — Finally fixed flickering (sneaky `WriteLine` — only using `\n` within nested render loops caused the flicker jumps)! General cleanup; turned growth factor into a switch expression. Added proper `README.md` with image.
 * **22-09-26** — Add: abstract entity class incl movement & terrain scanning, ITargetable & Harvestable WIP
-* **23-09-26** Refac: Tile TextureRefresher to switch-expression. Scanner for resources WIP
-* **23-09-26** WIP: Human's scanner needs compatibility with ITargetable
+* **23-09-26** — Refac: Tile TextureRefresher to switch-expression. Scanner for resources WIP
+* **24-09-26** — WIP: Human's scanner needs compatibility with ITargetable
+* **25-09-26** — Made Entity partial into tree and AI. WIP ScanFor and MoveTo
