@@ -54,16 +54,13 @@ partial class Human : Entity
             else if (Stamina == StaminaMax) field = false;
         }} = false;
     public Profession Profession {get; set;} = Profession.None;
-    private ResourceType _targetResource {get => field; set
-        {
-            field = Profession switch
+    private ResourceType _targetResource => Profession switch
             {
                 Profession.Farmer => ResourceType.Wheat,
                 Profession.Forager => ResourceType.Mushrooms,
                 Profession.None => ResourceType.None,
                 _ => ResourceType.None
             };
-        }}
     private List<Position> _targetMemory {get; set;} = new List<Position>();
     private Position _targetPosition {get; set;}
 

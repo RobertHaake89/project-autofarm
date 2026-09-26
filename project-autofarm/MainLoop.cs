@@ -23,15 +23,15 @@ class General
     {
         for (int y = 0; y < Terrain.MaxSizeY; y++)
         {
-            //if(y > 0) Console.Write("\n");
             for (int x = 0; x < Terrain.MaxSizeX; x++)
             {
-                entityDict["human1"].RunSchedule(terrain);
-
                 terrain.Grid![x,y].Resource.GiveGrowthChance();
 
                 terrain.Grid![x,y].TextureRefresher();
             }
         }
+        entityDict["human1"].RunSchedule(terrain);
+        //Thread.Sleep(2000);
+
     }
 }
