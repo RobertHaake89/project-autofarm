@@ -4,6 +4,10 @@ namespace ProjectAutofarm;
 
 partial class Entity : ITargetable // AI
 {
+    public virtual void RunSchedule(Terrain terrain)
+    {
+        
+    }
     public void MoveTo()
     {
         
@@ -12,7 +16,7 @@ partial class Entity : ITargetable // AI
 
 partial class Human : Entity
 {
-    public void RunSchedule(Terrain terrain)
+    public override void RunSchedule(Terrain terrain)
     {
         if (!IsExhausted)
         {

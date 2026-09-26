@@ -10,7 +10,7 @@ class General
 
         while (true)
         {
-            UpdateGame(terrain);
+            UpdateGame(terrain, entityDict);
 
             Renderer.Screen(terrain, entityDict);
 
@@ -19,13 +19,15 @@ class General
         }
     }
 
-    public static void UpdateGame(Terrain terrain)
+    public static void UpdateGame(Terrain terrain, Dictionary<string, Entity> entityDict)
     {
         for (int y = 0; y < Terrain.MaxSizeY; y++)
         {
             //if(y > 0) Console.Write("\n");
             for (int x = 0; x < Terrain.MaxSizeX; x++)
             {
+                entityDict["human1"].RunSchedule(terrain);
+
                 terrain.Grid![x,y].Resource.GiveGrowthChance();
 
                 terrain.Grid![x,y].TextureRefresher();
