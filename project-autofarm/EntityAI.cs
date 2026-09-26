@@ -18,13 +18,13 @@ partial class Human : Entity
         {
             if(_targetMemory.Any() == false) ScanFor(terrain);
             MoveTo();
-            ExecuteWork();
+            ExecuteWork(terrain);
         }
     }
 
     public virtual void ScanFor(Terrain terrain)
     {
-        Resource target = _targetResource;
+        ResourceType target = _targetResource;
 
         int x = 0;
         int y = 0;
@@ -32,28 +32,34 @@ partial class Human : Entity
         for (; y < Terrain.MaxSizeY; y++)
         for (; x < Terrain.MaxSizeX; x++)
         {
-            if (terrain.Grid![x,y].Position == target.Position)
+            if (terrain.Grid![x,y].Resource.Type == target)
             {
                 _targetMemory.Add(new Position(terrain.Grid[x,y].Position.X, terrain.Grid[x,y].Position.Y));
             }
         }
     }
 
-    public virtual Position MoveTo()
+    public virtual void MoveTo()
     {
         Position chosenTarget = _targetMemory[0];
 
-        if (Position.X < chosenTarget.X) return new Position(Position.X + 1, Position.Y);
-        else if (Position.Y < chosenTarget.Y) return new Position(Position.X, Position.Y + 1);
+        if (Position.X < chosenTarget.X) _targetPosition = new Position(Position.X + 1, Position.Y);
+        else if (Position.Y < chosenTarget.Y) _targetPosition = new Position(Position.X, Position.Y + 1);
 
-        if (Position.X > chosenTarget.X) return new Position(Position.X - 1, Position.Y);
-        else if (Position.Y > chosenTarget.Y) return new Position(Position.X, Position.Y - 1);
+        if (Position.X > chosenTarget.X) _targetPosition = new Position(Position.X - 1, Position.Y);
+        else if (Position.Y > chosenTarget.Y) _targetPosition = new Position(Position.X, Position.Y - 1);
 
-        return Position;
+        _targetPosition = Position;
     }
 
-    public void ExecuteWork()
+    public void ExecuteWork(Terrain terrain)
     {
-        
+        if (Position == _targetPosition)
+        {
+            if (terrain.Grid![Position.X, Position.Y].Resource.Type == _targetResource)
+            {
+                
+            }
+        }
     }
 }
