@@ -8,7 +8,7 @@ partial class Entity : ITargetable // AI
     {
         
     }
-    public void MoveTo()
+    public virtual void MoveTo(Terrain terrain)
     {
         
     }
@@ -20,13 +20,18 @@ partial class Human : Entity
     {
         if (!IsExhausted)
         {
-            if(_targetMemory.Any() == false) ScanFor(terrain);
+            if(_targetMemory.Any() == false && !IsExhausted) ScanFor(terrain);
             MoveTo();
             ExecuteWork(terrain);
         }
+        else if (IsExhausted)
+        {
+            _targetPosition = SpawnPoint;
+            MoveTo();
+        }
     }
 
-    public virtual void ScanFor(Terrain terrain)
+    public void ScanFor(Terrain terrain)
     {
         ResourceType target = _targetResource;
         //Console.WriteLine($"Target: {target}");
@@ -39,18 +44,27 @@ partial class Human : Entity
             && terrain.Grid![x,y].Resource.Status is GrowthProcess.Ripe)
             {
                 //Console.WriteLine($"FOUND RIPE TARGET at {x},{y}");
-                Thread.Sleep(500);
+                //Thread.Sleep(500);
                 _targetMemory.Add(new Position(terrain.Grid[x,y].Position.X, terrain.Grid[x,y].Position.Y));
             }
         }
         //Console.WriteLine("IS SCANNED");
     }
 
-    public virtual void MoveTo()
+    public void MoveTo()
     {
+        Position chosenTarget;
         //Console.WriteLine("IS MovingStart");
-        if (_targetMemory.Count == 0) return;
-        Position chosenTarget = _targetMemory[0];
+        if (!IsExhausted && _targetMemory.Count == 0) return;
+        else if (!IsExhausted && _targetMemory.Count != 0) chosenTarget = _targetMemory[0];
+        else if (IsExhausted)
+        {
+            _targetMemory.Clear();
+            _targetPosition = SpawnPoint;
+            //return;
+        }
+        
+        chosenTarget = _targetMemory[0];
 
         if (Position.X < chosenTarget.X && Position.Y < chosenTarget.Y) _targetPosition = new Position(Position.X + 1, Position.Y + 1);
         else if (Position.X > chosenTarget.X && Position.Y > chosenTarget.Y) _targetPosition = new Position(Position.X - 1, Position.Y - 1);
@@ -70,9 +84,11 @@ partial class Human : Entity
     {
         if (Position == _targetPosition)
         {
-            if (terrain.Grid![Position.X, Position.Y].Resource.Type == _targetResource)
+            if (terrain.Grid![Position.X, Position.Y].Resource.Type == _targetResource
+            && (terrain.Grid![Position.X, Position.Y].Resource.Status is GrowthProcess.Ripe))
             {
-                
+                terrain.Grid![Position.X, Position.Y].Resource.Status = GrowthProcess.Harvested;
+                Stamina--;
             }
         }
     }

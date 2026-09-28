@@ -42,7 +42,7 @@ abstract partial class Entity : ITargetable
 
 partial class Human : Entity
 {
-    public const int StaminaMax = 100;
+    public const int StaminaMax = 50;
     public int Stamina {get => field; set
         {
             if (field < 0) field = 0;
