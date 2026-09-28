@@ -40,7 +40,7 @@ abstract partial class Entity : ITargetable
     }
 }
 
-partial class Human : Entity
+abstract partial class Human : Entity
 {
     public const int StaminaMax = 50;
     public int Stamina {get => field; set
@@ -54,20 +54,30 @@ partial class Human : Entity
             else if (Stamina == StaminaMax) field = false;
         }} = false;
     public Profession Profession {get; set;} = Profession.None;
-    private ResourceType _targetResource => Profession switch
+    public ResourceType TargetResource => Profession switch
             {
                 Profession.Farmer => ResourceType.Wheat,
                 Profession.Forager => ResourceType.Mushrooms,
                 Profession.None => ResourceType.None,
                 _ => ResourceType.None
             };
-    private List<Position> _targetMemory {get; set;} = new List<Position>();
-    private Position _targetPosition {get; set;}
+    public List<Position> TargetMemory {get; set;} = new List<Position>();
+    public Position TargetPosition {get; set;}
 
     public Human(string name, char icon, Position position, Profession profession) : base(name, icon, position)
     {
         Profession = profession;
         Position = position;
-        _targetPosition = position;
+        TargetPosition = position;
+    }
+}
+
+partial class Farmer : Human
+{
+    public Farmer(string name, char icon, Position position, Profession profession) : base(name, icon, position, profession)
+    {
+        Profession = profession;
+        Position = position;
+        TargetPosition = position;
     }
 }

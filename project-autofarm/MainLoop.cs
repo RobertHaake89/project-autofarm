@@ -15,7 +15,7 @@ class General
             Renderer.Screen(terrain, entityDict);
 
             //Console.ReadKey();
-            Thread.Sleep(300);
+            //Thread.Sleep(300);
         }
     }
 
