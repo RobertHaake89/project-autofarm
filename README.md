@@ -120,3 +120,7 @@ This project is licensed under the MIT License.
 * **23-09-26** — Refac: Tile TextureRefresher to switch-expression. Scanner for resources WIP
 * **24-09-26** — WIP: Human's scanner needs compatibility with ITargetable
 * **25-09-26** — Made Entity partial into tree and AI. WIP ScanFor and MoveTo
+* **26-09-26** — Milestone: MoveTo is working!
+* **27-09-26** — NPC can harvest wheat but needs polish
+* **28-09-26** — Partial Entity class and inheritance of Professions
+* **29-09-26** — Harvesting works well so far. Renamed Pine to Spruce. Added some images

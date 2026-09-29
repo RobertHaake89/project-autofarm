@@ -34,8 +34,6 @@ abstract partial class Human : Entity
         else if (Position.X > chosenTarget.X) Position = new Position(Position.X - 1, Position.Y);
         else if (Position.Y > chosenTarget.Y) Position = new Position(Position.X, Position.Y - 1);
 
-        //Position = currentPosition;
-
         TargetPosition = chosenTarget;
         if (Position == chosenTarget) TargetMemory.RemoveAt(0);
     }
@@ -47,17 +45,13 @@ partial class Farmer : Human
     {
         if (!IsExhausted)
         {
-            //Console.WriteLine("seems not exhausted");
-            Thread.Sleep(300);
-            if(TargetMemory.Any() == false && !IsExhausted) ScanFor(terrain);
+            ScanFor(terrain);
+            
             MoveTo(terrain);
             DoWork(terrain);
-            //if(TargetMemory.Any() == false && !IsExhausted) Reseed(terrain);
         }
         else if (IsExhausted)
         {
-            //Console.WriteLine("seems exhausted");
-            Thread.Sleep(300);
             TargetPosition = SpawnPoint;
             MoveTo(terrain);
         }
@@ -65,10 +59,6 @@ partial class Farmer : Human
 
     public override void ScanFor(Terrain terrain)
     {
-        //ResourceType target = TargetResource;
-        //Console.WriteLine($"Target: {target}");
-        //Thread.Sleep(500);
-
         for (int y = 0; y < Terrain.MaxSizeY; y++)
         {
             int start = y % 2 == 0 ? 0 : Terrain.MaxSizeX - 1;
@@ -77,65 +67,57 @@ partial class Farmer : Human
 
             for (int x = start; x != end; x += step)
             {
-
-            if (terrain.Grid![x,y].Resource.Type == TargetResource)
-            {
-                if (terrain.Grid![x,y].Resource.Status is GrowthProcess.Ripe)
+                if (terrain.Grid![x,y].Resource.Type == TargetResource)
                 {
-                    TargetMemory.Add(new Position(terrain.Grid[x,y].Position.X, terrain.Grid[x,y].Position.Y));
-                }
-                else if (terrain.Grid![x,y].Resource.Status is GrowthProcess.Harvested)
-                {
-                    TargetMemory.Add(new Position(terrain.Grid[x,y].Position.X, terrain.Grid[x,y].Position.Y));
+                    if (terrain.Grid![x,y].Resource.Status is GrowthProcess.Ripe)
+                    {
+                        TargetMemory.Add(new Position(terrain.Grid[x,y].Position.X, terrain.Grid[x,y].Position.Y));                            
+                    }
+                    else if (terrain.Grid![x,y].Resource.Status is GrowthProcess.Fallow)
+                    {
+                        TargetMemory.Add(new Position(terrain.Grid[x,y].Position.X, terrain.Grid[x,y].Position.Y));
+                    }
+                    else if (terrain.Grid![x,y].Resource.Status is GrowthProcess.Plowed)
+                    {
+                        TargetMemory.Add(new Position(terrain.Grid[x,y].Position.X, terrain.Grid[x,y].Position.Y));
+                    }
+                    else if (/* !TargetMemory.Any() &&  */terrain.Grid![x,y].Resource.Status is GrowthProcess.Harvested)
+                    {
+                        TargetMemory.Add(new Position(terrain.Grid[x,y].Position.X, terrain.Grid[x,y].Position.Y));
+                    }
                 }
             }
         }
-    }
-        
-        //Console.WriteLine("IS SCANNED");
     }
 
     public void DoWork(Terrain terrain)
     {
-        if (Position == TargetPosition)
+        if (TargetResource is ResourceType.Wheat && Position == TargetPosition)
         {
-            //Console.WriteLine("is on target");
-            //Thread.Sleep(300);
             if (terrain.Grid![Position.X, Position.Y].Resource.Type == TargetResource)
-                if (terrain.Grid![Position.X, Position.Y].Resource.Status is GrowthProcess.Harvested)
+            {
+                if (terrain.Grid![Position.X, Position.Y].Resource.Status is GrowthProcess.Ripe)
                 {
-                    //Console.WriteLine("is sowing");
-                    //Thread.Sleep(300);
+                    terrain.Grid![Position.X, Position.Y].Resource.Status = GrowthProcess.Harvested;
+                    return;
+                }
+                    else if (terrain.Grid![Position.X, Position.Y].Resource.Status is GrowthProcess.Harvested)
+                {
                     terrain.Grid![Position.X, Position.Y].Resource.Status = GrowthProcess.Sown;
                 }
-                else if (terrain.Grid![Position.X, Position.Y].Resource.Status is GrowthProcess.Ripe)
+                    else if (terrain.Grid![Position.X, Position.Y].Resource.Status is GrowthProcess.Fallow)
                 {
-                    //Console.WriteLine("is Harvesting");
-                    //Thread.Sleep(300);
-                    terrain.Grid![Position.X, Position.Y].Resource.Status = GrowthProcess.Harvested;
+                    terrain.Grid![Position.X, Position.Y].Resource.Status = GrowthProcess.Plowed;
                 }
-                
-                Stamina--;
-                Console.WriteLine(Stamina);
+                    else if (terrain.Grid![Position.X, Position.Y].Resource.Status is GrowthProcess.Plowed)
+                {
+                    terrain.Grid![Position.X, Position.Y].Resource.Status = GrowthProcess.Sown;
+                }
 
-                    
-                
-            
-                    
+                //Stamina--;
+                //Console.WriteLine(Stamina);      
             }
-            
         }
     }
+}
 
-    /* public void Reseed(Terrain terrain)
-    {
-        if (Position == TargetPosition)
-        {
-            if (terrain.Grid![Position.X, Position.Y].Resource.Type == TargetResource
-            && (terrain.Grid![Position.X, Position.Y].Resource.Status is GrowthProcess.Harvested))
-            {
-                terrain.Grid![Position.X, Position.Y].Resource.Status = GrowthProcess.Sown;
-                Stamina--;
-            }
-        }
-    } */

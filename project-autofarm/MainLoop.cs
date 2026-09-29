@@ -15,7 +15,7 @@ class General
             Renderer.Screen(terrain, entityDict);
 
             //Console.ReadKey();
-            //Thread.Sleep(300);
+            Thread.Sleep(100);
         }
     }
 
@@ -27,7 +27,7 @@ class General
             {
                 terrain.Grid![x,y].Resource.GiveGrowthChance();
 
-                terrain.Grid![x,y].TextureRefresher();
+                terrain.Grid![x,y].UpdateAcre();
             }
         }
         entityDict["human1"].RunSchedule(terrain);

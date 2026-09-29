@@ -7,6 +7,7 @@ acre_wheat_sown,
 acre_wheat_growing,░
 acre_wheat_mature,▒
 acre_wheat_ripe,▓
+acre_wheat_harvested,┄
 acre_carot,❦
 forage_mushroom1,♣
 forage_mushroom2,♧
@@ -42,11 +43,11 @@ tree_oak_top,@
 tree_oak_branch_left,\
 tree_oak_branch_right,/
 tree_oak_stem,█
-tree_pine_top,⋀
-tree_pine_side_left,/
-tree_pine_side_right,\
-tree_pine_centre,^
-tree_pine_stem,█
+tree_spruce_top,⋀
+tree_spruce_side_left,/
+tree_spruce_side_right,\
+tree_spruce_centre,^
+tree_spruce_stem,█
 water_wave1,~
 water_wave2,≈
 water_wave3,≋

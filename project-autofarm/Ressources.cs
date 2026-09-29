@@ -11,7 +11,8 @@ public enum ResourceType
     }
     public enum GrowthProcess
     {
-        None = 0,
+        Fallow = 0,
+        Plowed,
         Sown,
         Young,
         Mature,
@@ -38,7 +39,7 @@ class Resource : ITargetable, IHarvestable
     {
         int factor = Type switch
         {
-            ResourceType.Wheat => 10,
+            ResourceType.Wheat => 15,
             ResourceType.Mushrooms => 20,
             _ => 10
         };

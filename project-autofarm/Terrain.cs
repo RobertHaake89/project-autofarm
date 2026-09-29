@@ -22,7 +22,7 @@ partial class Terrain // Data and Parameters
 
         int quantityOak = Random.Shared.Next(5, 8);
         for (int i = 0; i < quantityOak; i++)
-        CreatePineTree(xMin:30, yMin:0, xMax: 83, yMax: 4);
+        CreateSpruceTree(xMin:30, yMin:0, xMax: 83, yMax: 4);
 
         CreateOakTree(xMin:5, yMin:13, xMax: 20, yMax: 15);
 
@@ -83,7 +83,7 @@ partial class Terrain // Creation Methods
         {
             for (int incX = OffsetMin.X; incX < OffsetMax.X; incX++)
             {
-                Grid![incX,incY].Resource = new Resource(ResourceType.Wheat, GrowthProcess.Sown, (incX,incY));
+                Grid![incX,incY].Resource = new Resource(ResourceType.Wheat, GrowthProcess.Fallow, (incX,incY));
             }
         }
     }
@@ -148,25 +148,25 @@ partial class Terrain // Creation Methods
         }
     }
 
-    private void CreatePineTree(int xMin, int yMin, int xMax, int yMax)
+    private void CreateSpruceTree(int xMin, int yMin, int xMax, int yMax)
     {
-        string[,] pineArray =
+        string[,] spruceArray =
         {
-            {"skip", "skip", "skip", "tree_pine_top", "skip", "skip", "skip"},
-            {"skip", "skip", "tree_pine_side_left", "tree_pine_centre", "tree_pine_side_right", "skip", "skip"},
-            {"skip", "tree_pine_side_left", "tree_pine_centre", "tree_pine_centre", "tree_pine_centre", "tree_pine_side_right", "skip"},
-            {"skip", "skip", "skip","tree_pine_stem", "skip", "skip", "skip"},
+            {"skip", "skip", "skip", "tree_spruce_top", "skip", "skip", "skip"},
+            {"skip", "skip", "tree_spruce_side_left", "tree_spruce_centre", "tree_spruce_side_right", "skip", "skip"},
+            {"skip", "tree_spruce_side_left", "tree_spruce_centre", "tree_spruce_centre", "tree_spruce_centre", "tree_spruce_side_right", "skip"},
+            {"skip", "skip", "skip","tree_spruce_stem", "skip", "skip", "skip"},
         };
 
         int posX = Random.Shared.Next(xMin, xMax);
         int posY = Random.Shared.Next(yMin, yMax);
 
-        for (int incY = 0; incY < pineArray.GetLength(0); incY++)
+        for (int incY = 0; incY < spruceArray.GetLength(0); incY++)
         {
-            for (int incX = 0; incX < pineArray.GetLength(1); incX++)
+            for (int incX = 0; incX < spruceArray.GetLength(1); incX++)
             {
-                if (pineArray[incY,incX] != "skip")
-                Grid![incX + posX,incY + posY].Texture.TextureName = pineArray[incY,incX];
+                if (spruceArray[incY,incX] != "skip")
+                Grid![incX + posX,incY + posY].Texture.TextureName = spruceArray[incY,incX];
             }
         }
 
