@@ -5,7 +5,7 @@ namespace ProjectAutofarm;
 
 abstract partial class Entity : ITargetable // AI
 {
-    public abstract void RunSchedule(Terrain terrain);
+    public abstract Task RunSchedule(Terrain terrain);
     public abstract void ScanFor(Terrain terrain);
     public abstract void MoveTo(Terrain terrain);
 }
@@ -41,19 +41,26 @@ abstract partial class Human : Entity
 
 partial class Farmer : Human
 {
-    public override void RunSchedule(Terrain terrain)
+    public override async Task RunSchedule(Terrain terrain)
     {
-        if (!IsExhausted)
+        while (true)
         {
-            ScanFor(terrain);
-            
-            MoveTo(terrain);
-            DoWork(terrain);
-        }
-        else if (IsExhausted)
-        {
-            TargetPosition = SpawnPoint;
-            MoveTo(terrain);
+            if (!IsExhausted)
+            {
+                ScanFor(terrain);
+                await Task.Delay(10);
+                
+                MoveTo(terrain);
+                await Task.Delay(300);
+                DoWork(terrain);
+                await Task.Delay(80);
+            }
+            else if (IsExhausted)
+            {
+                TargetPosition = SpawnPoint;
+                MoveTo(terrain);
+            }
+            //await Task.Delay(400);
         }
     }
 

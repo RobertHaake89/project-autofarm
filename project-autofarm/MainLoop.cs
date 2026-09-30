@@ -4,22 +4,29 @@ namespace ProjectAutofarm;
 
 class General
 {
-    public static void MainLoop(Terrain terrain, Dictionary<string, Entity> entityDict)
+    public static async Task MainLoop(Terrain terrain, Dictionary<string, Entity> entityDict)
     {
         Console.Clear();
+        var tasks = new List <Task>();
+        
+        foreach (Entity entity in entityDict.Values)
+        {
+            tasks.Add(entity.RunSchedule(terrain));
+        }
 
         while (true)
         {
-            UpdateGame(terrain, entityDict);
+            await UpdateGame(terrain, entityDict);
 
             Renderer.Screen(terrain, entityDict);
 
             //Console.ReadKey();
-            Thread.Sleep(100);
+            await Task.Delay(60);
         }
+        //await Task.WhenAll(tasks);
     }
 
-    public static void UpdateGame(Terrain terrain, Dictionary<string, Entity> entityDict)
+    public static async Task UpdateGame(Terrain terrain, Dictionary<string, Entity> entityDict)
     {
         for (int y = 0; y < Terrain.MaxSizeY; y++)
         {
@@ -30,7 +37,7 @@ class General
                 terrain.Grid![x,y].UpdateAcre();
             }
         }
-        entityDict["human1"].RunSchedule(terrain);
+        //entityDict["human1"].RunSchedule(terrain);
         //Thread.Sleep(2000);
 
     }

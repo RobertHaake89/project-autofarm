@@ -62,7 +62,7 @@ abstract partial class Human : Entity
                 _ => ResourceType.None
             };
     public List<Position> TargetMemory {get; set;} = new List<Position>();
-    public Position TargetPosition {get; set;}
+    public Position TargetPosition;
 
     public Human(string name, char icon, Position position, Profession profession) : base(name, icon, position)
     {

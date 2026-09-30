@@ -4,7 +4,7 @@ namespace ProjectAutofarm;
 
 class Program
 {
-    public static void Main()
+    public static async Task Main()
     {
         Console.OutputEncoding = System.Text.Encoding.UTF8;
         Console.CursorVisible = false;
@@ -29,6 +29,6 @@ class Program
             {"human2", human2}
         };
         
-        General.MainLoop(terrain, entityList);
+        await General.MainLoop(terrain, entityList);
     }
 }
