@@ -7,26 +7,26 @@ class General
     public static async Task MainLoop(Terrain terrain, Dictionary<string, Entity> entityDict)
     {
         Console.Clear();
-        var tasks = new List <Task>();
+        //var tasks = new List <Task>();
         
         foreach (Entity entity in entityDict.Values)
         {
-            tasks.Add(entity.RunSchedule(terrain));
+            _ = entity.RunSchedule(terrain, scanTime: 40, moveSpeed: 60, workSpeed: 20);
         }
 
         while (true)
         {
-            await UpdateGame(terrain, entityDict);
+            await UpdateGame(terrain);
 
             Renderer.Screen(terrain, entityDict);
 
             //Console.ReadKey();
-            await Task.Delay(60);
+            await Task.Delay(100); // 60
         }
         //await Task.WhenAll(tasks);
     }
 
-    public static async Task UpdateGame(Terrain terrain, Dictionary<string, Entity> entityDict)
+    public static async Task UpdateGame(Terrain terrain)
     {
         for (int y = 0; y < Terrain.MaxSizeY; y++)
         {
@@ -37,8 +37,6 @@ class General
                 terrain.Grid![x,y].UpdateAcre();
             }
         }
-        //entityDict["human1"].RunSchedule(terrain);
-        //Thread.Sleep(2000);
 
     }
 }

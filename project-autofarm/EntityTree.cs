@@ -13,6 +13,7 @@ enum Status
 {
     Idle = 0,
     Working,
+    Exhausted,
     Resting,
     Sleeping,
     Chatting
@@ -48,11 +49,11 @@ abstract partial class Human : Entity
             if (field < 0) field = 0;
             else if (field > StaminaMax) field = StaminaMax;
         }} = StaminaMax;
-    public bool IsExhausted {get => field; set
+    /* public bool IsExhausted {get => field; set
         {
             if (Stamina == 0) field = true;
             else if (Stamina == StaminaMax) field = false;
-        }} = false;
+        }} = false; */
     public Profession Profession {get; set;} = Profession.None;
     public ResourceType TargetResource => Profession switch
             {
@@ -63,21 +64,25 @@ abstract partial class Human : Entity
             };
     public List<Position> TargetMemory {get; set;} = new List<Position>();
     public Position TargetPosition;
+    public Position IdlePosition;
 
-    public Human(string name, char icon, Position position, Profession profession) : base(name, icon, position)
+    public Human(string name, char icon, Position position, Position idlePosition, Profession profession) : base(name, icon, position)
     {
         Profession = profession;
         Position = position;
         TargetPosition = position;
+        IdlePosition = idlePosition;
     }
 }
 
 partial class Farmer : Human
 {
-    public Farmer(string name, char icon, Position position, Profession profession) : base(name, icon, position, profession)
+    public Farmer(string name, char icon, Position position, Position idlePosition, Profession profession) : base(name, icon, position, idlePosition, profession)
     {
         Profession = profession;
         Position = position;
         TargetPosition = position;
+        IdlePosition = idlePosition;
+
     }
 }

@@ -32,7 +32,7 @@ class Renderer
         RenderEntity (entityDict["human2"]);
     }
 
-    public static async void RenderEntity(Entity entity)
+    public static void RenderEntity(Entity entity)
     {
         Console.SetCursorPosition(entity.Position.X, entity.Position.Y);
         Console.Write(entity.Icon);

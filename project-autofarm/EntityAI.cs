@@ -5,7 +5,7 @@ namespace ProjectAutofarm;
 
 abstract partial class Entity : ITargetable // AI
 {
-    public abstract Task RunSchedule(Terrain terrain);
+    public abstract Task RunSchedule(Terrain terrain, int scanTime, int moveSpeed, int workSpeed);
     public abstract void ScanFor(Terrain terrain);
     public abstract void MoveTo(Terrain terrain);
 }
@@ -15,14 +15,13 @@ abstract partial class Human : Entity
     public override void MoveTo(Terrain terrain)
     {
         Position chosenTarget;
-        //Position currentPosition;
 
-        if (!IsExhausted && TargetMemory.Count == 0) return;
-        else if (!IsExhausted && TargetMemory.Count != 0) chosenTarget = TargetMemory[0];
-        else if (IsExhausted)
+        if (Status is not Status.Exhausted && TargetMemory.Count == 0) return;
+        else if (Status is not Status.Exhausted && TargetMemory.Count != 0) chosenTarget = TargetMemory[0];
+        else if (Status is Status.Exhausted)
         {
             TargetMemory.Clear();
-            chosenTarget = SpawnPoint;
+            chosenTarget = IdlePosition;
         }
         
         else chosenTarget = TargetMemory[0];
@@ -35,30 +34,49 @@ abstract partial class Human : Entity
         else if (Position.Y > chosenTarget.Y) Position = new Position(Position.X, Position.Y - 1);
 
         TargetPosition = chosenTarget;
-        if (Position == chosenTarget) TargetMemory.RemoveAt(0);
+        if (Status is not Status.Exhausted
+        && Position == chosenTarget
+        && TargetMemory.Any()) TargetMemory.RemoveAt(0);
     }
 }
 
 partial class Farmer : Human
 {
-    public override async Task RunSchedule(Terrain terrain)
+    public override async Task RunSchedule(Terrain terrain, int scanTime, int moveSpeed, int workSpeed)
     {
         while (true)
         {
-            if (!IsExhausted)
+            if (Status is Status.Idle)
             {
-                ScanFor(terrain);
-                await Task.Delay(10);
+                Status = Status.Working;
+            }
+            if (Status is Status.Working)
+            {
+                if (!TargetMemory.Any()) ScanFor(terrain);
+                //await Task.Delay(scanTime);
                 
                 MoveTo(terrain);
-                await Task.Delay(300);
+                //await Task.Delay(moveSpeed);
                 DoWork(terrain);
-                await Task.Delay(80);
+                await Task.Delay(moveSpeed);
+
+                //Console.WriteLine(Status);
+                //Console.WriteLine(IdlePosition);
             }
-            else if (IsExhausted)
+            else if (Status is Status.Exhausted)
             {
-                TargetPosition = SpawnPoint;
+                if (Position == IdlePosition) Status = Status.Resting;
+
+                //TargetPosition = IdlePosition;
                 MoveTo(terrain);
+
+                await Task.Delay(moveSpeed * 2);
+            }
+            else if (Status is Status.Resting)
+            {
+                TargetMemory.Clear();
+                await Task.Delay(10000);
+                Status = Status.Idle;
             }
             //await Task.Delay(400);
         }
@@ -94,7 +112,9 @@ partial class Farmer : Human
                     }
                 }
             }
+            TargetMemory = TargetMemory.Distinct().ToList();
         }
+        if (!TargetMemory.Any()) Status = Status.Exhausted;
     }
 
     public void DoWork(Terrain terrain)
@@ -120,8 +140,6 @@ partial class Farmer : Human
                 {
                     terrain.Grid![Position.X, Position.Y].Resource.Status = GrowthProcess.Sown;
                 }
-
-                //Stamina--;
                 //Console.WriteLine(Stamina);      
             }
         }
