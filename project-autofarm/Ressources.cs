@@ -39,7 +39,7 @@ class Resource : ITargetable, IHarvestable
     {
         int factor = Type switch
         {
-            ResourceType.Wheat => 8,
+            ResourceType.Wheat => 20,
             ResourceType.Mushrooms => 60,
             _ => 10
         };

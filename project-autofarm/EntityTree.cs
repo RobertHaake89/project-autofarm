@@ -76,8 +76,8 @@ partial class Human : Entity
                 Specialisation.Wheat => ResourceType.Wheat,
                 _ => ResourceType.None
             };
-    public ProcessingMode ProcessMode {get; set;} = ProcessingMode.None;
-    
+    public ProcessingMode Mode {get; set;} = ProcessingMode.None;
+    public int TargetMemorySize {get; set;} = 0;
     public List<Position> TargetMemory {get; set;} = new List<Position>();
 
     public Human(string name, char icon, Gender gender,Profession profession, Specialisation specialisation, Position position) : base(name, icon, gender, position)
