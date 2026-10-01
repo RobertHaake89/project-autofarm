@@ -2,46 +2,92 @@ using System;
 
 namespace ProjectAutofarm;
 
-enum Profession
-{
-    None = 0,
-    Farmer,
-    Forager
-}
 
-enum Status
-{
-    Idle = 0,
-    Working,
-    Exhausted,
-    Resting,
-    Sleeping,
-    Chatting
-}
+public enum Gender
+    {
+        None = 0,
+        Male,
+        Female
+    }
+    public enum Status
+    {
+        Idle = 0,
+        Working,
+        Exhausted,
+        Resting,
+        Sleeping,
+        Chatting
+    }
+    public enum Profession
+    {
+        None = 0,
+        Farmer,
+        Forager
+    }
 
+    public enum Specialisation
+    {
+        None = 0,
+        Wheat,
+    }
+
+    public enum ProcessingMode
+    {
+        None = 0,
+        Plowing,
+        Sowing,
+        Harvesting
+    }
 abstract partial class Entity : ITargetable
 {
     public string Name {get; set;} = "none";
     public char Icon {get; set;} = ' ';
-    public Position SpawnPoint {get; set;}
+    public Gender Gender {get; init;}
     public Position Position {get => field; set
         {
             field = new Position(
                 Math.Clamp(value.X, 0, Terrain.MaxSizeX),
                 Math.Clamp(value.Y, 0, Terrain.MaxSizeY));
         }}
+    public Position SpawnPoint {get; set;}
+    public Position IdlePosition;
+    public Position TargetPosition;
     public Status Status {get; set;} = Status.Idle;
 
-    public Entity(string name, char icon, Position position)
+    public Entity(string name, char icon, Gender gender, Position position)
     {
         Name = name;
         Icon = icon;
+        Gender = gender;
         SpawnPoint = position;
         Position = position;
+        IdlePosition = SpawnPoint; //new Position(Random.Shared.Next(0, Terrain.MaxSizeX), Random.Shared.Next(0, Random.Shared.Next(0, Terrain.MaxSizeY)));
+        TargetPosition = position;
     }
 }
 
-abstract partial class Human : Entity
+partial class Human : Entity
+{
+    public Profession Profession {get; set;}
+    public Specialisation Specialisation {get; set;} = Specialisation.Wheat;
+    //public int FieldSize {get => TargetMemory.Count;}
+    public ResourceType TargetResource => Specialisation switch
+            {
+                Specialisation.Wheat => ResourceType.Wheat,
+                _ => ResourceType.None
+            };
+    public ProcessingMode ProcessMode {get; set;} = ProcessingMode.None;
+    
+    public List<Position> TargetMemory {get; set;} = new List<Position>();
+
+    public Human(string name, char icon, Gender gender,Profession profession, Specialisation specialisation, Position position) : base(name, icon, gender, position)
+    {
+        Profession = profession;
+        Specialisation = specialisation;
+    }
+}
+
+/* abstract partial class Worker : Human
 {
     public const int StaminaMax = 50;
     public int Stamina {get => field; set
@@ -49,40 +95,22 @@ abstract partial class Human : Entity
             if (field < 0) field = 0;
             else if (field > StaminaMax) field = StaminaMax;
         }} = StaminaMax;
-    /* public bool IsExhausted {get => field; set
-        {
-            if (Stamina == 0) field = true;
-            else if (Stamina == StaminaMax) field = false;
-        }} = false; */
-    public Profession Profession {get; set;} = Profession.None;
-    public ResourceType TargetResource => Profession switch
-            {
-                Profession.Farmer => ResourceType.Wheat,
-                Profession.Forager => ResourceType.Mushrooms,
-                Profession.None => ResourceType.None,
-                _ => ResourceType.None
-            };
-    public List<Position> TargetMemory {get; set;} = new List<Position>();
-    public Position TargetPosition;
-    public Position IdlePosition;
-
-    public Human(string name, char icon, Position position, Position idlePosition, Profession profession) : base(name, icon, position)
+    
+    public Worker(string name, char icon, Gender gender, Position position) : base(name, icon, gender, position)
     {
-        Profession = profession;
-        Position = position;
-        TargetPosition = position;
-        IdlePosition = idlePosition;
+        
     }
-}
 
-partial class Farmer : Human
+    public abstract void DoWork(Terrain terrain);
+} */
+
+/* partial class Farmer : Worker
 {
-    public Farmer(string name, char icon, Position position, Position idlePosition, Profession profession) : base(name, icon, position, idlePosition, profession)
+    public enum Specialisation
     {
-        Profession = profession;
-        Position = position;
-        TargetPosition = position;
-        IdlePosition = idlePosition;
-
+        None = 0,
+        Wheat,
     }
-}
+    
+    
+} */

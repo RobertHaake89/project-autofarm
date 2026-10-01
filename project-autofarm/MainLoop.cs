@@ -11,7 +11,7 @@ class General
         
         foreach (Entity entity in entityDict.Values)
         {
-            _ = entity.RunSchedule(terrain, scanTime: 40, moveSpeed: 60, workSpeed: 20);
+            _ = entity.RunSchedule(terrain);
         }
 
         while (true)

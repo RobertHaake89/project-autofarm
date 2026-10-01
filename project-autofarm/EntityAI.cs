@@ -1,64 +1,41 @@
 using System;
 using System.Formats.Asn1;
+using System.Runtime.CompilerServices;
 
 namespace ProjectAutofarm;
 
 abstract partial class Entity : ITargetable // AI
 {
-    public abstract Task RunSchedule(Terrain terrain, int scanTime, int moveSpeed, int workSpeed);
+    public abstract Task RunSchedule(Terrain terrain);
+    public abstract void GeneralConditioner(Terrain terrain);
     public abstract void ScanFor(Terrain terrain);
     public abstract void MoveTo(Terrain terrain);
 }
 
-abstract partial class Human : Entity
+partial class Human : Entity
 {
-    public override void MoveTo(Terrain terrain)
-    {
-        Position chosenTarget;
-
-        if (Status is not Status.Exhausted && TargetMemory.Count == 0) return;
-        else if (Status is not Status.Exhausted && TargetMemory.Count != 0) chosenTarget = TargetMemory[0];
-        else if (Status is Status.Exhausted)
-        {
-            TargetMemory.Clear();
-            chosenTarget = IdlePosition;
-        }
-        
-        else chosenTarget = TargetMemory[0];
-
-        if (Position.X < chosenTarget.X && Position.Y < chosenTarget.Y) Position = new Position(Position.X + 1, Position.Y + 1);
-        else if (Position.X > chosenTarget.X && Position.Y > chosenTarget.Y) Position = new Position(Position.X - 1, Position.Y - 1);
-        else if (Position.X < chosenTarget.X) Position = new Position(Position.X + 1, Position.Y);
-        else if (Position.Y < chosenTarget.Y) Position = new Position(Position.X, Position.Y + 1);
-        else if (Position.X > chosenTarget.X) Position = new Position(Position.X - 1, Position.Y);
-        else if (Position.Y > chosenTarget.Y) Position = new Position(Position.X, Position.Y - 1);
-
-        TargetPosition = chosenTarget;
-        if (Status is not Status.Exhausted
-        && Position == chosenTarget
-        && TargetMemory.Any()) TargetMemory.RemoveAt(0);
-    }
-}
-
-partial class Farmer : Human
-{
-    public override async Task RunSchedule(Terrain terrain, int scanTime, int moveSpeed, int workSpeed)
+    public override async Task RunSchedule(Terrain terrain)
     {
         while (true)
         {
-            if (Status is Status.Idle)
+            GeneralConditioner(terrain);
+            await Task.Delay(20);
+        }
+    }
+    public override async void GeneralConditioner(Terrain terrain)
+    {
+        if (Status is Status.Idle)
             {
-                Status = Status.Working;
+                if (Profession is not Profession.None)Status = Status.Working;
             }
             if (Status is Status.Working)
             {
                 if (!TargetMemory.Any()) ScanFor(terrain);
-                //await Task.Delay(scanTime);
                 
                 MoveTo(terrain);
-                //await Task.Delay(moveSpeed);
-                DoWork(terrain);
-                await Task.Delay(moveSpeed);
+                
+                if (Profession is Profession.Farmer) DoFarmWork(terrain);
+                await Task.Delay(200);
 
                 //Console.WriteLine(Status);
                 //Console.WriteLine(IdlePosition);
@@ -70,7 +47,7 @@ partial class Farmer : Human
                 //TargetPosition = IdlePosition;
                 MoveTo(terrain);
 
-                await Task.Delay(moveSpeed * 2);
+                await Task.Delay(400);
             }
             else if (Status is Status.Resting)
             {
@@ -78,8 +55,6 @@ partial class Farmer : Human
                 await Task.Delay(10000);
                 Status = Status.Idle;
             }
-            //await Task.Delay(400);
-        }
     }
 
     public override void ScanFor(Terrain terrain)
@@ -94,32 +69,69 @@ partial class Farmer : Human
             {
                 if (terrain.Grid![x,y].Resource.Type == TargetResource)
                 {
-                    if (terrain.Grid![x,y].Resource.Status is GrowthProcess.Ripe)
+                    if (terrain.Grid![x,y].Resource.Status is GrowthProcess.Fallow)
+                    {
+                        ProcessMode = ProcessingMode.Plowing;
+                        TargetMemory.Add(new Position(terrain.Grid[x,y].Position.X, terrain.Grid[x,y].Position.Y));
+                    }
+                    else if (terrain.Grid![x,y].Resource.Status is GrowthProcess.Ripe/*  && ProcessMode is ProcessingMode.Harvesting */)
                     {
                         TargetMemory.Add(new Position(terrain.Grid[x,y].Position.X, terrain.Grid[x,y].Position.Y));                            
                     }
-                    else if (terrain.Grid![x,y].Resource.Status is GrowthProcess.Fallow)
+                    else if (terrain.Grid![x,y].Resource.Status is GrowthProcess.Plowed/*  && ProcessMode is ProcessingMode.Sowing */)
                     {
                         TargetMemory.Add(new Position(terrain.Grid[x,y].Position.X, terrain.Grid[x,y].Position.Y));
                     }
-                    else if (terrain.Grid![x,y].Resource.Status is GrowthProcess.Plowed)
-                    {
-                        TargetMemory.Add(new Position(terrain.Grid[x,y].Position.X, terrain.Grid[x,y].Position.Y));
-                    }
-                    else if (/* !TargetMemory.Any() &&  */terrain.Grid![x,y].Resource.Status is GrowthProcess.Harvested)
+                    else if (terrain.Grid![x,y].Resource.Status is GrowthProcess.Harvested/*  && ProcessMode is ProcessingMode.Sowing */)
                     {
                         TargetMemory.Add(new Position(terrain.Grid[x,y].Position.X, terrain.Grid[x,y].Position.Y));
                     }
                 }
             }
             TargetMemory = TargetMemory.Distinct().ToList();
+            
         }
-        if (!TargetMemory.Any()) Status = Status.Exhausted;
+        if (!TargetMemory.Any() && ProcessMode is ProcessingMode.Harvesting)
+        {
+            Status = Status.Exhausted;
+            ProcessMode = ProcessingMode.None;
+            
+        }
+        
+    }
+    public override void MoveTo(Terrain terrain)
+    {
+        Position chosenTarget;
+
+        if (Status is not Status.Exhausted && TargetMemory.Count == 0) return;
+        else if (Status is not Status.Exhausted && TargetMemory.Count != 0)
+        {
+            chosenTarget = TargetMemory[0];
+            TargetPosition = chosenTarget;
+        }
+        
+        else if (Status is Status.Exhausted)
+        {
+            TargetMemory.Clear();
+            chosenTarget = IdlePosition;
+        }
+        else chosenTarget = TargetMemory[0];
+
+        if (Position.X < chosenTarget.X && Position.Y < chosenTarget.Y) Position = new Position(Position.X + 1, Position.Y + 1);
+        else if (Position.X > chosenTarget.X && Position.Y > chosenTarget.Y) Position = new Position(Position.X - 1, Position.Y - 1);
+        else if (Position.X < chosenTarget.X) Position = new Position(Position.X + 1, Position.Y);
+        else if (Position.Y < chosenTarget.Y) Position = new Position(Position.X, Position.Y + 1);
+        else if (Position.X > chosenTarget.X) Position = new Position(Position.X - 1, Position.Y);
+        else if (Position.Y > chosenTarget.Y) Position = new Position(Position.X, Position.Y - 1);
+
+        if (Status is not Status.Exhausted
+        && Position == chosenTarget
+        && TargetMemory.Any()) TargetMemory.RemoveAt(0); 
     }
 
-    public void DoWork(Terrain terrain)
+    public void DoFarmWork(Terrain terrain)
     {
-        if (TargetResource is ResourceType.Wheat && Position == TargetPosition)
+        if (Specialisation is Specialisation.Wheat && TargetResource is ResourceType.Wheat && Position == TargetPosition)
         {
             if (terrain.Grid![Position.X, Position.Y].Resource.Type == TargetResource)
             {
@@ -145,4 +157,3 @@ partial class Farmer : Human
         }
     }
 }
-

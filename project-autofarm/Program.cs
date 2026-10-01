@@ -20,8 +20,8 @@ class Program
         terrain.CreateMap();
 
         // ♟ ♙ 
-        Entity human1 = new Farmer("Hans", '♟', position: new Position(12,4),idlePosition: new Position(10,13), Profession.Farmer);
-        Entity human2 = new Farmer("Jürgen", '♙', position: new Position(14,4), idlePosition: new Position(14,4), Profession.Forager);
+        Entity human1 = new Human("Hans", '♟', Gender.Male, Profession.Farmer, Specialisation.Wheat, position: new Position(12,4));
+        Entity human2 = new Human("Jürgen", '♙', Gender.Male, Profession.None, Specialisation.None, position: new Position(14,4));
 
         Dictionary<string, Entity> entityList = new Dictionary<string, Entity>()
         {
