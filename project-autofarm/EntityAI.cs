@@ -37,15 +37,11 @@ partial class Human : Entity
                 if (Profession is Profession.Farmer) DoFarmWork(terrain);
             
                 await Task.Delay(200);
-
-                //Console.WriteLine(Status);
-                //Console.WriteLine(IdlePosition);
             }
             else if (Status is Status.Exhausted)
             {
                 if (Position == IdlePosition) Status = Status.Resting;
 
-                //TargetPosition = IdlePosition;
                 MoveTo(terrain);
 
                 await Task.Delay(400);
@@ -72,38 +68,28 @@ partial class Human : Entity
                 {
                     if (terrain.Grid![x,y].Resource.Status is GrowthProcess.Fallow)
                     {
-                        Mode = ProcessingMode.Plowing;
                         TargetMemory.Add(new Position(terrain.Grid[x,y].Position.X, terrain.Grid[x,y].Position.Y));
-                        //TargetMemorySize++;
                     }
-                    else if (terrain.Grid![x,y].Resource.Status is GrowthProcess.Ripe/*  && Mode is ProcessingMode.Harvesting *//*  && TargetMemory.Count == TargetMemorySize */)
+                    else if (terrain.Grid![x,y].Resource.Status is GrowthProcess.Ripe or GrowthProcess.Mature or GrowthProcess.Young)
                     {
                         TargetMemory.Add(new Position(terrain.Grid[x,y].Position.X, terrain.Grid[x,y].Position.Y));                            
                     }
-                    else if (terrain.Grid![x,y].Resource.Status is GrowthProcess.Plowed/*  && Mode is ProcessingMode.Sowing */)
+                    else if (terrain.Grid![x,y].Resource.Status is GrowthProcess.Plowed)
                     {
                         TargetMemory.Add(new Position(terrain.Grid[x,y].Position.X, terrain.Grid[x,y].Position.Y));
                     }
-                    else if (terrain.Grid![x,y].Resource.Status is GrowthProcess.Harvested/*  && Mode is ProcessingMode.Sowing */)
+                    else if (terrain.Grid![x,y].Resource.Status is GrowthProcess.Harvested)
                     {
                         TargetMemory.Add(new Position(terrain.Grid[x,y].Position.X, terrain.Grid[x,y].Position.Y));
                     }
                     
                 }
             }
-
             TargetMemory = TargetMemory.Distinct().ToList();
             if (TargetMemory.Count == TargetMemorySize) Status = Status.Working;
-            
-        }
-        /* if (!TargetMemory.Any() && Mode is ProcessingMode.Harvesting)
-        {
-            Status = Status.Exhausted;
-            Mode = ProcessingMode.None;
-            
-        } */
-        
+        }        
     }
+
     public override void MoveTo(Terrain terrain)
     {
         Position chosenTarget;
@@ -143,29 +129,18 @@ partial class Human : Entity
                 if (terrain.Grid![Position.X, Position.Y].Resource.Status is GrowthProcess.Ripe)
                 {
                     terrain.Grid![Position.X, Position.Y].Resource.Status = GrowthProcess.Harvested;
-                    if (!TargetMemory.Any())
-                    {
-                        Status = Status.Exhausted;
-                        //Mode = ProcessingMode.Sowing;
-                       
-                    }
-                    //Mode = ProcessingMode.Sowing;
-                    //return;
                 }
                     else if (terrain.Grid![Position.X, Position.Y].Resource.Status is GrowthProcess.Harvested)
                 {
                     terrain.Grid![Position.X, Position.Y].Resource.Status = GrowthProcess.Sown;
                     if (!TargetMemory.Any())
                     {
-                        Status = Status.Exhausted;
-                        //Mode = ProcessingMode.Sowing;
-                       
+                        Status = Status.Exhausted;                       
                     }
                 }
                     else if (terrain.Grid![Position.X, Position.Y].Resource.Status is GrowthProcess.Fallow)
                 {
                     terrain.Grid![Position.X, Position.Y].Resource.Status = GrowthProcess.Plowed;
-                    //if (!TargetMemory.Any()) Mode = ProcessingMode.Sowing;
                 }
                     else if (terrain.Grid![Position.X, Position.Y].Resource.Status is GrowthProcess.Plowed)
                 {
@@ -173,9 +148,7 @@ partial class Human : Entity
                     if (!TargetMemory.Any())
                     {
                         Status = Status.Exhausted;
-                        TargetMemorySize = 0;
-                        //Mode = ProcessingMode.Sowing;
-                       
+                        TargetMemorySize = 0;                     
                     }
                 }
                 //Console.WriteLine(Stamina);      
