@@ -41,7 +41,8 @@ public enum Gender
 abstract partial class Entity : ITargetable
 {
     public string Name {get; set;} = "none";
-    public char Icon {get; set;} = ' ';
+    public char Icon { get => Position == SpawnPoint ? ' ' : field;
+    set ;}
     public Gender Gender {get; init;}
     public Position Position {get => field; set
         {
@@ -49,7 +50,7 @@ abstract partial class Entity : ITargetable
                 Math.Clamp(value.X, 0, Terrain.MaxSizeX),
                 Math.Clamp(value.Y, 0, Terrain.MaxSizeY));
         }}
-    public Position SpawnPoint {get; set;}
+    public Position SpawnPoint {get; init;}
     public Position IdlePosition;
     public Position TargetPosition;
     public Status Status {get; set;} = Status.Idle;
