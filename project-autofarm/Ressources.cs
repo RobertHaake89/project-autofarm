@@ -7,6 +7,7 @@ public enum ResourceType
     {
         None = 0,
         Wheat,
+        Wood,
         Mushrooms
     }
     public enum GrowthProcess

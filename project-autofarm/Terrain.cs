@@ -20,10 +20,12 @@ partial class Terrain // Data and Parameters
         CreateStones(0,0,100,100,factor:100);
         CreateField(70,35,90,80);
 
-        int quantityOak = Random.Shared.Next(5, 8);
-        for (int i = 0; i < quantityOak; i++)
-        CreateSpruceTree(xMin:30, yMin:0, xMax: 83, yMax: 4);
+        int quantitySpruce = Random.Shared.Next(5, 8);
+        for (int i = 0; i < quantitySpruce; i++)
+        CreateSpruceTree(xMin:30, yMin:0, xMax: MaxSizeX - 7, yMax: MaxSizeY - 5);
 
+        int quantityOak = Random.Shared.Next(0, 2);
+        for (int i = 0; i < quantityOak; i++)
         CreateOakTree(xMin:5, yMin:13, xMax: 20, yMax: 15);
 
         CreateMushrooms(0,0,95,30,factor:60);
@@ -165,7 +167,7 @@ partial class Terrain // Creation Methods
         {
             for (int incX = 0; incX < spruceArray.GetLength(1); incX++)
             {
-                if (spruceArray[incY,incX] != "skip")
+                if (spruceArray[incY,incX] != "skip" && Grid![incX, incY + 5].Resource.Type is ResourceType.None)
                 Grid![incX + posX,incY + posY].Texture.TextureName = spruceArray[incY,incX];
             }
         }
