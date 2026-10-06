@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 
 namespace ProjectAutofarm;
 
@@ -7,6 +8,7 @@ partial class Terrain // Data and Parameters
     public Tile[,]? Grid {get; private set;} = new Tile[MaxSizeX, MaxSizeY];
     public const int MaxSizeX = 90;
     public const int MaxSizeY = MaxSizeX * (16/9) / 4;
+    public List<Tree> TreeList {get; set;} = new List<Tree>();
 
     public void CreateMap() // xMin, yMin, xMax, yMax, radius?
     {
@@ -20,13 +22,15 @@ partial class Terrain // Data and Parameters
         CreateStones(0,0,100,100,factor:100);
         CreateField(70,35,90,80);
 
-        int quantitySpruce = Random.Shared.Next(5, 8);
-        for (int i = 0; i < quantitySpruce; i++)
-        CreateSpruceTree(xMin:30, yMin:0, xMax: MaxSizeX - 7, yMax: MaxSizeY - 5);
+        CreateTrees(xMin:30, yMin:1, xMax: MaxSizeX - 7, yMax: MaxSizeY - 6);
 
-        int quantityOak = Random.Shared.Next(0, 2);
+        /* int quantitySpruce = Random.Shared.Next(5, 8);
+        for (int i = 0; i < quantitySpruce; i++)
+        CreateSpruceTree(xMin:30, yMin:0, xMax: MaxSizeX - 7, yMax: MaxSizeY - 5); */
+
+        /* int quantityOak = Random.Shared.Next(0, 2);
         for (int i = 0; i < quantityOak; i++)
-        CreateOakTree(xMin:5, yMin:13, xMax: 20, yMax: 15);
+        CreateOakTree(xMin:5, yMin:13, xMax: 20, yMax: 15); */
 
         CreateMushrooms(0,0,95,30,factor:60);
         
@@ -150,6 +154,41 @@ partial class Terrain // Creation Methods
         }
     }
 
+    private void CreateTrees(int xMin, int yMin, int xMax, int yMax)
+    {
+        
+
+        int quantitySpruce = Random.Shared.Next(5, 8);
+        for (int i = 0; i < quantitySpruce; i++)
+        TreeList.Add(new Tree(TreeType.Spruce, new Position(0,0)));
+
+        
+
+        for (int treeIndex = 0; treeIndex < quantitySpruce; treeIndex++)
+        {
+            for (int incY = 0; incY < TreeList[treeIndex].Texture!.GetLength(0); incY++)
+            {
+                int posX = Random.Shared.Next(xMin, xMax);
+                int posY = Random.Shared.Next(yMin, yMax);
+
+                for (int incX = 0; incX < TreeList[treeIndex].Texture!.GetLength(1); incX++)
+                {
+                    if (TreeList[treeIndex].Texture![incY,incX] != "skip"
+                    && Grid![posX,posY+5].Resource.Type is not ResourceType.Wheat) // magic numbers, needs tree lenght and Width / 2
+                    {
+                        TreeList[treeIndex].Position = new Position(posX, posY);
+                        Grid![TreeList[treeIndex].Position.X + incX, TreeList[treeIndex].Position.Y + incY].Texture.TextureName = TreeList[treeIndex].Texture![incY,incX];
+                    }
+                }
+            }
+        }
+
+        TreeList.Sort((a,b) => a.Position.Y.CompareTo(b.Position.Y));
+
+        //foreach (Tree tree in TreeList) Console.WriteLine(tree.Position);
+        //Console.ReadKey();
+    }
+
     private void CreateSpruceTree(int xMin, int yMin, int xMax, int yMax)
     {
         string[,] spruceArray =
@@ -171,12 +210,6 @@ partial class Terrain // Creation Methods
                 Grid![incX + posX,incY + posY].Texture.TextureName = spruceArray[incY,incX];
             }
         }
-
-        /*    ⋀
-             /^\
-            /^^^\
-            /^^^\
-              █   */
     }
 
     private void CreateOakTree(int xMin, int yMin, int xMax, int yMax)
@@ -202,13 +235,6 @@ partial class Terrain // Creation Methods
                 Grid![incX + posX,incY + posY].Texture.TextureName = oakArray[incY,incX];
             }
         }
-
-        /*    @@@@
-            @@@@@@@@
-            @@@@@@@@@
-              \█ @@@
-               █/  
-               █*/
     }
 
     private void CreateMushrooms(int xMin, int yMin, int xMax, int yMax, int factor)

@@ -11,21 +11,24 @@ public enum TreeType
 class Tree
 {
     public string Name {get; set;} = "Tree";
-    public string[,]? Texture {get => field; 
-    init => field = GetTreeTexture();}
+    public string[,]? Texture {get; init;}
     public TreeType Type {get; init;}
     public ResourceType Resource {get; set;} = ResourceType.Wood;
-    public Position Position {get; init;}
+    public GrowthProcess Status {get; set;} = GrowthProcess.Ripe;
+    public Position Position {get; set;}
 
     public Tree(TreeType type, Position position)
     {
         Type = type;
         Position = position;
+        Texture = GetTreeTexture();
+        
     }
 
     public void CreateTree(TreeType type, Position position)
     {
         if (type == TreeType.Spruce) new Tree(TreeType.Spruce, new Position(position.X, position.Y));
+        if (type == TreeType.Oak) new Tree(TreeType.Oak, new Position(position.X, position.Y));
     }
 
     public string[,] GetTreeTexture()
@@ -39,6 +42,11 @@ class Tree
             {"skip", "tree_spruce_side_left", "tree_spruce_centre", "tree_spruce_centre", "tree_spruce_centre", "tree_spruce_side_right", "skip"},
             {"skip", "skip", "skip","tree_spruce_stem", "skip", "skip", "skip"},
         };
+        /*    ⋀
+             /^\
+            /^^^\
+            /^^^\
+              █   */
 
         string[,] oakArray1 =
         {
@@ -49,6 +57,12 @@ class Tree
             {"skip", "skip", "skip", "skip", "skip", "tree_oak_stem", "tree_oak_branch_right", "skip", "skip", "skip", "skip"},
             {"skip", "skip", "skip", "skip", "skip", "tree_oak_stem", "skip", "skip", "skip", "skip", "skip"},
         };
+        /*    @@@@
+            @@@@@@@@
+            @@@@@@@@@
+              \█ @@@
+               █/  
+               █*/
 
         string[,] chosenTexture;
 
