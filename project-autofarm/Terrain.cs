@@ -22,15 +22,8 @@ partial class Terrain // Data and Parameters
         CreateStones(0,0,100,100,factor:100);
         CreateField(70,35,90,80);
 
-        CreateTrees(xMin:MaxSizeX / 3, yMin:1, xMax: MaxSizeX - 8, yMax: MaxSizeY / 3);
-
-        /* int quantitySpruce = Random.Shared.Next(5, 8);
-        for (int i = 0; i < quantitySpruce; i++)
-        CreateSpruceTree(xMin:30, yMin:0, xMax: MaxSizeX - 7, yMax: MaxSizeY - 5); */
-
-        /* int quantityOak = Random.Shared.Next(0, 2);
-        for (int i = 0; i < quantityOak; i++)
-        CreateOakTree(xMin:5, yMin:13, xMax: 20, yMax: 15); */
+        CreateTrees(TreeType.Spruce, qtyMin: 5, qtyMax: 10, xMin:MaxSizeX / 3, yMin:1, xMax: MaxSizeX - 8, yMax: MaxSizeY / 3);
+        CreateTrees(TreeType.Oak, qtyMin: 1, qtyMax: 1, xMin:1 , yMin: MaxSizeY * 2 / 3, xMax: MaxSizeX / 2, yMax: MaxSizeY - 7);
 
         CreateMushrooms(0,0,95,30,factor:60);
         
@@ -154,97 +147,32 @@ partial class Terrain // Creation Methods
         }
     }
 
-    private void CreateTrees(int xMin, int yMin, int xMax, int yMax)
+    private void CreateTrees(TreeType treeType,int qtyMin, int qtyMax, int xMin, int yMin, int xMax, int yMax)
     {
-        int quantitySpruce = Random.Shared.Next(6, 10);
-        for (int i = 0; i < quantitySpruce; i++)
-        TreeList.Add(new Tree(TreeType.Spruce, new Position(0,0)));
+        int quantityTrees = Random.Shared.Next(qtyMin, qtyMax + 1);
+        int startingIndex = TreeList.Count;
+        int maxQuantityTrees = startingIndex + quantityTrees;
 
-        int quantityOak = 1;//Random.Shared.Next(1, 3);
-        for (int i = 0; i < quantityOak; i++)
-        TreeList.Add(new Tree(TreeType.Oak, new Position(0,0)));
-
-        for (int treeIndex = 0; treeIndex < TreeList.Count; treeIndex++)
+        for (int treeIndex = startingIndex; treeIndex < maxQuantityTrees; treeIndex++)
         {
+            TreeList.Add(new Tree(treeType, new Position(0,0)));
             int posX = Random.Shared.Next(xMin, xMax);
             int posY = Random.Shared.Next(yMin, yMax);
 
             for (int incY = 0; incY < TreeList[treeIndex].Texture!.GetLength(0); incY++)
             {
-                if (TreeList[treeIndex].Type is TreeType.Oak)
-                {
-                    posX = Random.Shared.Next(5, MaxSizeX / 3);
-                    posY = Random.Shared.Next(15, MaxSizeY - 6);
-                }
-                
                 for (int incX = 0; incX < TreeList[treeIndex].Texture!.GetLength(1); incX++)
                 {
-                    if (TreeList[treeIndex].Texture![incY,incX] != "skip"
-                    /* && Grid![posX,posY + 5].Resource.Type is not ResourceType.Wheat */) // magic numbers, needs tree lenght and Width / 2
+                    if (TreeList[treeIndex].Texture![incY,incX] != "skip")
                     {
                         TreeList[treeIndex].Position = new Position(posX, posY);
                     }
                 }
-                /* if (Grid![TreeList[treeIndex].Position.X,
-                TreeList[treeIndex].Position.Y + TreeList[treeIndex].Texture!.GetLength(0)]
-                .Resource.Type is not ResourceType.None)
-                {
-                    TreeList.Add(new Tree(TreeType.Spruce, new Position(0,0)));
-                    TreeList.RemoveAt(treeIndex);
-                } */
             }
         }
 
         TreeList.Distinct();
         TreeList.Sort((a,b) => a.Position.Y.CompareTo(b.Position.Y));
-    }
-
-    private void CreateSpruceTree(int xMin, int yMin, int xMax, int yMax)
-    {
-        string[,] spruceArray =
-        {
-            {"skip", "skip", "skip", "tree_spruce_top", "skip", "skip", "skip"},
-            {"skip", "skip", "tree_spruce_side_left", "tree_spruce_centre", "tree_spruce_side_right", "skip", "skip"},
-            {"skip", "tree_spruce_side_left", "tree_spruce_centre", "tree_spruce_centre", "tree_spruce_centre", "tree_spruce_side_right", "skip"},
-            {"skip", "skip", "skip","tree_spruce_stem", "skip", "skip", "skip"},
-        };
-
-        int posX = Random.Shared.Next(xMin, xMax);
-        int posY = Random.Shared.Next(yMin, yMax);
-
-        for (int incY = 0; incY < spruceArray.GetLength(0); incY++)
-        {
-            for (int incX = 0; incX < spruceArray.GetLength(1); incX++)
-            {
-                if (spruceArray[incY,incX] != "skip" && Grid![incX, incY + 5].Resource.Type is ResourceType.None)
-                Grid![incX + posX,incY + posY].Texture.TextureName = spruceArray[incY,incX];
-            }
-        }
-    }
-
-    private void CreateOakTree(int xMin, int yMin, int xMax, int yMax)
-    {
-        string[,] oakArray =
-        {
-            {"skip", "skip", "skip", "skip", "tree_oak_top", "tree_oak_top", "tree_oak_top", "tree_oak_top", "skip", "skip", "skip"},
-            {"skip", "skip", "tree_oak_top", "tree_oak_top", "tree_oak_top", "tree_oak_top", "tree_oak_top", "tree_oak_top", "tree_oak_top", "skip", "skip"},
-            {"skip", "skip", "tree_oak_top", "tree_oak_top", "tree_oak_top", "tree_oak_top", "tree_oak_top", "tree_oak_top", "tree_oak_top", "tree_oak_top", "skip"},
-            {"skip", "skip", "skip", "skip", "tree_oak_branch_left", "tree_oak_stem", "skip", "tree_oak_top", "tree_oak_top", "tree_oak_top", "skip"},
-            {"skip", "skip", "skip", "skip", "skip", "tree_oak_stem", "tree_oak_branch_right", "skip", "skip", "skip", "skip"},
-            {"skip", "skip", "skip", "skip", "skip", "tree_oak_stem", "skip", "skip", "skip", "skip", "skip"},
-        };
-
-        int posX = Random.Shared.Next(xMin, xMax);
-        int posY = Random.Shared.Next(yMin, yMax);
-
-        for (int incY = 0; incY < oakArray.GetLength(0); incY++)
-        {
-            for (int incX = 0; incX < oakArray.GetLength(1); incX++)
-            {
-                if (oakArray[incY,incX] != "skip")
-                Grid![incX + posX,incY + posY].Texture.TextureName = oakArray[incY,incX];
-            }
-        }
     }
 
     private void CreateMushrooms(int xMin, int yMin, int xMax, int yMax, int factor)
