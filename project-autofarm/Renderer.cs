@@ -31,11 +31,6 @@ class Renderer
         for (int x = 0; x < xMax; x++) output.Append('=');
         output.AppendLine();
 
-        
-
-        /* RenderEntity(entityDict["human1"]);
-        RenderEntity (entityDict["human2"]); */
-
         var human1 = entityDict["human1"];
         var human2 = entityDict["human2"];
 
@@ -54,13 +49,6 @@ class Renderer
         Console.Write(output);
     }
 
-    /* public static void RenderEntity(Entity entity)
-    {
-        Console.SetCursorPosition(entity.Position.X, entity.Position.Y);
-        Console.Write(entity.Icon);
-        Console.SetCursorPosition(0,0);
-    } */
-
     public static void RenderEntity(Entity entity)
     {
         Console.SetCursorPosition(entity.Position.X, entity.Position.Y);
@@ -76,8 +64,6 @@ class Renderer
         {  
             for (int x = 0; x < tree.Texture.GetLength(1); x++)
             {
-                //Console.SetCursorPosition(tree.Position.X + x, tree.Position.Y + y);
-
                 string textureName = tree.Texture[y,x];
                 
                 if (textureName == "skip") continue;
@@ -88,9 +74,7 @@ class Renderer
                 int index = screenY * (Terrain.MaxSizeX + Environment.NewLine.Length) + screenX;
 
                 output[index] = Texture.List[textureName];
-                
             }
         }
-
     }
 }

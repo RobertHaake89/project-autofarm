@@ -22,7 +22,7 @@ partial class Terrain // Data and Parameters
         CreateStones(0,0,100,100,factor:100);
         CreateField(70,35,90,80);
 
-        CreateTrees(xMin:30, yMin:1, xMax: MaxSizeX - 7, yMax: MaxSizeY - 6);
+        CreateTrees(xMin:MaxSizeX / 3, yMin:1, xMax: MaxSizeX - 8, yMax: MaxSizeY / 3);
 
         /* int quantitySpruce = Random.Shared.Next(5, 8);
         for (int i = 0; i < quantitySpruce; i++)
@@ -156,38 +156,47 @@ partial class Terrain // Creation Methods
 
     private void CreateTrees(int xMin, int yMin, int xMax, int yMax)
     {
-        
-
-        int quantitySpruce = 5;//Random.Shared.Next(5, 8);
+        int quantitySpruce = Random.Shared.Next(6, 10);
         for (int i = 0; i < quantitySpruce; i++)
         TreeList.Add(new Tree(TreeType.Spruce, new Position(0,0)));
 
-        
+        int quantityOak = 1;//Random.Shared.Next(1, 3);
+        for (int i = 0; i < quantityOak; i++)
+        TreeList.Add(new Tree(TreeType.Oak, new Position(0,0)));
 
-        for (int treeIndex = 0; treeIndex < quantitySpruce; treeIndex++)
+        for (int treeIndex = 0; treeIndex < TreeList.Count; treeIndex++)
         {
             int posX = Random.Shared.Next(xMin, xMax);
             int posY = Random.Shared.Next(yMin, yMax);
 
             for (int incY = 0; incY < TreeList[treeIndex].Texture!.GetLength(0); incY++)
             {
+                if (TreeList[treeIndex].Type is TreeType.Oak)
+                {
+                    posX = Random.Shared.Next(5, MaxSizeX / 3);
+                    posY = Random.Shared.Next(15, MaxSizeY - 6);
+                }
+                
                 for (int incX = 0; incX < TreeList[treeIndex].Texture!.GetLength(1); incX++)
                 {
                     if (TreeList[treeIndex].Texture![incY,incX] != "skip"
-                    && Grid![posX,posY/* +5 */].Resource.Type is not ResourceType.Wheat) // magic numbers, needs tree lenght and Width / 2
+                    /* && Grid![posX,posY + 5].Resource.Type is not ResourceType.Wheat */) // magic numbers, needs tree lenght and Width / 2
                     {
                         TreeList[treeIndex].Position = new Position(posX, posY);
-                        //Grid![TreeList[treeIndex].Position.X + incX, TreeList[treeIndex].Position.Y + incY].Texture.TextureName = TreeList[treeIndex].Texture![incY,incX];
                     }
                 }
+                /* if (Grid![TreeList[treeIndex].Position.X,
+                TreeList[treeIndex].Position.Y + TreeList[treeIndex].Texture!.GetLength(0)]
+                .Resource.Type is not ResourceType.None)
+                {
+                    TreeList.Add(new Tree(TreeType.Spruce, new Position(0,0)));
+                    TreeList.RemoveAt(treeIndex);
+                } */
             }
         }
 
         TreeList.Distinct();
         TreeList.Sort((a,b) => a.Position.Y.CompareTo(b.Position.Y));
-
-        //foreach (Tree tree in TreeList) Console.WriteLine(tree.Position);
-        //Console.ReadKey();
     }
 
     private void CreateSpruceTree(int xMin, int yMin, int xMax, int yMax)
