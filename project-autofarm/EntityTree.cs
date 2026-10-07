@@ -22,6 +22,7 @@ public enum Gender
     {
         None = 0,
         Farmer,
+        WoodCutter,
         Forager
     }
 

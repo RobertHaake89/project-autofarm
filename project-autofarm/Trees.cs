@@ -20,8 +20,8 @@ class Tree
     public Tree(TreeType type, Position position)
     {
         Type = type;
-        Position = position;
         Texture = GetTreeTexture();
+        Position = position;
         
     }
 

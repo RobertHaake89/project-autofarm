@@ -39,6 +39,9 @@ struct_floor1,║
 struct_door1,▯
 struct_window1,⊞
 struct_stairs1,▤
+tree_any_germinating,^
+tree_any_sprouting,ʎ
+tree_any-growing,Y
 tree_oak_top,@
 tree_oak_branch_left,\
 tree_oak_branch_right,/

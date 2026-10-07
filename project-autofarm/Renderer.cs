@@ -59,22 +59,29 @@ class Renderer
     public static void RenderTrees(Terrain terrain, StringBuilder output)
     {     
         foreach (var tree in terrain.TreeList)
+        {
+            int startX = tree.Position.X - tree.Texture!.GetLength(1) / 2;
+            int startY = tree.Position.Y - (tree.Texture.GetLength(0) - 1);
 
-        for (int y = 0; y < tree.Texture!.GetLength(0); y++)
-        {  
-            for (int x = 0; x < tree.Texture.GetLength(1); x++)
-            {
-                string textureName = tree.Texture[y,x];
-                
-                if (textureName == "skip") continue;
-                
-                int screenX = tree.Position.X + x;
-                int screenY = tree.Position.Y + y;
+            for (int y = 0; y < tree.Texture!.GetLength(0); y++)
+            {  
+                for (int x = 0; x < tree.Texture.GetLength(1); x++)
+                {
+                    string textureName = tree.Texture[y,x];
+                    
+                    if (textureName == "skip") continue;
+                    
+                    int screenX = startX + x;
+                    int screenY = startY + y;
 
-                int index = screenY * (Terrain.MaxSizeX + Environment.NewLine.Length) + screenX;
+                    int index = screenY * (Terrain.MaxSizeX + Environment.NewLine.Length) + screenX;
 
-                output[index] = Texture.List[textureName];
+                    output[index] = Texture.List[textureName];
+                    //Console.Write(tree.Position);
+                }
             }
         }
+
+        
     }
 }
