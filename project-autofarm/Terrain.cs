@@ -158,7 +158,7 @@ partial class Terrain // Creation Methods
     {
         
 
-        int quantitySpruce = Random.Shared.Next(5, 8);
+        int quantitySpruce = 5;//Random.Shared.Next(5, 8);
         for (int i = 0; i < quantitySpruce; i++)
         TreeList.Add(new Tree(TreeType.Spruce, new Position(0,0)));
 
@@ -166,23 +166,24 @@ partial class Terrain // Creation Methods
 
         for (int treeIndex = 0; treeIndex < quantitySpruce; treeIndex++)
         {
+            int posX = Random.Shared.Next(xMin, xMax);
+            int posY = Random.Shared.Next(yMin, yMax);
+
             for (int incY = 0; incY < TreeList[treeIndex].Texture!.GetLength(0); incY++)
             {
-                int posX = Random.Shared.Next(xMin, xMax);
-                int posY = Random.Shared.Next(yMin, yMax);
-
                 for (int incX = 0; incX < TreeList[treeIndex].Texture!.GetLength(1); incX++)
                 {
                     if (TreeList[treeIndex].Texture![incY,incX] != "skip"
-                    && Grid![posX,posY+5].Resource.Type is not ResourceType.Wheat) // magic numbers, needs tree lenght and Width / 2
+                    && Grid![posX,posY/* +5 */].Resource.Type is not ResourceType.Wheat) // magic numbers, needs tree lenght and Width / 2
                     {
                         TreeList[treeIndex].Position = new Position(posX, posY);
-                        Grid![TreeList[treeIndex].Position.X + incX, TreeList[treeIndex].Position.Y + incY].Texture.TextureName = TreeList[treeIndex].Texture![incY,incX];
+                        //Grid![TreeList[treeIndex].Position.X + incX, TreeList[treeIndex].Position.Y + incY].Texture.TextureName = TreeList[treeIndex].Texture![incY,incX];
                     }
                 }
             }
         }
 
+        TreeList.Distinct();
         TreeList.Sort((a,b) => a.Position.Y.CompareTo(b.Position.Y));
 
         //foreach (Tree tree in TreeList) Console.WriteLine(tree.Position);
