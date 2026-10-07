@@ -21,7 +21,7 @@ class Program
 
         // ♟ ♙ 
         Entity human1 = new Human("Hans", '♟', Gender.Male, Profession.Farmer, Specialisation.Wheat, position: new Position(8,3));
-        Entity human2 = new Human("Jürgen", '♙', Gender.Male, Profession.None, Specialisation.None, position: new Position(14,4));
+        Entity human2 = new Human("Jürgen", '♙', Gender.Male, Profession.Forester, Specialisation.SpruceWood, position: new Position(14,4));
 
         Dictionary<string, Entity> entityList = new Dictionary<string, Entity>()
         {

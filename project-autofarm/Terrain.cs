@@ -173,6 +173,9 @@ partial class Terrain // Creation Methods
 
         TreeList.Distinct();
         TreeList.Sort((a,b) => a.Position.Y.CompareTo(b.Position.Y));
+
+        foreach (Tree tree in TreeList)
+        Grid![tree.Position.X,tree.Position.Y].Resource.Type = tree.Resource;
     }
 
     private void CreateMushrooms(int xMin, int yMin, int xMax, int yMax, int factor)

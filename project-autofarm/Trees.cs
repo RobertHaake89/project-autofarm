@@ -13,7 +13,7 @@ class Tree
     public string Name {get; set;} = "Tree";
     public string[,]? Texture {get; init;}
     public TreeType Type {get; init;}
-    public ResourceType Resource {get; set;} = ResourceType.Wood;
+    public ResourceType Resource {get; set;} = ResourceType.SpruceWood;
     public GrowthProcess Status {get; set;} = GrowthProcess.Ripe;
     public Position Position {get; set;}
 

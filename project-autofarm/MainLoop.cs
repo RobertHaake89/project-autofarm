@@ -24,7 +24,6 @@ class General
             //Console.ReadKey();
             await Task.Delay(100); // 60
         }
-        //await Task.WhenAll(tasks);
     }
 
     public static async Task UpdateGame(Terrain terrain)
@@ -36,6 +35,8 @@ class General
                 terrain.Grid![x,y].Resource.GiveGrowthChance();
 
                 terrain.Grid![x,y].UpdateAcre();
+                //terrain.Grid![x,y].UpdateTrees();
+
             }
         }
 

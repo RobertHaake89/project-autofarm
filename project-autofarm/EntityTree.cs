@@ -22,7 +22,7 @@ public enum Gender
     {
         None = 0,
         Farmer,
-        WoodCutter,
+        Forester,
         Forager
     }
 
@@ -30,6 +30,9 @@ public enum Gender
     {
         None = 0,
         Wheat,
+        SpruceWood,
+        OakWood,
+        Mushrooms
     }
 
     public enum ProcessingMode
@@ -72,10 +75,12 @@ partial class Human : Entity
 {
     public Profession Profession {get; set;}
     public Specialisation Specialisation {get; set;} = Specialisation.Wheat;
-    //public int FieldSize {get => TargetMemory.Count;}
     public ResourceType TargetResource => Specialisation switch
             {
                 Specialisation.Wheat => ResourceType.Wheat,
+                Specialisation.SpruceWood => ResourceType.SpruceWood,
+                Specialisation.OakWood => ResourceType.OakWood,
+                Specialisation.Mushrooms => ResourceType.Mushrooms,
                 _ => ResourceType.None
             };
     public ProcessingMode Mode {get; set;} = ProcessingMode.None;
@@ -89,30 +94,3 @@ partial class Human : Entity
     }
 }
 
-/* abstract partial class Worker : Human
-{
-    public const int StaminaMax = 50;
-    public int Stamina {get => field; set
-        {
-            if (field < 0) field = 0;
-            else if (field > StaminaMax) field = StaminaMax;
-        }} = StaminaMax;
-    
-    public Worker(string name, char icon, Gender gender, Position position) : base(name, icon, gender, position)
-    {
-        
-    }
-
-    public abstract void DoWork(Terrain terrain);
-} */
-
-/* partial class Farmer : Worker
-{
-    public enum Specialisation
-    {
-        None = 0,
-        Wheat,
-    }
-    
-    
-} */

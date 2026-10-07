@@ -35,6 +35,7 @@ partial class Human : Entity
                 MoveTo(terrain);
                 
                 if (Profession is Profession.Farmer) DoFarmWork(terrain);
+                //if (Profession is Profession.Forester) ChopWood(terrain);
             
                 await Task.Delay(200);
             }
@@ -154,6 +155,31 @@ partial class Human : Entity
                 //Console.WriteLine(Stamina);      
             }
         }
-        
+    }
+
+    public void ChopWood(Terrain terrain)
+    {
+        if (Specialisation is Specialisation.SpruceWood or Specialisation.OakWood
+        && TargetResource is ResourceType.SpruceWood or ResourceType.OakWood
+        && Position.Y == TargetPosition.Y
+        && Position.X == TargetPosition.X - 1 || Position.X == TargetPosition.X + 1)
+        {
+            if (terrain.Grid![Position.X, Position.Y].Resource.Type == TargetResource)
+            {
+                if (terrain.Grid![Position.X, Position.Y].Resource.Status is GrowthProcess.Ripe)
+                {
+                    foreach (Tree tree in terrain.TreeList)
+                    if (Position == tree.Position) terrain.TreeList.Remove(tree);
+
+                    terrain.Grid![Position.X, Position.Y].Resource.Status = GrowthProcess.Harvested;
+                    terrain.Grid![Position.X, Position.Y].Resource.Type = ResourceType.None;
+                }
+                if (!TargetMemory.Any())
+                {
+                    Status = Status.Exhausted;
+                    TargetMemorySize = 0;                     
+                }
+            }
+        }
     }
 }

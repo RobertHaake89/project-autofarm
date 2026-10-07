@@ -7,7 +7,8 @@ public enum ResourceType
     {
         None = 0,
         Wheat,
-        Wood,
+        SpruceWood,
+        OakWood,
         Mushrooms
     }
     public enum GrowthProcess
@@ -42,6 +43,8 @@ class Resource : ITargetable, IHarvestable
         {
             ResourceType.Wheat => 25,
             ResourceType.Mushrooms => 60,
+            ResourceType.SpruceWood => 30,
+            ResourceType.OakWood => 30,
             _ => 10
         };
 
