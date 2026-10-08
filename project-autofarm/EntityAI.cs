@@ -198,7 +198,7 @@ partial class Human : Entity
                     && tree.Position.Y == TargetPosition.Y);
 
                     terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Status = GrowthProcess.Harvested;
-                    terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Type = ResourceType.None;
+                    terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Type = ResourceType.Fertile;
 
                     Status = Status.Exhausted;
                     TargetMemory.Clear();
@@ -211,5 +211,9 @@ partial class Human : Entity
                 }
             }
         }
+    }
+    public async Task PlantTree(Terrain terrain)
+    {
+        
     }
 }

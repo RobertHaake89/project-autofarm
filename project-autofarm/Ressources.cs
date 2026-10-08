@@ -6,6 +6,7 @@ namespace ProjectAutofarm;
 public enum ResourceType
     {
         None = 0,
+        Fertile,
         Wheat,
         SpruceWood,
         OakWood,

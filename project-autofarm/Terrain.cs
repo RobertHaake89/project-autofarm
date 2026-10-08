@@ -14,6 +14,7 @@ partial class Terrain // Data and Parameters
     {
         CreateTiles();
         CreateDirtFoundation();
+        CreateFertileSoil();
         CreateGrassPatch(60,0,100,100,radius:8);
         CreateGrassPatch(40,50,80,100,radius:5);
         CreateGrassPatch(50,0,100,40,radius:5);
@@ -41,6 +42,17 @@ partial class Terrain // Creation Methods
             for (int x = 0; x < MaxSizeX; x++)
             {
                 Grid![x,y] = new Tile((x,y),"empty");
+            }
+        }
+    }
+
+    private void CreateFertileSoil()
+    {
+        for (int y = MaxSizeY / 3; y < MaxSizeY; y++)
+        {
+            for (int x = MaxSizeX / 3; x < MaxSizeX; x++)
+            {
+                Grid![x,y].Resource.Type = ResourceType.Fertile;
             }
         }
     }
