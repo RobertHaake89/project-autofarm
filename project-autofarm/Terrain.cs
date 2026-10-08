@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Security.Cryptography.X509Certificates;
 
 namespace ProjectAutofarm;
 
@@ -8,6 +9,9 @@ partial class Terrain // Data and Parameters
     public Tile[,]? Grid {get; private set;} = new Tile[MaxSizeX, MaxSizeY];
     public const int MaxSizeX = 90;
     public const int MaxSizeY = MaxSizeX * (16/9) / 4;
+    public const int TreeMaxQty = SpruceMaxQty + OakMaxQty;
+    public const int SpruceMaxQty = 10;
+    public const int OakMaxQty = 1;
     public List<Tree> TreeList {get; set;} = new List<Tree>();
 
     public void CreateMap() // xMin, yMin, xMax, yMax, radius?
@@ -23,8 +27,8 @@ partial class Terrain // Data and Parameters
         CreateStones(0,0,100,100,factor:100);
         CreateField(70,35,90,80);
 
-        CreateTrees(TreeType.Spruce, qtyMin: 5, qtyMax: 10, xMin:MaxSizeX / 3, yMin: 4, xMax: MaxSizeX - 5, yMax: MaxSizeY / 3);
-        CreateTrees(TreeType.Oak, qtyMin: 1, qtyMax: 1, xMin:5 , yMin: MaxSizeY * 2 / 3, xMax: MaxSizeX * 2 / 3, yMax: MaxSizeY - 1);
+        CreateTrees(TreeType.Spruce, qtyMin: 5, qtyMax: SpruceMaxQty, xMin:MaxSizeX / 3, yMin: 4, xMax: MaxSizeX - 5, yMax: MaxSizeY / 3);
+        CreateTrees(TreeType.Oak, qtyMin: 1, qtyMax: OakMaxQty, xMin:5 , yMin: MaxSizeY * 2 / 3, xMax: MaxSizeX * 2 / 3, yMax: MaxSizeY - 1);
 
         CreateMushrooms(0,0,95,30,factor:60);
         
@@ -161,7 +165,7 @@ partial class Terrain // Creation Methods
 
     private void CreateTrees(TreeType treeType,int qtyMin, int qtyMax, int xMin, int yMin, int xMax, int yMax)
     {
-        int quantityTrees = Random.Shared.Next(qtyMin, qtyMax + 1);
+        int quantityTrees = Random.Shared.Next(qtyMin, qtyMax);
         int startingIndex = TreeList.Count;
         int maxQuantityTrees = startingIndex + quantityTrees;
 
@@ -192,7 +196,6 @@ partial class Terrain // Creation Methods
             Grid![tree.Position.X,tree.Position.Y].Resource.Type = tree.Resource;
             Grid![tree.Position.X, tree.Position.Y].Resource.Status = tree.Status;
         }
-        
     }
 
     private void CreateMushrooms(int xMin, int yMin, int xMax, int yMax, int factor)

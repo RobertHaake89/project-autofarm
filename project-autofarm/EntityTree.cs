@@ -39,8 +39,8 @@ public enum Gender
     {
         None = 0,
         Plowing,
-        Sowing,
-        Harvesting
+        Planting,
+        Harvesting,
     }
 abstract partial class Entity : ITargetable
 {
@@ -79,15 +79,17 @@ abstract partial class Entity : ITargetable
 partial class Human : Entity
 {
     public Profession Profession {get; set;}
-    public Specialisation Specialisation {get; set;} = Specialisation.Wheat;
-    public ResourceType TargetResource => Specialisation switch
+    public Specialisation Specialisation {get; set;}
+    public ResourceType TargetResource {get => field = Mode == ProcessingMode.Planting 
+        ? ResourceType.Fertile 
+        : Specialisation switch
             {
                 Specialisation.Wheat => ResourceType.Wheat,
                 Specialisation.SpruceWood => ResourceType.SpruceWood,
                 Specialisation.OakWood => ResourceType.OakWood,
                 Specialisation.Mushrooms => ResourceType.Mushrooms,
                 _ => ResourceType.None
-            };
+            }; set;}
     public ProcessingMode Mode {get; set;} = ProcessingMode.None;
     public int TargetMemorySize {get => field; set => field = Math.Max(field,value);}
     public List<Position> TargetMemory {get; set;} = new List<Position>();

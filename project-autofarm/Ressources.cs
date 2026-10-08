@@ -16,7 +16,7 @@ public enum ResourceType
     {
         Fallow = 0,
         Plowed,
-        Sown,
+        Planted,
         Young,
         Mature,
         Ripe,
@@ -54,7 +54,7 @@ class Resource : ITargetable, IHarvestable
         if (Status == GrowthProcess.Ripe) return;
         else if (RandomNumber == factor)
         {
-            if (Status == GrowthProcess.Sown) Status = GrowthProcess.Young;
+            if (Status == GrowthProcess.Planted) Status = GrowthProcess.Young;
             else if (Status == GrowthProcess.Young) Status = GrowthProcess.Mature;
             else if (Status == GrowthProcess.Mature) Status = GrowthProcess.Ripe;
         }

@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Formats.Asn1;
 using System.Runtime.CompilerServices;
 using System.Security;
@@ -26,26 +27,51 @@ partial class Human : Entity
     public override async Task GeneralConditioner(Terrain terrain)
     {
         if (Status is Status.Idle)
+        {
+            if (Profession is not Profession.None) Status = Status.Working;
+
+            if (Profession is Profession.Forester)
             {
-                if (Profession is not Profession.None)Status = Status.Working;
-            }
-            if (Status is Status.Working)
-            {
-                if (!TargetMemory.Any()) await ScanFor(terrain);
-                
-                 await MoveTo(terrain);
-                 await Task.Delay(SpeedMove);
-                
-                if (Profession is Profession.Farmer)
+                if (terrain.TreeList.Count <= Terrain.TreeMaxQty / 2)
                 {
-                    await DoFarmWork(terrain);
-                    await Task.Delay(SpeedWorking);
-                } 
-                    if (Profession is Profession.Forester)
+                    Mode = ProcessingMode.Planting;
+                    TargetResource = ResourceType.Fertile;
+                }
+                else
+                {
+                    Mode = ProcessingMode.Harvesting;
+                    TargetResource = ResourceType.SpruceWood;
+                }
+            }
+        }
+
+        if (Status is Status.Working)
+        {
+            if (!TargetMemory.Any()/*  && Mode is not ProcessingMode.Planting */) await ScanFor(terrain);
+            
+                await MoveTo(terrain);
+                await Task.Delay(SpeedMove);
+            
+            if (Profession is Profession.Farmer)
+            {
+                await DoFarmWork(terrain);
+                await Task.Delay(SpeedWorking);
+            } 
+            if (Profession is Profession.Forester)
+            {
+                if (Mode is ProcessingMode.Harvesting)
                 {
                     await ChopWood(terrain);
                     await Task.Delay(SpeedWorking);
-                } 
+                }
+                /* else if (Mode is ProcessingMode.Planting)
+                {
+                    await PlantTree(terrain,randomFactor: 10);
+                    await Task.Delay(SpeedWorking);
+                } */
+            }
+
+            //Console.Write($"Name:{this} Specialisation: {Specialisation} TargetResource: {TargetResource} Mode: {Mode}");
             
                 
             }
@@ -153,7 +179,7 @@ partial class Human : Entity
                 }
                     else if (terrain.Grid![Position.X, Position.Y].Resource.Status is GrowthProcess.Harvested)
                 {
-                    terrain.Grid![Position.X, Position.Y].Resource.Status = GrowthProcess.Sown;
+                    terrain.Grid![Position.X, Position.Y].Resource.Status = GrowthProcess.Planted;
                     if (!TargetMemory.Any())
                     {
                         Status = Status.Exhausted;                       
@@ -165,7 +191,7 @@ partial class Human : Entity
                 }
                     else if (terrain.Grid![Position.X, Position.Y].Resource.Status is GrowthProcess.Plowed)
                 {
-                    terrain.Grid![Position.X, Position.Y].Resource.Status = GrowthProcess.Sown;
+                    terrain.Grid![Position.X, Position.Y].Resource.Status = GrowthProcess.Planted;
                     if (!TargetMemory.Any())
                     {
                         Status = Status.Exhausted;
@@ -192,7 +218,7 @@ partial class Human : Entity
                 if (terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Status is GrowthProcess.Ripe)
                 {
                     Position = new Position(Position.X - 1, Position.Y);
-                    await Task.Delay(10000);
+                    await Task.Delay(10); // 10000
                     terrain.TreeList.RemoveAll(tree 
                     => tree.Position.X == TargetPosition.X
                     && tree.Position.Y == TargetPosition.Y);
@@ -212,8 +238,31 @@ partial class Human : Entity
             }
         }
     }
-    public async Task PlantTree(Terrain terrain)
+    public async Task PlantTree(Terrain terrain, int randomFactor)
     {
-        
+        int randomNumber = Random.Shared.Next(0, randomFactor);
+
+        if (terrain.Grid![Position.X, Position.Y].Resource.Type is ResourceType.Fertile)
+        {
+            if (randomNumber == randomFactor)
+            {
+                terrain.TreeList.Add(new Tree(TreeType.Spruce, new Position(Position.X, Position.Y), GrowthProcess.Planted));
+            }
+        }
     }
+
+    /* public async Task DoScouting(Terrain terrain, ResourceType target)
+    {
+        Position startingPosition = new Position(Terrain.MaxSizeX / 3, Terrain.MaxSizeY / 3);
+        TargetPosition = startingPosition;
+        await MoveTo(terrain);
+
+        for (int y = Terrain.MaxSizeY / 3; y < Terrain.MaxSizeY; y++)
+        {
+            for (int x = Terrain.MaxSizeX / 3; x < Terrain.MaxSizeX; x++)
+            {
+                if ()
+            }
+        }
+    } */
 }

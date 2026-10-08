@@ -24,7 +24,7 @@ class Tile : ITargetable
                 {   
                     GrowthProcess.Fallow => "bot_grass1",
                     GrowthProcess.Plowed => "bot_dirt1",
-                    GrowthProcess.Sown => "acre_wheat_sown",
+                    GrowthProcess.Planted => "acre_wheat_sown",
                     GrowthProcess.Young => "acre_wheat_growing",
                     GrowthProcess.Mature => "acre_wheat_mature",
                     GrowthProcess.Ripe => "acre_wheat_ripe",
@@ -45,7 +45,7 @@ class Tile : ITargetable
             {
                 Texture.TextureName = Resource.Status switch
                 {   
-                    GrowthProcess.Sown => "tree_any_germinating",
+                    GrowthProcess.Planted => "tree_any_germinating",
                     GrowthProcess.Young => "tree_any_sprouting",
                     GrowthProcess.Mature => "tree_any_growing",
                     GrowthProcess.Ripe => "bot_grass1",
