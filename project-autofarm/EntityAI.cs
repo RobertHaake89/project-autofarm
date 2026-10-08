@@ -35,12 +35,12 @@ partial class Human : Entity
                 if (terrain.TreeList.Count <= Terrain.TreeMaxQty / 2)
                 {
                     Mode = ProcessingMode.Planting;
-                    TargetResource = ResourceType.Fertile;
+                    //TargetResource = ResourceType.Fertile;
                 }
                 else
                 {
                     Mode = ProcessingMode.Harvesting;
-                    TargetResource = ResourceType.SpruceWood;
+                    //TargetResource = ResourceType.SpruceWood;
                 }
             }
         }
@@ -64,11 +64,11 @@ partial class Human : Entity
                     await ChopWood(terrain);
                     await Task.Delay(SpeedWorking);
                 }
-                /* else if (Mode is ProcessingMode.Planting)
+                else if (Mode is ProcessingMode.Planting)
                 {
-                    await PlantTree(terrain,randomFactor: 10);
+                    await PlantTree(terrain,randomFactor: 60);
                     await Task.Delay(SpeedWorking);
-                } */
+                }
             }
 
             //Console.Write($"Name:{this} Specialisation: {Specialisation} TargetResource: {TargetResource} Mode: {Mode}");
@@ -240,13 +240,19 @@ partial class Human : Entity
     }
     public async Task PlantTree(Terrain terrain, int randomFactor)
     {
-        int randomNumber = Random.Shared.Next(0, randomFactor);
+        int randomNumber = Random.Shared.Next(0, randomFactor + 1);
 
         if (terrain.Grid![Position.X, Position.Y].Resource.Type is ResourceType.Fertile)
         {
             if (randomNumber == randomFactor)
             {
                 terrain.TreeList.Add(new Tree(TreeType.Spruce, new Position(Position.X, Position.Y), GrowthProcess.Planted));
+            }
+
+            if (terrain.TreeList.Count == Terrain.TreeMaxQty)
+            {
+                Mode = ProcessingMode.Harvesting;
+                Status = Status.Exhausted;
             }
         }
     }
