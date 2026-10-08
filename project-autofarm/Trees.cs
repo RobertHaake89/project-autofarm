@@ -13,22 +13,28 @@ class Tree
     public string Name {get; set;} = "Tree";
     public string[,]? Texture {get; init;}
     public TreeType Type {get; init;}
-    public ResourceType Resource {get; set;} = ResourceType.SpruceWood;
-    public GrowthProcess Status {get; set;} = GrowthProcess.Ripe;
+    public ResourceType Resource {get; set;}
+    public GrowthProcess Status {get; set;}
     public Position Position {get; set;}
 
-    public Tree(TreeType type, Position position)
+    public Tree(TreeType type, Position position, GrowthProcess status = GrowthProcess.Ripe)
     {
         Type = type;
-        Texture = GetTreeTexture();
+        Status = status;
         Position = position;
-        
+        Resource = type switch
+        {
+            TreeType.Spruce => ResourceType.SpruceWood,
+            TreeType.Oak => ResourceType.OakWood,
+            _ => ResourceType.None
+        };
+        Texture = GetTreeTexture();
     }
 
-    public void CreateTree(TreeType type, Position position)
+    public void CreateTree(TreeType type, Position position, Terrain terrain)
     {
-        if (type == TreeType.Spruce) new Tree(TreeType.Spruce, new Position(position.X, position.Y));
-        if (type == TreeType.Oak) new Tree(TreeType.Oak, new Position(position.X, position.Y));
+        if (type == TreeType.Spruce) terrain.TreeList.Add(new Tree(TreeType.Spruce, new Position(position.X, position.Y), GrowthProcess.Sown));
+        if (type == TreeType.Oak) terrain.TreeList.Add(new Tree(TreeType.Oak, new Position(position.X, position.Y), GrowthProcess.Sown));
     }
 
     public string[,] GetTreeTexture()

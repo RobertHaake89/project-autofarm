@@ -155,7 +155,7 @@ partial class Terrain // Creation Methods
 
         for (int treeIndex = startingIndex; treeIndex < maxQuantityTrees; treeIndex++)
         {
-            TreeList.Add(new Tree(treeType, new Position(0,0)));
+            TreeList.Add(new Tree(treeType, new Position(0,0), GrowthProcess.Ripe));
             int posX = Random.Shared.Next(xMin, xMax);
             int posY = Random.Shared.Next(yMin, yMax);
 
@@ -167,6 +167,7 @@ partial class Terrain // Creation Methods
                     {
                         TreeList[treeIndex].Position = new Position(posX, posY);
                     }
+                    
                 }
             }
         }
@@ -175,7 +176,11 @@ partial class Terrain // Creation Methods
         TreeList.Sort((a,b) => a.Position.Y.CompareTo(b.Position.Y));
 
         foreach (Tree tree in TreeList)
-        Grid![tree.Position.X,tree.Position.Y].Resource.Type = tree.Resource;
+        {
+            Grid![tree.Position.X,tree.Position.Y].Resource.Type = tree.Resource;
+            Grid![tree.Position.X, tree.Position.Y].Resource.Status = tree.Status;
+        }
+        
     }
 
     private void CreateMushrooms(int xMin, int yMin, int xMax, int yMax, int factor)

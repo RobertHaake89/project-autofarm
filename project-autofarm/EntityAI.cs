@@ -1,15 +1,16 @@
 using System;
 using System.Formats.Asn1;
 using System.Runtime.CompilerServices;
+using System.Security;
 
 namespace ProjectAutofarm;
 
 abstract partial class Entity : ITargetable // AI
 {
     public abstract Task RunSchedule(Terrain terrain);
-    public abstract void GeneralConditioner(Terrain terrain);
-    public abstract void ScanFor(Terrain terrain);
-    public abstract void MoveTo(Terrain terrain);
+    public abstract Task GeneralConditioner(Terrain terrain);
+    public abstract Task ScanFor(Terrain terrain);
+    public abstract Task MoveTo(Terrain terrain);
 }
 
 partial class Human : Entity
@@ -18,11 +19,11 @@ partial class Human : Entity
     {
         while (true)
         {
-            GeneralConditioner(terrain);
-            await Task.Delay(100);
+            await GeneralConditioner(terrain);
+            //await Task.Delay(100);
         }
     }
-    public override async void GeneralConditioner(Terrain terrain)
+    public override async Task GeneralConditioner(Terrain terrain)
     {
         if (Status is Status.Idle)
             {
@@ -30,20 +31,28 @@ partial class Human : Entity
             }
             if (Status is Status.Working)
             {
-                if (!TargetMemory.Any()) ScanFor(terrain);
+                if (!TargetMemory.Any()) await ScanFor(terrain);
                 
-                MoveTo(terrain);
+                 await MoveTo(terrain);
                 
-                if (Profession is Profession.Farmer) DoFarmWork(terrain);
-                //if (Profession is Profession.Forester) ChopWood(terrain);
+                if (Profession is Profession.Farmer)
+                {
+                    await DoFarmWork(terrain);
+                    await Task.Delay(70);
+                } 
+                    if (Profession is Profession.Forester)
+                {
+                    await ChopWood(terrain);
+                    await Task.Delay(100);
+                } 
             
-                await Task.Delay(200);
+                
             }
             else if (Status is Status.Exhausted)
             {
                 if (Position == IdlePosition) Status = Status.Resting;
 
-                MoveTo(terrain);
+                await MoveTo(terrain);
 
                 await Task.Delay(400);
             }
@@ -55,7 +64,7 @@ partial class Human : Entity
             }
     }
 
-    public override void ScanFor(Terrain terrain)
+    public override async Task ScanFor(Terrain terrain)
     {
         for (int y = 0; y < Terrain.MaxSizeY; y++)
         {
@@ -91,7 +100,7 @@ partial class Human : Entity
         }        
     }
 
-    public override void MoveTo(Terrain terrain)
+    public override async Task MoveTo(Terrain terrain)
     {
         Position chosenTarget;
 
@@ -116,12 +125,20 @@ partial class Human : Entity
         else if (Position.X > chosenTarget.X) Position = new Position(Position.X - 1, Position.Y);
         else if (Position.Y > chosenTarget.Y) Position = new Position(Position.X, Position.Y - 1);
 
+        /* if (Position == chosenTarget && TargetResource is ResourceType.SpruceWood or ResourceType.OakWood)
+        {
+            //TargetPosition = new Position(chosenTarget.X - 1, chosenTarget.Y);
+            Position = new Position(Position.X - 1, Position.Y);
+        } */
+
+        
+
         if (Status is not Status.Exhausted
         && Position == chosenTarget
         && TargetMemory.Any()) TargetMemory.RemoveAt(0); 
     }
 
-    public void DoFarmWork(Terrain terrain)
+    public async Task DoFarmWork(Terrain terrain)
     {
         if (Specialisation is Specialisation.Wheat && TargetResource is ResourceType.Wheat && Position == TargetPosition)
         {
@@ -157,25 +174,32 @@ partial class Human : Entity
         }
     }
 
-    public void ChopWood(Terrain terrain)
+    public async Task ChopWood(Terrain terrain)
     {
+        //Console.Write($"Position: {Position} TargetPosition: {TargetPosition}");
+        //Console.ReadKey();
         if (Specialisation is Specialisation.SpruceWood or Specialisation.OakWood
         && TargetResource is ResourceType.SpruceWood or ResourceType.OakWood
-        && Position.Y == TargetPosition.Y
-        && Position.X == TargetPosition.X - 1 || Position.X == TargetPosition.X + 1)
+        && Position.X == TargetPosition.X
+        && Position.Y == TargetPosition.Y)
         {
-            if (terrain.Grid![Position.X, Position.Y].Resource.Type == TargetResource)
+            if (terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Type == TargetResource)
             {
-                if (terrain.Grid![Position.X, Position.Y].Resource.Status is GrowthProcess.Ripe)
+                //Console.Write("First IF works!");
+                if (terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Status is GrowthProcess.Ripe)
                 {
-                    foreach (Tree tree in terrain.TreeList)
-                    if (Position == tree.Position) terrain.TreeList.Remove(tree);
+                    Position = new Position(Position.X - 1, Position.Y);
+                    await Task.Delay(10000);
+                    terrain.TreeList.RemoveAll(tree 
+                    => tree.Position.X == TargetPosition.X
+                    && tree.Position.Y == TargetPosition.Y);
 
-                    terrain.Grid![Position.X, Position.Y].Resource.Status = GrowthProcess.Harvested;
-                    terrain.Grid![Position.X, Position.Y].Resource.Type = ResourceType.None;
+                    terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Status = GrowthProcess.Harvested;
+                    terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Type = ResourceType.None;
                 }
                 if (!TargetMemory.Any())
                 {
+                    //Console.Write("Eshausted IF works!");
                     Status = Status.Exhausted;
                     TargetMemorySize = 0;                     
                 }
