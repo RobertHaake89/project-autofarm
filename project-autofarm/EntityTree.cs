@@ -48,6 +48,10 @@ abstract partial class Entity : ITargetable
     public char Icon { get => Position == SpawnPoint ? ' ' : field;
     set ;}
     public Gender Gender {get; init;}
+    public int SpeedMove {get => 
+    Status is Status.Exhausted 
+        ? (int)(field * 1.5) 
+        : field; set;}
     public Position Position {get => field; set
         {
             field = new Position(
@@ -59,11 +63,12 @@ abstract partial class Entity : ITargetable
     public Position TargetPosition;
     public Status Status {get; set;} = Status.Idle;
 
-    public Entity(string name, char icon, Gender gender, Position position)
+    public Entity(string name, char icon, Gender gender, int speedMove, Position position)
     {
         Name = name;
         Icon = icon;
         Gender = gender;
+        SpeedMove = speedMove;
         SpawnPoint = position;
         Position = position;
         IdlePosition = SpawnPoint; //new Position(Random.Shared.Next(0, Terrain.MaxSizeX), Random.Shared.Next(0, Random.Shared.Next(0, Terrain.MaxSizeY)));
@@ -86,8 +91,16 @@ partial class Human : Entity
     public ProcessingMode Mode {get; set;} = ProcessingMode.None;
     public int TargetMemorySize {get => field; set => field = Math.Max(field,value);}
     public List<Position> TargetMemory {get; set;} = new List<Position>();
+    public int SpeedWorking {get;
+    set => field = Profession switch
+    {
+        Profession.Farmer => 100,
+        Profession.Forester => 10000,
+        Profession.Forager => 4000,
+        _ => 500
+    };}
 
-    public Human(string name, char icon, Gender gender,Profession profession, Specialisation specialisation, Position position) : base(name, icon, gender, position)
+    public Human(string name, char icon, Gender gender, int speedMove, Profession profession, Specialisation specialisation, Position position) : base(name, icon, gender, speedMove, position)
     {
         Profession = profession;
         Specialisation = specialisation;

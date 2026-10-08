@@ -34,16 +34,17 @@ partial class Human : Entity
                 if (!TargetMemory.Any()) await ScanFor(terrain);
                 
                  await MoveTo(terrain);
+                 await Task.Delay(SpeedMove);
                 
                 if (Profession is Profession.Farmer)
                 {
                     await DoFarmWork(terrain);
-                    await Task.Delay(70);
+                    await Task.Delay(SpeedWorking);
                 } 
                     if (Profession is Profession.Forester)
                 {
                     await ChopWood(terrain);
-                    await Task.Delay(100);
+                    await Task.Delay(SpeedWorking);
                 } 
             
                 
@@ -63,6 +64,8 @@ partial class Human : Entity
                 Status = Status.Idle;
             }
     }
+
+
 
     public override async Task ScanFor(Terrain terrain)
     {
@@ -196,6 +199,9 @@ partial class Human : Entity
 
                     terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Status = GrowthProcess.Harvested;
                     terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Type = ResourceType.None;
+
+                    Status = Status.Exhausted;
+                    TargetMemory.Clear();
                 }
                 if (!TargetMemory.Any())
                 {
