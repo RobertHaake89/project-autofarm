@@ -26,31 +26,38 @@ partial class Human : Entity
     }
     public override async Task GeneralConditioner(Terrain terrain)
     {
+        /* Console.Write(
+    $"Position: {Position} | Status: {Status} | " +
+    $"Targets: {TargetMemory.Count} | TargetSize: {TargetMemorySize}"); */
+
+
         if (Status is Status.Idle)
         {
-            if (Profession is not Profession.None) Status = Status.Working;
+            if (Profession is not Profession.None)
+                Status = Status.Working;
 
-            if (Profession is Profession.Forester)
+            /* if (Profession is Profession.Forester)
             {
-                if (terrain.TreeList.Count <= Terrain.TreeMaxQty / 2)
+                if (terrain.TreeList.Count < Terrain.TreeMaxQty / 2)
                 {
                     Mode = ProcessingMode.Planting;
-                    //TargetResource = ResourceType.Fertile;
+                    Console.Write("Plantmode");
                 }
-                else
+                else if (terrain.TreeList.Count >= Terrain.TreeMaxQty / 2)
                 {
                     Mode = ProcessingMode.Harvesting;
-                    //TargetResource = ResourceType.SpruceWood;
+                    Console.Write("Harvestmode");
                 }
-            }
+            } */
         }
 
         if (Status is Status.Working)
         {
-            if (!TargetMemory.Any()/*  && Mode is not ProcessingMode.Planting */) await ScanFor(terrain);
+            if (!TargetMemory.Any())
+                await ScanFor(terrain);
             
-                await MoveTo(terrain);
-                await Task.Delay(SpeedMove);
+            await MoveTo(terrain);
+            await Task.Delay(SpeedMove);
             
             if (Profession is Profession.Farmer)
             {
@@ -59,31 +66,31 @@ partial class Human : Entity
             } 
             if (Profession is Profession.Forester)
             {
-                if (Mode is ProcessingMode.Harvesting)
+                if (terrain.TreeList.Count >= Terrain.TreeMaxQty / 2)
                 {
+                    Mode = ProcessingMode.Harvesting;
                     await ChopWood(terrain);
                     await Task.Delay(SpeedWorking);
                 }
-                else if (Mode is ProcessingMode.Planting)
+                else if (terrain.TreeList.Count < Terrain.TreeMaxQty / 2)
                 {
-                    await PlantTree(terrain,randomFactor: 60);
+                    Mode = ProcessingMode.Planting;
+                    await PlantTree(terrain,randomFactor: 130);
                     await Task.Delay(SpeedWorking);
                 }
             }
-
-            //Console.Write($"Name:{this} Specialisation: {Specialisation} TargetResource: {TargetResource} Mode: {Mode}");
-            
                 
             }
-            else if (Status is Status.Exhausted)
+            if (Status is Status.Exhausted)
             {
+                TargetPosition = IdlePosition;
                 if (Position == IdlePosition) Status = Status.Resting;
 
                 await MoveTo(terrain);
 
                 await Task.Delay(400);
             }
-            else if (Status is Status.Resting)
+            if (Status is Status.Resting)
             {
                 TargetMemory.Clear();
                 await Task.Delay(10000);
@@ -240,6 +247,9 @@ partial class Human : Entity
     }
     public async Task PlantTree(Terrain terrain, int randomFactor)
     {
+        /* if (Status is Status.Exhausted)
+            return; */
+
         int randomNumber = Random.Shared.Next(0, randomFactor + 1);
 
         if (terrain.Grid![Position.X, Position.Y].Resource.Type is ResourceType.Fertile)
@@ -249,11 +259,16 @@ partial class Human : Entity
                 terrain.TreeList.Add(new Tree(TreeType.Spruce, new Position(Position.X, Position.Y), GrowthProcess.Planted));
             }
 
-            if (terrain.TreeList.Count == Terrain.TreeMaxQty)
+            //if (!TargetMemory.Any()) Status = Status.Exhausted;
+            if (terrain.TreeList.Count > Terrain.TreeMaxQty * 7/10)
             {
+                
                 Mode = ProcessingMode.Harvesting;
                 Status = Status.Exhausted;
+                //TargetMemory.Clear();
             }
+            else await ScanFor(terrain);
+            
         }
     }
 

@@ -2,11 +2,19 @@ using System;
 
 namespace ProjectAutofarm;
 
+public enum Soil
+{
+    Barren = 0,
+    SemiArid,
+    Fertile
+}
+
 class Tile : ITargetable
 {
     public Texture Texture {get; set;}
     public Position Position {get; set;}
     public Resource Resource {get; set;}
+    public Soil Soil {get; set;} = Soil.Barren;
     public Tile((int x, int y) position, string textureName = "empty")
     {
         Texture = new Texture(textureName);
@@ -37,7 +45,7 @@ class Tile : ITargetable
         Texture.TextureName = Texture.TextureName;
     }
 
-    public void UpdateTrees()
+    public void UpdateTrees(Terrain terrain)
     {
         if (Resource != null)
         {

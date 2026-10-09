@@ -61,12 +61,5 @@ class Resource : ITargetable, IHarvestable
     }
 }
 
-/* class Wheat : Ressource
-{
-    public Wheat(GrowthProcess status) : base(RessourceType.Wheat, status)
-    {
-        
-    }
-} */
 
 

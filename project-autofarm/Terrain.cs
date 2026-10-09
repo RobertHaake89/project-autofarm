@@ -52,9 +52,9 @@ partial class Terrain // Creation Methods
 
     private void CreateFertileSoil()
     {
-        for (int y = MaxSizeY / 3; y < MaxSizeY; y++)
+        for (int y = 4; y < MaxSizeY; y++)
         {
-            for (int x = MaxSizeX / 3; x < MaxSizeX; x++)
+            for (int x = MaxSizeX / 3; x < MaxSizeX - 4; x++)
             {
                 Grid![x,y].Resource.Type = ResourceType.Fertile;
             }

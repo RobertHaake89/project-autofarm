@@ -5,6 +5,7 @@ namespace ProjectAutofarm;
 
 class General
 {
+    private static int _isUpdating = 0;
     public static async Task MainLoop(Terrain terrain, Dictionary<string, Entity> entityDict)
     {
         Console.Clear();
@@ -17,16 +18,19 @@ class General
 
         while (true)
         {
-            await UpdateGame(terrain);
-
+            UpdateTiles(terrain);
+            await UpdateGameAsync(terrain);
             Renderer.Screen(terrain, entityDict);
+
+            //Console.Write($"{entityDict["human2"].Position}, {entityDict["human2"].Status}");
+            
 
             //Console.ReadKey();
             await Task.Delay(100); // 60
         }
     }
 
-    public static async Task UpdateGame(Terrain terrain)
+    public static void UpdateTiles(Terrain terrain)
     {
         for (int y = 0; y < Terrain.MaxSizeY; y++)
         {
@@ -35,10 +39,33 @@ class General
                 terrain.Grid![x,y].Resource.GiveGrowthChance();
 
                 terrain.Grid![x,y].UpdateAcre();
-                //terrain.Grid![x,y].UpdateTrees();
+                //terrain.Grid![x,y].UpdateAcre();
 
             }
         }
 
+    }
+
+    public static async Task UpdateGameAsync(Terrain terrain)
+    {
+        if (Interlocked.Exchange(ref _isUpdating, 1) == 1)
+            return;
+
+        try
+        {
+            foreach (Tree tree in terrain.TreeList.ToList())
+            {
+                await tree.GiveGrowthChance();
+                await tree.SelfSeeding(terrain, randomFactor: 1000);
+
+            }
+                
+            
+            //await Task.Delay(1000);
+        }
+        finally
+        {
+            Volatile.Write(ref _isUpdating, 0);
+        }
     }
 }
