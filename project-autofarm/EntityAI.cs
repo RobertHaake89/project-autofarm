@@ -1,8 +1,4 @@
 using System;
-using System.Diagnostics;
-using System.Formats.Asn1;
-using System.Runtime.CompilerServices;
-using System.Security;
 
 namespace ProjectAutofarm;
 
@@ -36,19 +32,10 @@ partial class Human : Entity
             if (Profession is not Profession.None)
                 Status = Status.Working;
 
-            /* if (Profession is Profession.Forester)
-            {
-                if (terrain.TreeList.Count < Terrain.TreeMaxQty / 2)
-                {
-                    Mode = ProcessingMode.Planting;
-                    Console.Write("Plantmode");
-                }
-                else if (terrain.TreeList.Count >= Terrain.TreeMaxQty / 2)
-                {
-                    Mode = ProcessingMode.Harvesting;
-                    Console.Write("Harvestmode");
-                }
-            } */
+            if (Profession is Profession.Forester
+            && terrain.TreeList.Count >= Terrain.TreeCuttingThreshold
+            && terrain.TreeList.Count( tree => tree.Status is GrowthProcess.Ripe) < Terrain.TreeCuttingThreshold)
+                Status = Status.Resting;
         }
 
         if (Status is Status.Working)
@@ -66,13 +53,15 @@ partial class Human : Entity
             } 
             if (Profession is Profession.Forester)
             {
-                if (terrain.TreeList.Count > Terrain.TreeMaxQty * 7/10)
+                //Console.Write(Mode);
+                //Console.Write(Terrain.TreeCuttingThreshold);
+                if (terrain.TreeList.Count >= Terrain.TreeCuttingThreshold)
                 {
                     Mode = ProcessingMode.Harvesting;
                     await ChopWood(terrain);
                     await Task.Delay(SpeedWorking);
                 }
-                else if (terrain.TreeList.Count <= Terrain.TreeMaxQty * 7/10)
+                else if (terrain.TreeList.Count < Terrain.TreeCuttingThreshold)
                 {
                     Mode = ProcessingMode.Planting;
                     await PlantTree(terrain,randomFactor: 110);
@@ -94,6 +83,7 @@ partial class Human : Entity
             {
                 TargetMemory.Clear();
                 await Task.Delay(10000);
+
                 Status = Status.Idle;
             }
     }
@@ -102,6 +92,7 @@ partial class Human : Entity
 
     public override async Task ScanFor(Terrain terrain)
     {
+        //Console.Write("Scan is working");
         for (int y = 0; y < Terrain.MaxSizeY; y++)
         {
             int start = y % 2 == 0 ? 0 : Terrain.MaxSizeX - 1;
@@ -132,12 +123,13 @@ partial class Human : Entity
                 }
             }
             TargetMemory = TargetMemory.Distinct().ToList();
-            if (TargetMemory.Count == TargetMemorySize) Status = Status.Working;
+            //if (TargetMemory.Count == TargetMemorySize) Status = Status.Working;
         }        
     }
 
     public override async Task MoveTo(Terrain terrain)
     {
+        //Console.Write("MoveTo WOrks ");
         Position chosenTarget;
 
         if (Status is not Status.Exhausted && TargetMemory.Count == 0) return;
@@ -212,10 +204,11 @@ partial class Human : Entity
 
     public async Task ChopWood(Terrain terrain)
     {
+        //Console.Write("Chopping entry");
         //Console.Write($"Position: {Position} TargetPosition: {TargetPosition}");
         //Console.ReadKey();
-        if (terrain.TreeList.Count == Terrain.TreeMaxQty * 7/10
-        && Mode is ProcessingMode.Harvesting
+        if (/* terrain.TreeList.Count >= Terrain.TreeCuttingThreshold
+        &&  */Mode is ProcessingMode.Harvesting
         && Specialisation is Specialisation.SpruceWood or Specialisation.OakWood
         && TargetResource is ResourceType.SpruceWood or ResourceType.OakWood
         && Position.X == TargetPosition.X
@@ -227,7 +220,7 @@ partial class Human : Entity
                 if (terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Status is GrowthProcess.Ripe)
                 {
                     Position = new Position(Position.X - 1, Position.Y);
-                    await Task.Delay(10); // 10000
+                    await Task.Delay(10_000); // 10000
                     terrain.TreeList.RemoveAll(tree 
                     => tree.Position.X == TargetPosition.X
                     && tree.Position.Y == TargetPosition.Y);
@@ -249,8 +242,8 @@ partial class Human : Entity
     }
     public async Task PlantTree(Terrain terrain, int randomFactor)
     {
-        /* if (Status is Status.Exhausted)
-            return; */
+        if (Status is Status.Exhausted)
+            return;
 
         int randomNumber = Random.Shared.Next(0, randomFactor + 1);
 
@@ -261,13 +254,13 @@ partial class Human : Entity
                 terrain.TreeList.Add(new Tree(TreeType.Spruce, new Position(Position.X, Position.Y), GrowthProcess.Planted));
             }
 
-            //if (!TargetMemory.Any()) Status = Status.Exhausted;
-            if (terrain.TreeList.Count >= Terrain.TreeMaxQty * 7/10)
+            if (!TargetMemory.Any()) Status = Status.Exhausted;
+            if (terrain.TreeList.Count >= Terrain.TreeCuttingThreshold)
             {
                 
                 Mode = ProcessingMode.Harvesting;
                 Status = Status.Exhausted;
-                //TargetMemory.Clear();
+                TargetMemory.Clear();
             }
             else await ScanFor(terrain);
             

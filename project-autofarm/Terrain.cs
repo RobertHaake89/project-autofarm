@@ -10,8 +10,9 @@ partial class Terrain // Data and Parameters
     public const int MaxSizeX = 90;
     public const int MaxSizeY = MaxSizeX * (16/9) / 4;
     public const int TreeMaxQty = SpruceMaxQty + OakMaxQty;
-    public const int SpruceMaxQty = 10;
+    public const int SpruceMaxQty = 20;
     public const int OakMaxQty = 1;
+    public const int TreeCuttingThreshold = TreeMaxQty * 7 / 10;
     public List<Tree> TreeList {get; set;} = [];
 
     public void CreateMap() // xMin, yMin, xMax, yMax, radius?
@@ -191,11 +192,11 @@ partial class Terrain // Creation Methods
         TreeList.Distinct();
         TreeList.Sort((a,b) => a.Position.Y.CompareTo(b.Position.Y));
 
-        foreach (Tree tree in TreeList)
+        /* foreach (Tree tree in TreeList)
         {
-            Grid![tree.Position.X,tree.Position.Y].Resource.Type = tree.Resource;
+            Grid![tree.Position.X, tree.Position.Y].Resource.Type = tree.Resource;
             Grid![tree.Position.X, tree.Position.Y].Resource.Status = tree.Status;
-        }
+        } */
     }
 
     private void CreateMushrooms(int xMin, int yMin, int xMax, int yMax, int factor)

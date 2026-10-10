@@ -79,13 +79,15 @@ class Tree
         && spreadSpectrumY > 2);
         
 
-        if (terrain.TreeList.Count <= Terrain.TreeMaxQty / 2
+        if (terrain.TreeList.Count <= Terrain.TreeMaxQty
         && randomNumber == randomFactor
         && Type is TreeType.Spruce
         && Status is GrowthProcess.Ripe
         && terrain.Grid![Position.X + spreadSpectrumX, Position.Y + spreadSpectrumY].Resource.Type is ResourceType.Fertile)
         {
             terrain.TreeList.Add(new Tree(Type, new Position(Position.X +setPosition.X, Position.Y + setPosition.Y), GrowthProcess.Planted));
+            //terrain.Grid![spreadSpectrumX,spreadSpectrumY].Resource.Type = tree.Resource;
+            //terrain.Grid![spreadSpectrumX,spreadSpectrumY].Resource.Status = tree.Status;
         }
     }
 

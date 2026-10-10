@@ -22,7 +22,7 @@ class General
             await UpdateGameAsync(terrain);
             Renderer.Screen(terrain, entityDict);
 
-            Console.Write($"{entityDict["human2"].Position}, {entityDict["human2"].Status}");
+            //Console.Write($"{entityDict["human2"].Position}, {entityDict["human2"].Status}");
             
 
             //Console.ReadKey();
@@ -56,8 +56,17 @@ class General
             foreach (Tree tree in terrain.TreeList.ToList())
             {
                 await tree.GiveGrowthChance();
-                await tree.SelfSeeding(terrain, randomFactor: 900);
+                await tree.SelfSeeding(terrain, randomFactor: 1300);
+
+                terrain.Grid![tree.Position.X, tree.Position.Y].Resource.Type = tree.Resource;
+                terrain.Grid![tree.Position.X, tree.Position.Y].Resource.Status = tree.Status;
             }
+
+            /* foreach (Tree tree in terrain.TreeList)
+        {
+            terrain.Grid![tree.Position.X, tree.Position.Y].Resource.Type = tree.Resource;
+            terrain.Grid![tree.Position.X, tree.Position.Y].Resource.Status = tree.Status;
+        } */
                 
             
             //await Task.Delay(1000);
