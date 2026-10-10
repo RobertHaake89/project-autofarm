@@ -12,7 +12,7 @@ partial class Terrain // Data and Parameters
     public const int TreeMaxQty = SpruceMaxQty + OakMaxQty;
     public const int SpruceMaxQty = 10;
     public const int OakMaxQty = 1;
-    public List<Tree> TreeList {get; set;} = new List<Tree>();
+    public List<Tree> TreeList {get; set;} = [];
 
     public void CreateMap() // xMin, yMin, xMax, yMax, radius?
     {
@@ -27,7 +27,7 @@ partial class Terrain // Data and Parameters
         CreateStones(0,0,100,100,factor:100);
         CreateField(70,35,90,80);
 
-        CreateTrees(TreeType.Spruce, qtyMin: 5, qtyMax: SpruceMaxQty, xMin:MaxSizeX / 3, yMin: 4, xMax: MaxSizeX - 5, yMax: MaxSizeY / 3);
+        //CreateTrees(TreeType.Spruce, qtyMin: 5, qtyMax: SpruceMaxQty, xMin:MaxSizeX / 3, yMin: 4, xMax: MaxSizeX - 5, yMax: MaxSizeY / 3);
         CreateTrees(TreeType.Oak, qtyMin: 1, qtyMax: OakMaxQty, xMin:5 , yMin: MaxSizeY * 2 / 3, xMax: MaxSizeX * 2 / 3, yMax: MaxSizeY - 1);
 
         CreateMushrooms(0,0,95,30,factor:60);

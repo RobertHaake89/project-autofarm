@@ -66,16 +66,16 @@ partial class Human : Entity
             } 
             if (Profession is Profession.Forester)
             {
-                if (terrain.TreeList.Count >= Terrain.TreeMaxQty / 2)
+                if (terrain.TreeList.Count > Terrain.TreeMaxQty * 7/10)
                 {
                     Mode = ProcessingMode.Harvesting;
                     await ChopWood(terrain);
                     await Task.Delay(SpeedWorking);
                 }
-                else if (terrain.TreeList.Count < Terrain.TreeMaxQty / 2)
+                else if (terrain.TreeList.Count <= Terrain.TreeMaxQty * 7/10)
                 {
                     Mode = ProcessingMode.Planting;
-                    await PlantTree(terrain,randomFactor: 130);
+                    await PlantTree(terrain,randomFactor: 110);
                     await Task.Delay(SpeedWorking);
                 }
             }
@@ -88,7 +88,7 @@ partial class Human : Entity
 
                 await MoveTo(terrain);
 
-                await Task.Delay(400);
+                await Task.Delay(SpeedMove * 2);
             }
             if (Status is Status.Resting)
             {
@@ -214,7 +214,9 @@ partial class Human : Entity
     {
         //Console.Write($"Position: {Position} TargetPosition: {TargetPosition}");
         //Console.ReadKey();
-        if (Specialisation is Specialisation.SpruceWood or Specialisation.OakWood
+        if (terrain.TreeList.Count == Terrain.TreeMaxQty * 7/10
+        && Mode is ProcessingMode.Harvesting
+        && Specialisation is Specialisation.SpruceWood or Specialisation.OakWood
         && TargetResource is ResourceType.SpruceWood or ResourceType.OakWood
         && Position.X == TargetPosition.X
         && Position.Y == TargetPosition.Y)
@@ -231,12 +233,12 @@ partial class Human : Entity
                     && tree.Position.Y == TargetPosition.Y);
 
                     terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Status = GrowthProcess.Harvested;
-                    terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Type = ResourceType.Fertile;
+                    //terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Type = ResourceType.Fertile;
 
                     Status = Status.Exhausted;
                     TargetMemory.Clear();
                 }
-                if (!TargetMemory.Any())
+                if (TargetMemory.Count == 0)
                 {
                     //Console.Write("Eshausted IF works!");
                     Status = Status.Exhausted;
@@ -260,7 +262,7 @@ partial class Human : Entity
             }
 
             //if (!TargetMemory.Any()) Status = Status.Exhausted;
-            if (terrain.TreeList.Count > Terrain.TreeMaxQty * 7/10)
+            if (terrain.TreeList.Count >= Terrain.TreeMaxQty * 7/10)
             {
                 
                 Mode = ProcessingMode.Harvesting;
