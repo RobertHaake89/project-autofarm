@@ -24,7 +24,6 @@ public enum ResourceType
     }
 class Resource : ITargetable, IHarvestable
 {
-    //public Tile Tile {get;}
     public ResourceType Type {get; set;} = ResourceType.None;
     public string? Name => Type.ToString();
     public Position Position {get; set;}

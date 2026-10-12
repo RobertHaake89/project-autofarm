@@ -9,7 +9,6 @@ class General
     public static async Task MainLoop(Terrain terrain, Dictionary<string, Entity> entityDict)
     {
         Console.Clear();
-        //var tasks = new List <Task>();
         
         foreach (Entity entity in entityDict.Values)
         {
@@ -22,9 +21,6 @@ class General
             await UpdateGameAsync(terrain);
             Renderer.Screen(terrain, entityDict);
 
-            //Console.Write($"{entityDict["human2"].Position}, {entityDict["human2"].Status}");
-            
-            //Console.Write(terrain.TreeList.Count);
             //Console.ReadKey();
             await Task.Delay(100); // 60
         }
@@ -61,15 +57,6 @@ class General
                 terrain.Grid![tree.Position.X, tree.Position.Y].Resource.Type = tree.Resource;
                 terrain.Grid![tree.Position.X, tree.Position.Y].Resource.Status = tree.Status;
             }
-
-            /* foreach (Tree tree in terrain.TreeList)
-        {
-            terrain.Grid![tree.Position.X, tree.Position.Y].Resource.Type = tree.Resource;
-            terrain.Grid![tree.Position.X, tree.Position.Y].Resource.Status = tree.Status;
-        } */
-                
-            
-            //await Task.Delay(1000);
         }
         finally
         {

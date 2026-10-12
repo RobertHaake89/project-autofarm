@@ -1,6 +1,6 @@
 # Project Autofarm
 
-![Project Autofarm](Images/main.png)
+![Project Autofarm](Images/main_121026.png)
 
 ## About
 
@@ -91,6 +91,7 @@ This project has already helped me a lot so far to strengthen my C# knowledge, b
 
 ### Requirements
 
+* C# 14
 * .NET 10 SDK
 
 ### Run
@@ -124,3 +125,18 @@ This project is licensed under the MIT License.
 * **27-09-26** — NPC can harvest wheat but needs polish
 * **28-09-26** — Partial Entity class and inheritance of Professions
 * **29-09-26** — Harvesting works well so far. Renamed Pine to Spruce. Added some images
+* **30-09-26** — Added Exhausted Mechanic, harvesting buggy now, needs fix asap! Milestone: Project AutoFarm's villagers are moving Async!
+* **01-10-26** — Added Working-Exhaustion cycle. NPC still needs to properly know when all Tiles are ripe!
+added specialisations to preofessions and refactoring between inheritance and composition
+* **02-10-26** — Fix: farming cycle working fine so far
+* **05-10-26** — Add: NPC icon-getter adjusted to fit Spawnpoint
+* **06-10-26** — WIP: Tree instances creation and rendering. Still very glitchy! Add: new Tree class
+
+* **07-10-26** — WIP: Forager is scanning and walking. changed tree render position from anchor top-left to bottom-centre. Cleaned up tree-gen code. Fine adjustment in tree placement. Add: render dimension
+* **08-10-26** — add: tree planting works but needs polish. WIP: forester scanning. Add: Fertile to Resource Status and fertilzer method for terrain world-gen. Add: movment speed depending on status. Fix: Tree chopping and async adjustment
+
+* **09-10-26** — WIP: planting mechanic added, still buggy
+* **10-10-26** — Reason for buggy forestry found.. no tile resource update.. WIP: Balancing tree planting and self-seeding. Planting to chopping still very buggy
+
+* **12-10-26** — Tree planting/self-seeding/harvesting mechanic (hopefully) fixed and added Fisher-Yater Algorithm to shuffly forester's targets. WIP fixing SelfSeeding and out of boundaries Array bug
+* **13-10-26** — 

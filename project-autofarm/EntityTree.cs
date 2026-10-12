@@ -71,7 +71,7 @@ abstract partial class Entity : ITargetable
         SpeedMove = speedMove;
         SpawnPoint = position;
         Position = position;
-        IdlePosition = SpawnPoint; //new Position(Random.Shared.Next(0, Terrain.MaxSizeX), Random.Shared.Next(0, Random.Shared.Next(0, Terrain.MaxSizeY)));
+        IdlePosition = SpawnPoint;
         TargetPosition = position;
     }
 }

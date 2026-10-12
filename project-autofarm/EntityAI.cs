@@ -17,24 +17,18 @@ partial class Human : Entity
         while (true)
         {
             await GeneralConditioner(terrain);
-            //await Task.Delay(100);
         }
     }
     public override async Task GeneralConditioner(Terrain terrain)
     {
-        /* Console.Write(
-    $"Position: {Position} | Status: {Status} | " +
-    $"Targets: {TargetMemory.Count} | TargetSize: {TargetMemorySize}"); */
-
-
         if (Status is Status.Idle)
         {
             if (Profession is not Profession.None)
                 Status = Status.Working;
 
             if (Profession is Profession.Forester
-            /* && terrain.TreeList.Count >= Terrain.TreeCuttingThreshold */
-            && terrain.TreeList.Count( tree => tree.Status is GrowthProcess.Ripe) >= Terrain.TreeCuttingThreshold)
+                && terrain.TreeList.Count( tree => tree.Status is GrowthProcess.Ripe)
+                >= Terrain.TreeCuttingThreshold)
                 Status = Status.Working;
         }
 
@@ -53,8 +47,6 @@ partial class Human : Entity
             } 
             if (Profession is Profession.Forester)
             {
-                //Console.Write(Mode);
-                //Console.Write(Terrain.TreeCuttingThreshold);
                 if (terrain.TreeList.Count >= Terrain.TreeCuttingThreshold)
                 {
                     Mode = ProcessingMode.Harvesting;
@@ -92,7 +84,6 @@ partial class Human : Entity
 
     public override async Task ScanFor(Terrain terrain)
     {
-        //Console.Write("Scan is working");
         for (int y = 0; y < Terrain.MaxSizeY; y++)
         {
             int start = y % 2 == 0 ? 0 : Terrain.MaxSizeX - 1;
@@ -125,13 +116,11 @@ partial class Human : Entity
             TargetMemory = TargetMemory.Distinct().ToList();
 
             if (Profession is Profession.Forester && Mode is ProcessingMode.Harvesting) TargetMemory.Shuffle();
-            //if (TargetMemory.Count == TargetMemorySize) Status = Status.Working;
         }        
     }
 
     public override async Task MoveTo(Terrain terrain)
     {
-        //Console.Write("MoveTo WOrks ");
         Position chosenTarget;
 
         if (Status is not Status.Exhausted && TargetMemory.Count == 0) return;
@@ -153,15 +142,7 @@ partial class Human : Entity
         else if (Position.X < chosenTarget.X) Position = new Position(Position.X + 1, Position.Y);
         else if (Position.Y < chosenTarget.Y) Position = new Position(Position.X, Position.Y + 1);
         else if (Position.X > chosenTarget.X) Position = new Position(Position.X - 1, Position.Y);
-        else if (Position.Y > chosenTarget.Y) Position = new Position(Position.X, Position.Y - 1);
-
-        /* if (Position == chosenTarget && TargetResource is ResourceType.SpruceWood or ResourceType.OakWood)
-        {
-            //TargetPosition = new Position(chosenTarget.X - 1, chosenTarget.Y);
-            Position = new Position(Position.X - 1, Position.Y);
-        } */
-
-        
+        else if (Position.Y > chosenTarget.Y) Position = new Position(Position.X, Position.Y - 1);        
 
         if (Status is not Status.Exhausted
         && Position == chosenTarget
@@ -206,20 +187,14 @@ partial class Human : Entity
 
     public async Task ChopWood(Terrain terrain)
     {
-        //Console.Write("Chopping entry");
-        //Console.Write($"Position: {Position} TargetPosition: {TargetPosition}");
-        //Console.ReadKey();
-
-        if (/* terrain.TreeList.Count >= Terrain.TreeCuttingThreshold
-        &&  */Mode is ProcessingMode.Harvesting
-        && Specialisation is Specialisation.SpruceWood or Specialisation.OakWood
-        && TargetResource is ResourceType.SpruceWood or ResourceType.OakWood
-        && Position.X == TargetPosition.X
-        && Position.Y == TargetPosition.Y)
+        if (Mode is ProcessingMode.Harvesting
+            && Specialisation is Specialisation.SpruceWood or Specialisation.OakWood
+            && TargetResource is ResourceType.SpruceWood or ResourceType.OakWood
+            && Position.X == TargetPosition.X
+            && Position.Y == TargetPosition.Y)
         {
             if (terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Type == TargetResource)
             {
-                //Console.Write("First IF works!");
                 if (terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Status is GrowthProcess.Ripe)
                 {
                     Position = new Position(Position.X - 1, Position.Y);
@@ -229,14 +204,12 @@ partial class Human : Entity
                     && tree.Position.Y == TargetPosition.Y);
 
                     terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Status = GrowthProcess.Harvested;
-                    //terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Type = ResourceType.Fertile;
 
                     Status = Status.Exhausted;
                     TargetMemory.Clear();
                 }
                 if (TargetMemory.Count == 0)
                 {
-                    //Console.Write("Eshausted IF works!");
                     Status = Status.Exhausted;
                     TargetMemorySize = 0;                     
                 }
@@ -269,19 +242,4 @@ partial class Human : Entity
             
         }
     }
-
-    /* public async Task DoScouting(Terrain terrain, ResourceType target)
-    {
-        Position startingPosition = new Position(Terrain.MaxSizeX / 3, Terrain.MaxSizeY / 3);
-        TargetPosition = startingPosition;
-        await MoveTo(terrain);
-
-        for (int y = Terrain.MaxSizeY / 3; y < Terrain.MaxSizeY; y++)
-        {
-            for (int x = Terrain.MaxSizeX / 3; x < Terrain.MaxSizeX; x++)
-            {
-                if ()
-            }
-        }
-    } */
 }

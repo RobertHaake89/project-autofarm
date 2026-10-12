@@ -1,6 +1,4 @@
 using System;
-using System.ComponentModel;
-using System.Security.Cryptography.X509Certificates;
 
 namespace ProjectAutofarm;
 
@@ -75,7 +73,7 @@ partial class Terrain // Creation Methods
     
     private void CreateGrassPatch(int xMin, int yMin, int xMax, int yMax, int radius)
     {
-        var OffsetMin = (X:MaxSizeX * xMin/100, Y:MaxSizeY * yMin/100); // parameters for min/max size
+        var OffsetMin = (X:MaxSizeX * xMin/100, Y:MaxSizeY * yMin/100);
         var OffsetMax = (X:MaxSizeX * xMax/100, Y:MaxSizeY * yMax/100);
 
         for (int incY = OffsetMin.Y; incY < OffsetMax.Y; incY++)
@@ -180,13 +178,6 @@ partial class Terrain // Creation Methods
         
 
         TreeList.Distinct();
-        //TreeList.Sort((a,b) => a.Position.Y.CompareTo(b.Position.Y));
-
-        /* foreach (Tree tree in TreeList)
-        {
-            Grid![tree.Position.X, tree.Position.Y].Resource.Type = tree.Resource;
-            Grid![tree.Position.X, tree.Position.Y].Resource.Status = tree.Status;
-        } */
     }
 
     private void CreateMushrooms(int xMin, int yMin, int xMax, int yMax, int factor)

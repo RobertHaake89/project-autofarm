@@ -32,19 +32,6 @@ class Tree
         terrain.Grid![Position.X, Position.Y ].Resource.Type = Resource;
     }
 
-    /* public void CreateTree(TreeType type, Position position, Terrain terrain)
-    {
-        if (Type == TreeType.Spruce) terrain.TreeList.Add(new Tree(TreeType.Spruce, new Position(position.X, position.Y), GrowthProcess.Planted));
-        if (type == TreeType.Oak) terrain.TreeList.Add(new Tree(TreeType.Oak, new Position(position.X, position.Y), GrowthProcess.Planted));
-        
-        terrain.Grid![Position.X, Position.Y ].Resource.Type = Resource;
-    }
-
-    public void SetTileResource(Terrain terrain)
-    {
-        terrain.Grid![Position.X, Position.Y ].Resource.Type = Resource;
-    } */
-
     public async Task GiveGrowthChance()
     {
         int factor = Type switch
@@ -67,8 +54,6 @@ class Tree
 
     public Task SelfSeeding(Terrain terrain, int randomFactor)
     {
-        //await Task.Delay(1000);
-
         int randomNumber = Random.Shared.Next(0, randomFactor + 1);
 
         int spreadSpectrumX;
@@ -84,11 +69,10 @@ class Tree
             setPosition = new Position(Position.X + spreadSpectrumX,Position.Y + spreadSpectrumY);
         }
         while (spreadSpectrumX < -3
-        && spreadSpectrumY < -1
-        && spreadSpectrumX > 3
-        && spreadSpectrumY > 2);
+            && spreadSpectrumY < -1
+            && spreadSpectrumX > 3
+            && spreadSpectrumY > 2);
 
-        //Console.Write(setPosition);
         setPosition.X = Math.Clamp(setPosition.X, borderDistanceX, Terrain.MaxSizeX - borderDistanceX);
         setPosition.Y = Math.Clamp(setPosition.Y, borderDistanceY, Terrain.MaxSizeY - borderDistanceY - 1);
 

@@ -69,7 +69,8 @@ class Renderer
                 {
                     string textureName = tree.Texture[y,x];
                     
-                    if (textureName == "skip") continue;
+                    if (textureName == "skip")
+                        continue;
                     
                     int screenX = startX + x;
                     int screenY = startY + y;
@@ -77,11 +78,8 @@ class Renderer
                     int index = screenY * (Terrain.MaxSizeX + Environment.NewLine.Length) + screenX;
 
                     output[index] = Texture.List[textureName];
-                    //Console.Write(tree.Position);
                 }
             }
         }
-
-        
     }
 }

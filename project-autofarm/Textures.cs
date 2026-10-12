@@ -1,6 +1,3 @@
-using System;
-using System.IO;
-
 namespace ProjectAutofarm;
 
 class Texture(string textureName = "empty")
