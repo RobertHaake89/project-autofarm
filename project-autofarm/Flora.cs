@@ -73,8 +73,8 @@ class Tree
 
         int spreadSpectrumX;
         int spreadSpectrumY;
-        //int borderDistanceX = 6;
-        //int borderDistanceY = 3;
+        int borderDistanceX = 6;
+        int borderDistanceY = 4;
         Position setPosition;
 
         do
@@ -87,14 +87,17 @@ class Tree
         && spreadSpectrumY < -1
         && spreadSpectrumX > 3
         && spreadSpectrumY > 2);
-        
+
+        //Console.Write(setPosition);
+        setPosition.X = Math.Clamp(setPosition.X, borderDistanceX, Terrain.MaxSizeX - borderDistanceX);
+        setPosition.Y = Math.Clamp(setPosition.Y, borderDistanceY, Terrain.MaxSizeY - borderDistanceY - 1);
 
         if (terrain.TreeList.Count < Terrain.TreeMaxQty
             && randomNumber == randomFactor
-            && Type is TreeType.Spruce or TreeType.Oak
+            && Type is TreeType.Spruce
             && Status is GrowthProcess.Ripe
             && terrain.Grid![setPosition.X, setPosition.Y]
-                .Soil is Soil.SemiArid or Soil.Fertile)
+                .Resource.Type is ResourceType.Fertile/* Soil is Soil.SemiArid or Soil.Fertile */)
         {
             terrain.TreeList.Add(new Tree(Type, setPosition, GrowthProcess.Planted, terrain));
             //terrain.Grid![spreadSpectrumX,spreadSpectrumY].Resource.Type = tree.Resource;

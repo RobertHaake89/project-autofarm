@@ -24,7 +24,7 @@ class General
 
             //Console.Write($"{entityDict["human2"].Position}, {entityDict["human2"].Status}");
             
-            Console.Write(terrain.TreeList.Count);
+            //Console.Write(terrain.TreeList.Count);
             //Console.ReadKey();
             await Task.Delay(100); // 60
         }
@@ -56,7 +56,7 @@ class General
             foreach (Tree tree in terrain.TreeList.ToList())
             {
                 await tree.GiveGrowthChance();
-                await tree.SelfSeeding(terrain, randomFactor: 1300);
+                await tree.SelfSeeding(terrain, randomFactor: 1000); // 1000
 
                 terrain.Grid![tree.Position.X, tree.Position.Y].Resource.Type = tree.Resource;
                 terrain.Grid![tree.Position.X, tree.Position.Y].Resource.Status = tree.Status;

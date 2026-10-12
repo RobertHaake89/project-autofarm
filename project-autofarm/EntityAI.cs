@@ -33,9 +33,9 @@ partial class Human : Entity
                 Status = Status.Working;
 
             if (Profession is Profession.Forester
-            && terrain.TreeList.Count >= Terrain.TreeCuttingThreshold
-            && terrain.TreeList.Count( tree => tree.Status is GrowthProcess.Ripe) < Terrain.TreeCuttingThreshold)
-                Status = Status.Resting;
+            /* && terrain.TreeList.Count >= Terrain.TreeCuttingThreshold */
+            && terrain.TreeList.Count( tree => tree.Status is GrowthProcess.Ripe) >= Terrain.TreeCuttingThreshold)
+                Status = Status.Working;
         }
 
         if (Status is Status.Working)
@@ -61,10 +61,10 @@ partial class Human : Entity
                     await ChopWood(terrain);
                     await Task.Delay(SpeedWorking);
                 }
-                else if (terrain.TreeList.Count < Terrain.TreeCuttingThreshold)
+                else if (terrain.TreeList.Count < Terrain.TreeMaxQty)
                 {
                     Mode = ProcessingMode.Planting;
-                    await PlantTree(terrain,randomFactor: 110);
+                    await PlantTree(terrain,randomFactor: 70);
                     await Task.Delay(SpeedWorking);
                 }
             }
@@ -123,6 +123,8 @@ partial class Human : Entity
                 }
             }
             TargetMemory = TargetMemory.Distinct().ToList();
+
+            if (Profession is Profession.Forester && Mode is ProcessingMode.Harvesting) TargetMemory.Shuffle();
             //if (TargetMemory.Count == TargetMemorySize) Status = Status.Working;
         }        
     }
@@ -207,6 +209,7 @@ partial class Human : Entity
         //Console.Write("Chopping entry");
         //Console.Write($"Position: {Position} TargetPosition: {TargetPosition}");
         //Console.ReadKey();
+
         if (/* terrain.TreeList.Count >= Terrain.TreeCuttingThreshold
         &&  */Mode is ProcessingMode.Harvesting
         && Specialisation is Specialisation.SpruceWood or Specialisation.OakWood

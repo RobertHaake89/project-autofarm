@@ -10,7 +10,7 @@ partial class Terrain // Data and Parameters
     public const int MaxSizeX = 90;
     public const int MaxSizeY = MaxSizeX * (16/9) / 4;
     public const int TreeMaxQty = SpruceMaxQty + OakMaxQty;
-    public const int SpruceMaxQty = 20;
+    public const int SpruceMaxQty = 19;
     public const int OakMaxQty = 1;
     public const int TreeCuttingThreshold = TreeMaxQty * 7 / 10;
     public List<Tree> TreeList {get; set;} = [];
