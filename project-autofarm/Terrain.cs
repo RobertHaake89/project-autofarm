@@ -29,7 +29,7 @@ partial class Terrain // Data and Parameters
         CreateField(70,35,90,80);
 
         //CreateTrees(TreeType.Spruce, qtyMin: 5, qtyMax: SpruceMaxQty, xMin:MaxSizeX / 3, yMin: 4, xMax: MaxSizeX - 5, yMax: MaxSizeY / 3);
-        CreateTrees(TreeType.Oak, qtyMin: 1, qtyMax: OakMaxQty, xMin:5 , yMin: MaxSizeY * 2 / 3, xMax: MaxSizeX * 2 / 3, yMax: MaxSizeY - 1);
+        CreateTrees(TreeType.Oak, qtyMin: 1, qtyMax: OakMaxQty + 1, xMin:5 , yMin: MaxSizeY * 2 / 3, xMax: MaxSizeX * 2 / 3, yMax: MaxSizeY - 1);
 
         CreateMushrooms(0,0,95,30,factor:60);
         
@@ -170,27 +170,17 @@ partial class Terrain // Creation Methods
         int startingIndex = TreeList.Count;
         int maxQuantityTrees = startingIndex + quantityTrees;
 
-        for (int treeIndex = startingIndex; treeIndex < maxQuantityTrees; treeIndex++)
-        {
-            TreeList.Add(new Tree(treeType, new Position(0,0), GrowthProcess.Ripe));
-            int posX = Random.Shared.Next(xMin, xMax);
-            int posY = Random.Shared.Next(yMin, yMax);
+        int posX = Random.Shared.Next(xMin, xMax + 1);
+        int posY = Random.Shared.Next(yMin, yMax + 1);
 
-            for (int incY = 0; incY < TreeList[treeIndex].Texture!.GetLength(0); incY++)
-            {
-                for (int incX = 0; incX < TreeList[treeIndex].Texture!.GetLength(1); incX++)
-                {
-                    if (TreeList[treeIndex].Texture![incY,incX] != "skip")
-                    {
-                        TreeList[treeIndex].Position = new Position(posX, posY);
-                    }
-                    
-                }
-            }
+        for (int incY = 0; incY < qtyMax; incY++)
+        {
+            TreeList.Add(new Tree(treeType, new Position(posX,posY), GrowthProcess.Ripe, this));
         }
+        
 
         TreeList.Distinct();
-        TreeList.Sort((a,b) => a.Position.Y.CompareTo(b.Position.Y));
+        //TreeList.Sort((a,b) => a.Position.Y.CompareTo(b.Position.Y));
 
         /* foreach (Tree tree in TreeList)
         {

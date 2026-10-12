@@ -24,7 +24,7 @@ class General
 
             //Console.Write($"{entityDict["human2"].Position}, {entityDict["human2"].Status}");
             
-
+            Console.Write(terrain.TreeList.Count);
             //Console.ReadKey();
             await Task.Delay(100); // 60
         }
@@ -74,7 +74,16 @@ class General
         finally
         {
             Volatile.Write(ref _isUpdating, 0);
-            terrain.TreeList.Sort((a,b) => a.Position.Y.CompareTo(a.Position.Y));
+            terrain.TreeList.Sort((a,b) =>
+            {
+                int xComparison = a.Position.X.CompareTo(b.Position.X);
+
+                if (xComparison != 0)
+                    return xComparison;
+
+                return a.Position.Y.CompareTo(b.Position.Y);
+            });
+                
         }
     }
 }

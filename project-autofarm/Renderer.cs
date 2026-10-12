@@ -58,7 +58,7 @@ class Renderer
 
     public static void RenderTrees(Terrain terrain, StringBuilder output)
     {     
-        foreach (var tree in terrain.TreeList)
+        foreach (var tree in terrain.TreeList.ToList())
         {
             int startX = tree.Position.X - tree.Texture!.GetLength(1) / 2;
             int startY = tree.Position.Y - (tree.Texture.GetLength(0) - 1);

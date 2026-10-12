@@ -251,7 +251,7 @@ partial class Human : Entity
         {
             if (randomNumber == randomFactor)
             {
-                terrain.TreeList.Add(new Tree(TreeType.Spruce, new Position(Position.X, Position.Y), GrowthProcess.Planted));
+                terrain.TreeList.Add(new Tree(TreeType.Spruce, new Position(Position.X, Position.Y), GrowthProcess.Planted, terrain));
             }
 
             if (!TargetMemory.Any()) Status = Status.Exhausted;

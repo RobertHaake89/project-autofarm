@@ -17,7 +17,7 @@ class Tree
     public GrowthProcess Status {get; set;}
     public Position Position {get; set;}
 
-    public Tree(TreeType type, Position position, GrowthProcess status = GrowthProcess.Ripe)
+    public Tree(TreeType type, Position position, GrowthProcess status, Terrain terrain)
     {
         Type = type;
         Status = status;
@@ -28,14 +28,22 @@ class Tree
             TreeType.Oak => ResourceType.OakWood,
             _ => ResourceType.None
         };
-        //Texture = GetTreeTexture();
+
+        terrain.Grid![Position.X, Position.Y ].Resource.Type = Resource;
     }
 
-    public void CreateTree(TreeType type, Position position, Terrain terrain)
+    /* public void CreateTree(TreeType type, Position position, Terrain terrain)
     {
-        if (type == TreeType.Spruce) terrain.TreeList.Add(new Tree(TreeType.Spruce, new Position(position.X, position.Y), GrowthProcess.Planted));
+        if (Type == TreeType.Spruce) terrain.TreeList.Add(new Tree(TreeType.Spruce, new Position(position.X, position.Y), GrowthProcess.Planted));
         if (type == TreeType.Oak) terrain.TreeList.Add(new Tree(TreeType.Oak, new Position(position.X, position.Y), GrowthProcess.Planted));
+        
+        terrain.Grid![Position.X, Position.Y ].Resource.Type = Resource;
     }
+
+    public void SetTileResource(Terrain terrain)
+    {
+        terrain.Grid![Position.X, Position.Y ].Resource.Type = Resource;
+    } */
 
     public async Task GiveGrowthChance()
     {
@@ -57,7 +65,7 @@ class Tree
         }
     }
 
-    public async Task SelfSeeding(Terrain terrain, int randomFactor)
+    public Task SelfSeeding(Terrain terrain, int randomFactor)
     {
         //await Task.Delay(1000);
 
@@ -65,13 +73,15 @@ class Tree
 
         int spreadSpectrumX;
         int spreadSpectrumY;
+        //int borderDistanceX = 6;
+        //int borderDistanceY = 3;
         Position setPosition;
 
         do
         {
             spreadSpectrumX = Random.Shared.Next(-7, 7);
             spreadSpectrumY = Random.Shared.Next(-3, 4);
-            setPosition = new Position(spreadSpectrumX, spreadSpectrumY);
+            setPosition = new Position(Position.X + spreadSpectrumX,Position.Y + spreadSpectrumY);
         }
         while (spreadSpectrumX < -3
         && spreadSpectrumY < -1
@@ -79,16 +89,19 @@ class Tree
         && spreadSpectrumY > 2);
         
 
-        if (terrain.TreeList.Count <= Terrain.TreeMaxQty
-        && randomNumber == randomFactor
-        && Type is TreeType.Spruce
-        && Status is GrowthProcess.Ripe
-        && terrain.Grid![Position.X + spreadSpectrumX, Position.Y + spreadSpectrumY].Resource.Type is ResourceType.Fertile)
+        if (terrain.TreeList.Count < Terrain.TreeMaxQty
+            && randomNumber == randomFactor
+            && Type is TreeType.Spruce or TreeType.Oak
+            && Status is GrowthProcess.Ripe
+            && terrain.Grid![setPosition.X, setPosition.Y]
+                .Soil is Soil.SemiArid or Soil.Fertile)
         {
-            terrain.TreeList.Add(new Tree(Type, new Position(Position.X +setPosition.X, Position.Y + setPosition.Y), GrowthProcess.Planted));
+            terrain.TreeList.Add(new Tree(Type, setPosition, GrowthProcess.Planted, terrain));
             //terrain.Grid![spreadSpectrumX,spreadSpectrumY].Resource.Type = tree.Resource;
             //terrain.Grid![spreadSpectrumX,spreadSpectrumY].Resource.Status = tree.Status;
         }
+
+        return Task.CompletedTask;
     }
 
     public string[,] GetTreeTexture()
