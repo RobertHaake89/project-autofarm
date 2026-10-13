@@ -8,7 +8,7 @@ partial class Terrain // Data and Parameters
     public const int MaxSizeX = 90;
     public const int MaxSizeY = MaxSizeX * (16/9) / 4;
     public const int TreeMaxQty = SpruceMaxQty + OakMaxQty;
-    public const int SpruceMaxQty = 19;
+    public const int SpruceMaxQty = 23;
     public const int OakMaxQty = 1;
     public const int TreeCuttingThreshold = TreeMaxQty * 7 / 10;
     public List<Tree> TreeList {get; set;} = [];
@@ -24,10 +24,10 @@ partial class Terrain // Data and Parameters
         CreateFoliage(0,0,100,100,factor:80);
         CreateGrassShafts(0,0,100,100,factor:200);
         CreateStones(0,0,100,100,factor:100);
-        CreateField(70,35,90,80);
+        CreateField(xMin: 69,yMin: 35,xMax: 89,yMax: 80);
 
         //CreateTrees(TreeType.Spruce, qtyMin: 5, qtyMax: SpruceMaxQty, xMin:MaxSizeX / 3, yMin: 4, xMax: MaxSizeX - 5, yMax: MaxSizeY / 3);
-        CreateTrees(TreeType.Oak, qtyMin: 1, qtyMax: OakMaxQty + 1, xMin:5 , yMin: MaxSizeY * 2 / 3, xMax: MaxSizeX * 2 / 3, yMax: MaxSizeY - 1);
+        CreateTrees(PlantType.Oak, qtyMin: 1, qtyMax: OakMaxQty + 1, xMin:5 , yMin: MaxSizeY * 2 / 3, xMax: MaxSizeX * 2 / 3, yMax: MaxSizeY - 1);
 
         CreateMushrooms(0,0,95,30,factor:60);
         
@@ -162,7 +162,7 @@ partial class Terrain // Creation Methods
         }
     }
 
-    private void CreateTrees(TreeType treeType,int qtyMin, int qtyMax, int xMin, int yMin, int xMax, int yMax)
+    private void CreateTrees(PlantType treeType,int qtyMin, int qtyMax, int xMin, int yMin, int xMax, int yMax)
     {
         int quantityTrees = Random.Shared.Next(qtyMin, qtyMax);
         int startingIndex = TreeList.Count;

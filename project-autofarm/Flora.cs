@@ -2,46 +2,53 @@ using System;
 
 namespace ProjectAutofarm;
 
-public enum TreeType
+public enum PlantType
 {
     None = 0,
     Spruce,
     Oak
 }
-class Tree
+
+abstract class Vegetation
 {
     public string Name {get; set;} = "Tree";
-    public string[,]? Texture {get => field = GetTreeTexture(); set;}
-    public TreeType Type {get; init;}
+    public PlantType Type {get; init;}
     public ResourceType Resource {get; set;}
     public GrowthProcess Status {get; set;}
     public Position Position {get; set;}
 
-    public Tree(TreeType type, Position position, GrowthProcess status, Terrain terrain)
+    public Vegetation(PlantType type, Position position, GrowthProcess status, Terrain terrain)
     {
         Type = type;
         Status = status;
         Position = position;
-        Resource = type switch
-        {
-            TreeType.Spruce => ResourceType.SpruceWood,
-            TreeType.Oak => ResourceType.OakWood,
-            _ => ResourceType.None
-        };
-
         terrain.Grid![Position.X, Position.Y ].Resource.Type = Resource;
     }
+}
+
+class Tree : Vegetation
+{
+    public Tree(PlantType type, Position position, GrowthProcess status, Terrain terrain) :base(type, position, status, terrain)
+    {
+        Resource = type switch
+        {
+            PlantType.Spruce => ResourceType.SpruceWood,
+            PlantType.Oak => ResourceType.OakWood,
+            _ => ResourceType.None
+        };
+    }
+    public string[,]? Texture {get => field = GetTreeTexture(); set;}
 
     public async Task GiveGrowthChance()
     {
         int factor = Type switch
         {
-            TreeType.Spruce => 100,
-            TreeType.Oak => 200,
+            PlantType.Spruce => 100,
+            PlantType.Oak => 200,
             _ => 10
         };
 
-        int RandomNumber = Random.Shared.Next(0,factor + 1);
+        int RandomNumber = Random.Shared.Next(factor + 1);
 
         if (Status == GrowthProcess.Ripe) return;
         else if (RandomNumber == factor)
@@ -54,7 +61,7 @@ class Tree
 
     public Task SelfSeeding(Terrain terrain, int randomFactor)
     {
-        int randomNumber = Random.Shared.Next(0, randomFactor + 1);
+        int randomNumber = Random.Shared.Next(randomFactor + 1);
 
         int spreadSpectrumX;
         int spreadSpectrumY;
@@ -64,13 +71,13 @@ class Tree
 
         do
         {
-            spreadSpectrumX = Random.Shared.Next(-7, 7);
+            spreadSpectrumX = Random.Shared.Next(-7, 8);
             spreadSpectrumY = Random.Shared.Next(-3, 4);
             setPosition = new Position(Position.X + spreadSpectrumX,Position.Y + spreadSpectrumY);
         }
-        while (spreadSpectrumX < -3
-            && spreadSpectrumY < -1
-            && spreadSpectrumX > 3
+        while (spreadSpectrumX < -4
+            && spreadSpectrumY < -2
+            && spreadSpectrumX > 4
             && spreadSpectrumY > 2);
 
         setPosition.X = Math.Clamp(setPosition.X, borderDistanceX, Terrain.MaxSizeX - borderDistanceX);
@@ -78,7 +85,7 @@ class Tree
 
         if (terrain.TreeList.Count < Terrain.TreeMaxQty
             && randomNumber == randomFactor
-            && Type is TreeType.Spruce
+            && Type is PlantType.Spruce
             && Status is GrowthProcess.Ripe
             && terrain.Grid![setPosition.X, setPosition.Y]
                 .Resource.Type is ResourceType.Fertile/* Soil is Soil.SemiArid or Soil.Fertile */)
@@ -150,7 +157,7 @@ class Tree
 
         string[,] chosenTexture;
 
-        if (Type is TreeType.Spruce)
+        if (Type is PlantType.Spruce)
         {
             chosenTexture = Status switch
             {
@@ -161,7 +168,7 @@ class Tree
                 _ => spruceRipe
             };
         }
-        else if (Type is TreeType.Oak)
+        else if (Type is PlantType.Oak)
         {
             chosenTexture = randomizer switch
             {

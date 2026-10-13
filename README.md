@@ -139,4 +139,4 @@ added specialisations to preofessions and refactoring between inheritance and co
 * **10-10-26** — Reason for buggy forestry found.. no tile resource update.. WIP: Balancing tree planting and self-seeding. Planting to chopping still very buggy
 
 * **12-10-26** — Tree planting/self-seeding/harvesting mechanic (hopefully) fixed and added Fisher-Yater Algorithm to shuffly forester's targets. WIP fixing SelfSeeding and out of boundaries Array bug
-* **13-10-26** — 
+* **13-10-26** — Refac: Tree into derived class from abstract Vegetation, Add: third person as forager, job implementation pending

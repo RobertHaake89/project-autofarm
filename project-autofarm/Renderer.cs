@@ -33,6 +33,7 @@ class Renderer
 
         var human1 = entityDict["human1"];
         var human2 = entityDict["human2"];
+        var human3 = entityDict["human3"];
 
         int index1 = human1.Position.Y * (xMax + Environment.NewLine.Length)
                         + human1.Position.X;
@@ -43,6 +44,11 @@ class Renderer
                         + human2.Position.X;
         
         output[index2] = human2.Icon;
+
+        int index3 = human3.Position.Y * (xMax + Environment.NewLine.Length)
+                        + human3.Position.X;
+        
+        output[index3] = human3.Icon;
 
         RenderTrees(terrain, output);
 

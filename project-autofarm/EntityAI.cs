@@ -221,13 +221,13 @@ partial class Human : Entity
         if (Status is Status.Exhausted)
             return;
 
-        int randomNumber = Random.Shared.Next(0, randomFactor + 1);
+        int randomNumber = Random.Shared.Next(randomFactor + 1);
 
         if (terrain.Grid![Position.X, Position.Y].Resource.Type is ResourceType.Fertile)
         {
             if (randomNumber == randomFactor)
             {
-                terrain.TreeList.Add(new Tree(TreeType.Spruce, new Position(Position.X, Position.Y), GrowthProcess.Planted, terrain));
+                terrain.TreeList.Add(new Tree(PlantType.Spruce, new Position(Position.X, Position.Y), GrowthProcess.Planted, terrain));
             }
 
             if (!TargetMemory.Any()) Status = Status.Exhausted;

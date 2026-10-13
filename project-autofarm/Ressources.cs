@@ -48,7 +48,7 @@ class Resource : ITargetable, IHarvestable
             _ => 10
         };
 
-        int RandomNumber = Random.Shared.Next(0,factor + 1);
+        int RandomNumber = Random.Shared.Next(factor + 1);
 
         if (Status == GrowthProcess.Ripe) return;
         else if (RandomNumber == factor)

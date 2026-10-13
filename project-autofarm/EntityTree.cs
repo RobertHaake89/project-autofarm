@@ -23,7 +23,8 @@ public enum Gender
         None = 0,
         Farmer,
         Forester,
-        Forager
+        Forager,
+        Hunter
     }
 
     public enum Specialisation
@@ -102,7 +103,8 @@ partial class Human : Entity
         _ => 500
     };}
 
-    public Human(string name, char icon, Gender gender, int speedMove, Profession profession, Specialisation specialisation, Position position) : base(name, icon, gender, speedMove, position)
+    public Human(string name, char icon, Gender gender, int speedMove, Profession profession, Specialisation specialisation, Position position)
+        : base(name, icon, gender, speedMove, position)
     {
         Profession = profession;
         Specialisation = specialisation;
