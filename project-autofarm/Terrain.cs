@@ -8,10 +8,11 @@ partial class Terrain // Data and Parameters
     public const int MaxSizeX = 90;
     public const int MaxSizeY = MaxSizeX * (16/9) / 4;
     public const int TreeMaxQty = SpruceMaxQty + OakMaxQty;
-    public const int SpruceMaxQty = 23;
+    public const int SpruceMaxQty = 18;
     public const int OakMaxQty = 1;
     public const int TreeCuttingThreshold = TreeMaxQty * 7 / 10;
     public List<Tree> TreeList {get; set;} = [];
+    //public List<Mushroom> MushroomList {get; set;} = [];
 
     public void CreateMap() // xMin, yMin, xMax, yMax, radius?
     {
@@ -29,7 +30,7 @@ partial class Terrain // Data and Parameters
         //CreateTrees(TreeType.Spruce, qtyMin: 5, qtyMax: SpruceMaxQty, xMin:MaxSizeX / 3, yMin: 4, xMax: MaxSizeX - 5, yMax: MaxSizeY / 3);
         CreateTrees(PlantType.Oak, qtyMin: 1, qtyMax: OakMaxQty + 1, xMin:5 , yMin: MaxSizeY * 2 / 3, xMax: MaxSizeX * 2 / 3, yMax: MaxSizeY - 1);
 
-        CreateMushrooms(0,0,95,30,factor:60);
+        //CreateMushrooms(0,0,95,30,factor:60);
         
         CreateFarmHouse(5,0);
     }
@@ -180,7 +181,7 @@ partial class Terrain // Creation Methods
         TreeList.Distinct();
     }
 
-    private void CreateMushrooms(int xMin, int yMin, int xMax, int yMax, int factor)
+    /* private void CreateMushrooms(int xMin, int yMin, int xMax, int yMax, int factor)
     {
         var OffsetMin = (X:MaxSizeX * xMin/100, Y:MaxSizeY * yMin/100);
         var OffsetMax = (X:MaxSizeX * xMax/100, Y:MaxSizeY * yMax/100);
@@ -195,7 +196,7 @@ partial class Terrain // Creation Methods
                 Grid![incX,incY].Texture.TextureName = mushroomArray[Random.Shared.Next(0,mushroomArray.Length)];
             }
         }
-    }
+    } */
     
     private void CreateFarmHouse(int posX, int posY)
     {

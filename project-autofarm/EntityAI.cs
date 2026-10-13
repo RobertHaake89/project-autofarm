@@ -1,5 +1,3 @@
-using System;
-
 namespace ProjectAutofarm;
 
 abstract partial class Entity : ITargetable // AI
@@ -221,7 +219,7 @@ partial class Human : Entity
         if (Status is Status.Exhausted)
             return;
 
-        int randomNumber = Random.Shared.Next(randomFactor + 1);
+        int randomNumber = RandomNumberGenerator.GetInt32(randomFactor + 1); //Random.Shared.Next(randomFactor + 1);
 
         if (terrain.Grid![Position.X, Position.Y].Resource.Type is ResourceType.Fertile)
         {

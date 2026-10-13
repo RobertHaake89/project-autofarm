@@ -1,4 +1,4 @@
-﻿using System;
+﻿global using System.Security.Cryptography;
 
 namespace ProjectAutofarm;
 

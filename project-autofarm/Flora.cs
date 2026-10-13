@@ -1,4 +1,5 @@
 using System;
+using System.Dynamic;
 
 namespace ProjectAutofarm;
 
@@ -6,12 +7,13 @@ public enum PlantType
 {
     None = 0,
     Spruce,
-    Oak
+    Oak,
+    Mushroom
 }
 
 abstract class Vegetation
 {
-    public string Name {get; set;} = "Tree";
+    public string Name {get; set;}
     public PlantType Type {get; init;}
     public ResourceType Resource {get; set;}
     public GrowthProcess Status {get; set;}
@@ -19,44 +21,11 @@ abstract class Vegetation
 
     public Vegetation(PlantType type, Position position, GrowthProcess status, Terrain terrain)
     {
+        Name = Type.ToString();
         Type = type;
         Status = status;
         Position = position;
         terrain.Grid![Position.X, Position.Y ].Resource.Type = Resource;
-    }
-}
-
-class Tree : Vegetation
-{
-    public Tree(PlantType type, Position position, GrowthProcess status, Terrain terrain) :base(type, position, status, terrain)
-    {
-        Resource = type switch
-        {
-            PlantType.Spruce => ResourceType.SpruceWood,
-            PlantType.Oak => ResourceType.OakWood,
-            _ => ResourceType.None
-        };
-    }
-    public string[,]? Texture {get => field = GetTreeTexture(); set;}
-
-    public async Task GiveGrowthChance()
-    {
-        int factor = Type switch
-        {
-            PlantType.Spruce => 100,
-            PlantType.Oak => 200,
-            _ => 10
-        };
-
-        int RandomNumber = Random.Shared.Next(factor + 1);
-
-        if (Status == GrowthProcess.Ripe) return;
-        else if (RandomNumber == factor)
-        {
-            if (Status == GrowthProcess.Planted) Status = GrowthProcess.Young;
-            else if (Status == GrowthProcess.Young) Status = GrowthProcess.Mature;
-            else if (Status == GrowthProcess.Mature) Status = GrowthProcess.Ripe;
-        }
     }
 
     public Task SelfSeeding(Terrain terrain, int randomFactor)
@@ -91,11 +60,43 @@ class Tree : Vegetation
                 .Resource.Type is ResourceType.Fertile/* Soil is Soil.SemiArid or Soil.Fertile */)
         {
             terrain.TreeList.Add(new Tree(Type, setPosition, GrowthProcess.Planted, terrain));
-            //terrain.Grid![spreadSpectrumX,spreadSpectrumY].Resource.Type = tree.Resource;
-            //terrain.Grid![spreadSpectrumX,spreadSpectrumY].Resource.Status = tree.Status;
         }
 
         return Task.CompletedTask;
+    }
+}
+
+class Tree : Vegetation
+{
+    public Tree(PlantType type, Position position, GrowthProcess status, Terrain terrain) :base(type, position, status, terrain)
+    {
+        Resource = type switch
+        {
+            PlantType.Spruce => ResourceType.SpruceWood,
+            PlantType.Oak => ResourceType.OakWood,
+            _ => ResourceType.None
+        };
+    }
+    public string[,]? Texture {get => field = GetTreeTexture(); set;}
+
+    public async Task GiveGrowthChance()
+    {
+        int factor = Type switch
+        {
+            PlantType.Spruce => 100,
+            PlantType.Oak => 200,
+            _ => 10
+        };
+
+        int RandomNumber = Random.Shared.Next(factor + 1);
+
+        if (Status == GrowthProcess.Ripe) return;
+        else if (RandomNumber == factor)
+        {
+            if (Status == GrowthProcess.Planted) Status = GrowthProcess.Young;
+            else if (Status == GrowthProcess.Young) Status = GrowthProcess.Mature;
+            else if (Status == GrowthProcess.Mature) Status = GrowthProcess.Ripe;
+        }
     }
 
     public string[,] GetTreeTexture()
@@ -179,5 +180,26 @@ class Tree : Vegetation
         else chosenTexture = spruceRipe;
 
         return chosenTexture;
+    }
+
+    class Mushroom : Vegetation
+    {
+        public Mushroom(PlantType type, Position position, GrowthProcess status, Terrain terrain) : base(type, position, status, terrain)
+        {
+            Type = type;
+            Position = position;
+            Status = status;
+            
+            terrain.Grid![position.X, position.Y ].Resource.Type = Resource;
+        }
+
+        public void PlaceMushroom(Terrain terrain)
+        {
+            for (int y = 0; y < Terrain.MaxSizeY; y++)
+                for (int x = 0; x < Terrain.MaxSizeY; x++)
+                {
+                    
+                }
+        }
     }
 }
