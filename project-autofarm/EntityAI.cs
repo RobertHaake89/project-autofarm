@@ -59,23 +59,23 @@ partial class Human : Entity
                 }
             }
                 
-            }
-            if (Status is Status.Exhausted)
-            {
-                TargetPosition = IdlePosition;
-                if (Position == IdlePosition) Status = Status.Resting;
+        }
+        if (Status is Status.Exhausted)
+        {
+            TargetPosition = IdlePosition;
+            if (Position == IdlePosition) Status = Status.Resting;
 
-                await MoveTo(terrain);
+            await MoveTo(terrain);
 
-                await Task.Delay(SpeedMove * 2);
-            }
-            if (Status is Status.Resting)
-            {
-                TargetMemory.Clear();
-                await Task.Delay(10000);
+            await Task.Delay(SpeedMove * 2);
+        }
+        if (Status is Status.Resting)
+        {
+            TargetMemory.Clear();
+            await Task.Delay(10000);
 
-                Status = Status.Idle;
-            }
+            Status = Status.Idle;
+        }
     }
 
 
@@ -108,7 +108,6 @@ partial class Human : Entity
                     {
                         TargetMemory.Add(new Position(terrain.Grid[x,y].Position.X, terrain.Grid[x,y].Position.Y));
                     }
-                    
                 }
             }
             TargetMemory = TargetMemory.Distinct().ToList();
@@ -202,6 +201,7 @@ partial class Human : Entity
                     && tree.Position.Y == TargetPosition.Y);
 
                     terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Status = GrowthProcess.Harvested;
+                    terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Type = ResourceType.None;
 
                     Status = Status.Exhausted;
                     TargetMemory.Clear();
