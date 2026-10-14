@@ -50,6 +50,15 @@ class General
             {
                 await tree.GiveGrowthChance();
                 await tree.SelfSeeding(terrain, randomFactor: 1000); // 1000
+                await tree.CreateMycel(terrain, randomFactor: 2);
+
+                if (tree.Mycel is not null) Console.Write($"{tree.Name} has mycel");
+
+                if (tree.Mycel is not null)
+                {
+                    await tree.Mycel.AddMushrooms(terrain, randomFactor: 2);
+                    Console.Write($"{tree.Mycel.MushroomList.Count} mushrooms connected");
+                }
 
                 terrain.Grid![tree.Position.X, tree.Position.Y].Resource.Type = tree.Resource;
                 terrain.Grid![tree.Position.X, tree.Position.Y].Resource.Status = tree.Status;

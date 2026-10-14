@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace ProjectAutofarm;
@@ -26,29 +27,20 @@ class Renderer
             output.AppendLine();
         }
 
+        for (int x = 0; x < xMax; x++)
+            output.Append('=');
 
-
-        for (int x = 0; x < xMax; x++) output.Append('=');
         output.AppendLine();
 
         var human1 = entityDict["human1"];
         var human2 = entityDict["human2"];
         //var human3 = entityDict["human3"];
 
-        int index1 = human1.Position.Y * (xMax + Environment.NewLine.Length)
-                        + human1.Position.X;
-        
-        output[index1] = human1.Icon;
+        RenderMushrooms(terrain, output);
 
-        int index2 = human2.Position.Y * (xMax + Environment.NewLine.Length)
-                        + human2.Position.X;
-        
-        output[index2] = human2.Icon;
-
-        /* int index3 = human3.Position.Y * (xMax + Environment.NewLine.Length)
-                        + human3.Position.X;
-        
-        output[index3] = human3.Icon; */
+        RenderEntity(human1, output);
+        RenderEntity(human2, output);
+        //RenderEntity(human3, output);
 
         RenderTrees(terrain, output);
 
@@ -60,6 +52,14 @@ class Renderer
         Console.SetCursorPosition(entity.Position.X, entity.Position.Y);
         Console.Write(entity.Icon);
         Console.SetCursorPosition(0,0);
+    }
+
+    public static void RenderEntity(Entity entity, StringBuilder output)
+    {
+        int index = entity.Position.Y * (Terrain.MaxSizeX + Environment.NewLine.Length)
+                        + entity.Position.X;
+        
+        output[index] = entity.Icon;
     }
 
     public static void RenderTrees(Terrain terrain, StringBuilder output)
@@ -85,6 +85,28 @@ class Renderer
 
                     output[index] = Texture.List[textureName];
                 }
+            }
+        }
+    }
+
+    public static void RenderMushrooms(Terrain terrain, StringBuilder output)
+    {
+        foreach (var tree in terrain.TreeList.ToList())
+        {
+            char icon;
+            if (tree.Mycel is not null)
+            {
+                foreach(var mushroom in tree.Mycel.MushroomList)
+                {
+                    icon = mushroom.Icon;
+                    int index = mushroom.Position.Y * (Terrain.MaxSizeX + Environment.NewLine.Length) + mushroom.Position.X;
+
+                    output[index] = icon;
+                }
+
+
+
+                    
             }
         }
     }

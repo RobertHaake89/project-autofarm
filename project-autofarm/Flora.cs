@@ -100,14 +100,22 @@ class Tree : Vegetation
         }
     }
 
-    public void CreateMycel(Terrain terrain, int randomFactor)
+    public async Task CreateMycel(Terrain terrain, int randomFactor)
     {
-        int randomNumber = Random.Shared.Next(randomFactor);
+        int randomNumber = Random.Shared.Next(randomFactor + 1);
 
-        if (randomNumber == randomFactor
-            && terrain.MycelList.Count < Terrain.MycelMaxQty)
-                terrain.MycelList.Add(
-                new Mycel(this, terrain));
+        if (Mycel is null
+        && Status is GrowthProcess.Ripe
+        && Type is PlantType.Spruce
+        && terrain.MycelList.Count <= Terrain.MycelMaxQty
+        && randomNumber == randomFactor)
+        {
+            Mycel = new Mycel(this, terrain);
+            //Console.Write("Create Mycel works");
+            terrain.MycelList.Add(new Mycel(this, terrain));
+            //Console.ReadKey();
+
+        }   
     }
 
     public string[,] GetTreeTexture()
@@ -202,39 +210,39 @@ class Mycel : Vegetation
     public List<Mushroom> MushroomList {get; set;} = [];
     public Mycel(Tree parent, Terrain terrain) : base(PlantType.Mycel, parent.Position, GrowthProcess.Planted, terrain)
     {
-        
+        Parent = parent;
     }
 
-    public void AddMushrooms(Terrain terrain, int randomFactor)
+    public async Task AddMushrooms(Terrain terrain, int randomFactor)
     {
-        int randomNumber = Random.Shared.Next(randomFactor);
-        int radiusPos = Random.Shared.Next(-MushroomMaxRadius, MushroomMaxRadius + 1);
+        int randomNumber = Random.Shared.Next(randomFactor + 1);
+        int radiusPosX = Random.Shared.Next(-MushroomMaxRadius, MushroomMaxRadius + 1);
+        int radiusPosY = Random.Shared.Next(-MushroomMaxRadius, MushroomMaxRadius + 1);
 
         if (randomNumber == randomFactor
             && MushroomList.Count < MycelMaxMushrooms
-            && terrain.Grid![Position.X, Position.Y].Resource.Type is ResourceType.None)
-                MushroomList.Add(
-                new Mushroom(this,new Position(Position.X + radiusPos, (Position.Y + radiusPos)/4), terrain));
+            && terrain.Grid![Parent.Position.X + radiusPosX, Parent.Position.Y].Resource.Type is ResourceType.None)
+        {
+            MushroomList.Add(
+                new Mushroom(this,new Position(Position.X + radiusPosX, Position.Y + radiusPosY / 4), terrain));
+            terrain.Grid![Parent.Position.X, Parent.Position.Y].Resource.Type = Resource;
+            Console.Write("has been added");
+        }
+                
     }
 }
 
 class Mushroom : Vegetation
 {
     public Mycel Parent;
-    public string Icon {get; set;}
+    public char Icon {get; set;}
     public Mushroom(Mycel parent, Position position, Terrain terrain) : base(PlantType.Mushroom, position, GrowthProcess.Planted, terrain)
     {
-        Parent = parent;      
-        terrain.Grid![parent.Position.X, parent.Position.Y ].Resource.Type = Resource;
-    }
+        Icon = parent.Parent.Type is PlantType.Oak
+            ? '♣' 
+            : '♧';
 
-    /* public void PlaceMushrooms(Terrain terrain)
-    {
-        for (int y = 0; y < Terrain.MaxSizeY; y++)
-            for (int x = 0; x < Terrain.MaxSizeY; x++)
-            {
-                MushroomList.Add(new Mushroom(new Position(x,y), terrain));
-                terrain.Grid![x,y].Resource.Type = ResourceType.Mushrooms;
-            }
-    } */
+        Parent = parent;      
+        
+    }
 }
