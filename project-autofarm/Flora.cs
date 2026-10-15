@@ -115,11 +115,13 @@ class Tree : Vegetation
     {
         int randomNumber = Random.Shared.Next(randomFactor + 1);
 
-        if (/* terrain.TreeList.Count >= Terrain.SpruceMaxQty
-            &&  */Mycel is null
+        if (terrain.TreeList.Count(
+                tree => tree.Type is PlantType.Spruce) 
+                >= Terrain.SpruceMaxQty * 90 / 100
+            && Mycel is null
             && Status is GrowthProcess.Ripe
             && Type is PlantType.Spruce or PlantType.Oak
-            && terrain.MycelList.Count < Terrain.MycelMaxQty
+            && terrain.MycelList.Count <= Terrain.MycelMaxQty
             && randomNumber == randomFactor)
         {
             Mycel = new Mycel(this, terrain);
