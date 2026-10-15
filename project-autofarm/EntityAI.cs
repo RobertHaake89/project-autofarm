@@ -200,7 +200,7 @@ partial class Human : Entity
                     => tree.Position.X == TargetPosition.X
                     && tree.Position.Y == TargetPosition.Y);
 
-                    terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Status = GrowthProcess.Harvested;
+                    terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Status = GrowthProcess.Fallow;
                     terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Type = ResourceType.None;
 
                     Status = Status.Exhausted;

@@ -50,16 +50,16 @@ class General
             {
                 await tree.GiveGrowthChance();
                 await tree.SelfSeeding(terrain, randomFactor: 1000); // 1000
-                await tree.CreateMycel(terrain, randomFactor: 500);
+                await tree.CreateMycel(terrain, randomFactor: 5000);
 
-                if (tree.Mycel is not null) Console.Write($"{tree.Name} has mycel");
+                //if (tree.Mycel is not null) Console.Write($"Tree has mycel");
 
                 if (tree.Mycel is not null)
                 {
                     await tree.Mycel.AddMushrooms(terrain, randomFactor: 50);
-                    Console.Write($"{tree.Mycel.MushroomList.Count} mushrooms connected");
+                    //Console.Write($"{tree.Mycel.MushroomList.Count} mushrooms connected");
                 }
-                Console.Write($"MycelList: {terrain.MycelList.Count}");
+                //Console.Write($"MycelList: {terrain.MycelList.Count}");
 
                 /* foreach (Mycel mycel in terrain.MycelList)
                     Console.Write(mycel.Position); */

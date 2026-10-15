@@ -11,7 +11,7 @@ partial class Terrain // Data and Parameters
     public const int SpruceMaxQty = 18;
     public const int OakMaxQty = 1;
     public const int TreeCuttingThreshold = TreeMaxQty * 7 / 10;
-    public const int MycelMaxQty = 1;
+    public const int MycelMaxQty = 3;
     public List<Tree> TreeList {get; set;} = [];
     public List<Mycel> MycelList {get; set;} = [];
 
@@ -29,7 +29,7 @@ partial class Terrain // Data and Parameters
         CreateField(xMin: 69,yMin: 35,xMax: 89,yMax: 80);
 
         //CreateTrees(TreeType.Spruce, qtyMin: 5, qtyMax: SpruceMaxQty, xMin:MaxSizeX / 3, yMin: 4, xMax: MaxSizeX - 5, yMax: MaxSizeY / 3);
-        CreateTrees(PlantType.Oak, qtyMin: 1, qtyMax: OakMaxQty + 1, xMin:5 , yMin: MaxSizeY * 2 / 3, xMax: MaxSizeX * 2 / 3, yMax: MaxSizeY - 1);
+        //CreateTrees(PlantType.Oak, qtyMin: 1, qtyMax: OakMaxQty + 1, xMin:5 , yMin: MaxSizeY * 2 / 3, xMax: MaxSizeX * 2 / 3, yMax: MaxSizeY - 1);
 
         //CreateMushrooms(0,0,95,30,factor:60);
         

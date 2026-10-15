@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.ComponentModel;
 namespace ProjectAutofarm;
 
 public enum PlantType
@@ -37,7 +35,7 @@ class Tree : Vegetation
         Resource = type switch
         {
             PlantType.Spruce => ResourceType.SpruceWood,
-            PlantType.Oak => ResourceType.OakWood,
+            PlantType.Oak => ResourceType.SpruceWood/* ResourceType.OakWood */, // Changed for testing
             _ => ResourceType.None
         };
     }
@@ -87,6 +85,10 @@ class Tree : Vegetation
         setPosition.X = Math.Clamp(setPosition.X, borderDistanceX, Terrain.MaxSizeX - borderDistanceX);
         setPosition.Y = Math.Clamp(setPosition.Y, borderDistanceY, Terrain.MaxSizeY - borderDistanceY - 1);
 
+        //Console.Write($"Oak Counter: {terrain.TreeList.Count(tree => tree.Type == PlantType.Oak)}");
+        //Console.Write($"Spruce Counter: {terrain.TreeList.Count(tree => tree.Type == PlantType.Spruce)}"); // 18 max
+        //Console.Write($"SpruceRipe: {terrain.TreeList.Count(tree => tree.Status is GrowthProcess.Ripe)}");
+
         if (terrain.TreeList.Count < Terrain.TreeMaxQty
             && randomNumber == randomFactor
             && Type is PlantType.Spruce
@@ -94,8 +96,17 @@ class Tree : Vegetation
             && terrain.Grid![setPosition.X, setPosition.Y]
                 .Resource.Type is ResourceType.Fertile/* Soil is Soil.SemiArid or Soil.Fertile */)
         {
-            terrain.TreeList.Add(new Tree(Type, setPosition, GrowthProcess.Planted, terrain));
-        }
+            PlantType typeModifier =
+                terrain.TreeList.Count(tree => tree.Type == PlantType.Oak) < Terrain.OakMaxQty
+                && terrain.TreeList.Count(tree => tree.Type is PlantType.Spruce) == Terrain.SpruceMaxQty
+                && terrain.TreeList.Count(tree => tree.Status is GrowthProcess.Ripe) == Terrain.SpruceMaxQty
+                    ? PlantType.Oak 
+                    : PlantType.Spruce;
+
+                    if (typeModifier == PlantType.Oak) Math.Clamp(Position.Y, 7, Terrain.MaxSizeY - 1);
+
+            terrain.TreeList.Add(new Tree(typeModifier, setPosition, GrowthProcess.Planted, terrain));
+        }        
 
         return Task.CompletedTask;
     }
@@ -104,17 +115,18 @@ class Tree : Vegetation
     {
         int randomNumber = Random.Shared.Next(randomFactor + 1);
 
-        if (terrain.TreeList.Count == Terrain.SpruceMaxQty
-            && Mycel is null
+        if (/* terrain.TreeList.Count >= Terrain.SpruceMaxQty
+            &&  */Mycel is null
             && Status is GrowthProcess.Ripe
-            && Type is PlantType.Spruce
-            && terrain.MycelList.Count <= Terrain.MycelMaxQty
+            && Type is PlantType.Spruce or PlantType.Oak
+            && terrain.MycelList.Count < Terrain.MycelMaxQty
             && randomNumber == randomFactor)
         {
             Mycel = new Mycel(this, terrain);
             //Console.Write("Create Mycel works");
             terrain.MycelList.Add(Mycel);
             //Console.ReadKey();
+            terrain.MycelList.Distinct().ToList();
 
         }   
     }
@@ -160,7 +172,37 @@ class Tree : Vegetation
             /^^^\
               █   */
 
-        string[,] oakArray1 =
+        string[,] oakPlanted =
+        {
+            {"skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip"},
+            {"skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip"},
+            {"skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip"},
+            {"skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip"},
+            {"skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip"},
+            {"skip", "skip", "skip", "skip", "skip", "tree_any_planted", "skip", "skip", "skip", "skip", "skip"}
+        };
+
+        string[,] oakGerm =
+        {
+            {"skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip"},
+            {"skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip"},
+            {"skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip"},
+            {"skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip"},
+            {"skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip"},
+            {"skip", "skip", "skip", "skip", "skip", "tree_any_germinating", "skip", "skip", "skip", "skip", "skip"}
+        };
+
+        string[,] oakGrowing =
+        {
+            {"skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip"},
+            {"skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip"},
+            {"skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip"},
+            {"skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip"},
+            {"skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip", "skip"},
+            {"skip", "skip", "skip", "skip", "skip", "tree_oak_growing", "skip", "skip", "skip", "skip", "skip"}
+        };
+
+        string[,] oakRipe =
         {
             {"skip", "skip", "skip", "skip", "tree_oak_top", "tree_oak_top", "tree_oak_top", "tree_oak_top", "skip", "skip", "skip"},
             {"skip", "skip", "tree_oak_top", "tree_oak_top", "tree_oak_top", "tree_oak_top", "tree_oak_top", "tree_oak_top", "tree_oak_top", "skip", "skip"},
@@ -191,10 +233,13 @@ class Tree : Vegetation
         }
         else if (Type is PlantType.Oak)
         {
-            chosenTexture = randomizer switch
+            chosenTexture = Status switch
             {
-                1 => oakArray1,
-                _ => oakArray1
+                GrowthProcess.Planted => oakPlanted,
+                GrowthProcess.Young => oakGerm,
+                GrowthProcess.Mature => oakGrowing,
+                GrowthProcess.Ripe => oakRipe,
+                _ => oakRipe
             };
         }
         else chosenTexture = spruceRipe;
@@ -220,16 +265,20 @@ class Mycel : Vegetation
         int radiusPosX = Random.Shared.Next(-MushroomMaxRadius, MushroomMaxRadius + 1);
         int radiusPosY = Random.Shared.Next(-MushroomMaxRadius, MushroomMaxRadius + 1);
 
+        Position setPosition = new Position(
+            Math.Clamp(Parent.Position.X + radiusPosX, 1, Terrain.MaxSizeX -1),
+            Math.Clamp(Parent.Position.Y + radiusPosY / 4, 1, Terrain.MaxSizeY -1));
+
         if (randomNumber == randomFactor
             && radiusPosX != 0
             && radiusPosY != 0
             && MushroomList.Count < MycelMaxMushrooms
-            && terrain.Grid![Math.Clamp(Parent.Position.X + radiusPosX, 1, Terrain.MaxSizeX), Math.Clamp(Parent.Position.Y + radiusPosY / 4, 1, Terrain.MaxSizeY)].Resource.Type is ResourceType.None)
+            && terrain.Grid![setPosition.X, setPosition.Y].Resource.Type is ResourceType.None)
         {
             MushroomList.Add(
-                new Mushroom(this,new Position(Math.Clamp(Parent.Position.X + radiusPosX, 1, Terrain.MaxSizeX), Math.Clamp(Parent.Position.Y + radiusPosY / 4, 1, Terrain.MaxSizeY)), terrain));
-            terrain.Grid![Math.Clamp(Parent.Position.X + radiusPosX, 1, Terrain.MaxSizeX), Math.Clamp(Parent.Position.Y + radiusPosY / 4, 1, Terrain.MaxSizeY)].Resource.Type = Resource;
-            Console.Write("has been added");
+                new Mushroom(this,new Position(setPosition.X, setPosition.Y), terrain));
+            terrain.Grid![setPosition.X, setPosition.Y].Resource.Type = Resource;
+            //Console.Write("has been added");
         }
                 
     }
