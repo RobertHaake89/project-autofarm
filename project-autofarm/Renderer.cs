@@ -102,11 +102,7 @@ class Renderer
                     int index = mushroom.Position.Y * (Terrain.MaxSizeX + Environment.NewLine.Length) + mushroom.Position.X;
 
                     output[index] = icon;
-                }
-
-
-
-                    
+                }   
             }
         }
     }

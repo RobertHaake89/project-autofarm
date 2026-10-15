@@ -27,43 +27,6 @@ abstract class Vegetation
         Position = position;
         terrain.Grid![Position.X, Position.Y ].Resource.Type = Resource;
     }
-
-    public Task SelfSeeding(Terrain terrain, int randomFactor)
-    {
-        int randomNumber = Random.Shared.Next(randomFactor + 1);
-
-        int spreadSpectrumX;
-        int spreadSpectrumY;
-        int borderDistanceX = 6;
-        int borderDistanceY = 4;
-        Position setPosition;
-
-        do
-        {
-            spreadSpectrumX = Random.Shared.Next(-7, 8);
-            spreadSpectrumY = Random.Shared.Next(-3, 4);
-            setPosition = new Position(Position.X + spreadSpectrumX,Position.Y + spreadSpectrumY);
-        }
-        while (spreadSpectrumX < -4
-            && spreadSpectrumY < -2
-            && spreadSpectrumX > 4
-            && spreadSpectrumY > 2);
-
-        setPosition.X = Math.Clamp(setPosition.X, borderDistanceX, Terrain.MaxSizeX - borderDistanceX);
-        setPosition.Y = Math.Clamp(setPosition.Y, borderDistanceY, Terrain.MaxSizeY - borderDistanceY - 1);
-
-        if (terrain.TreeList.Count < Terrain.TreeMaxQty
-            && randomNumber == randomFactor
-            && Type is PlantType.Spruce
-            && Status is GrowthProcess.Ripe
-            && terrain.Grid![setPosition.X, setPosition.Y]
-                .Resource.Type is ResourceType.Fertile/* Soil is Soil.SemiArid or Soil.Fertile */)
-        {
-            terrain.TreeList.Add(new Tree(Type, setPosition, GrowthProcess.Planted, terrain));
-        }
-
-        return Task.CompletedTask;
-    }
 }
 
 class Tree : Vegetation
@@ -100,19 +63,57 @@ class Tree : Vegetation
         }
     }
 
+    public Task SelfSeeding(Terrain terrain, int randomFactor)
+    {
+        int randomNumber = Random.Shared.Next(randomFactor + 1);
+
+        int spreadSpectrumX;
+        int spreadSpectrumY;
+        int borderDistanceX = 6;
+        int borderDistanceY = 4;
+        Position setPosition;
+
+        do
+        {
+            spreadSpectrumX = Random.Shared.Next(-8, 9);
+            spreadSpectrumY = Random.Shared.Next(-4, 5);
+            setPosition = new Position(Position.X + spreadSpectrumX,Position.Y + spreadSpectrumY);
+        }
+        while (spreadSpectrumX < -4
+            && spreadSpectrumY < -2
+            && spreadSpectrumX > 4
+            && spreadSpectrumY > 2);
+
+        setPosition.X = Math.Clamp(setPosition.X, borderDistanceX, Terrain.MaxSizeX - borderDistanceX);
+        setPosition.Y = Math.Clamp(setPosition.Y, borderDistanceY, Terrain.MaxSizeY - borderDistanceY - 1);
+
+        if (terrain.TreeList.Count < Terrain.TreeMaxQty
+            && randomNumber == randomFactor
+            && Type is PlantType.Spruce
+            && Status is GrowthProcess.Ripe
+            && terrain.Grid![setPosition.X, setPosition.Y]
+                .Resource.Type is ResourceType.Fertile/* Soil is Soil.SemiArid or Soil.Fertile */)
+        {
+            terrain.TreeList.Add(new Tree(Type, setPosition, GrowthProcess.Planted, terrain));
+        }
+
+        return Task.CompletedTask;
+    }
+
     public async Task CreateMycel(Terrain terrain, int randomFactor)
     {
         int randomNumber = Random.Shared.Next(randomFactor + 1);
 
-        if (Mycel is null
-        && Status is GrowthProcess.Ripe
-        && Type is PlantType.Spruce
-        && terrain.MycelList.Count <= Terrain.MycelMaxQty
-        && randomNumber == randomFactor)
+        if (terrain.TreeList.Count == Terrain.SpruceMaxQty
+            && Mycel is null
+            && Status is GrowthProcess.Ripe
+            && Type is PlantType.Spruce
+            && terrain.MycelList.Count <= Terrain.MycelMaxQty
+            && randomNumber == randomFactor)
         {
             Mycel = new Mycel(this, terrain);
             //Console.Write("Create Mycel works");
-            terrain.MycelList.Add(new Mycel(this, terrain));
+            terrain.MycelList.Add(Mycel);
             //Console.ReadKey();
 
         }   
@@ -205,8 +206,8 @@ class Tree : Vegetation
 class Mycel : Vegetation
 {
     public Tree Parent;
-    public const int MycelMaxMushrooms = 5;
-    public const int MushroomMaxRadius = 5;
+    public const int MycelMaxMushrooms = 6;
+    public const int MushroomMaxRadius = 10;
     public List<Mushroom> MushroomList {get; set;} = [];
     public Mycel(Tree parent, Terrain terrain) : base(PlantType.Mycel, parent.Position, GrowthProcess.Planted, terrain)
     {
@@ -220,12 +221,14 @@ class Mycel : Vegetation
         int radiusPosY = Random.Shared.Next(-MushroomMaxRadius, MushroomMaxRadius + 1);
 
         if (randomNumber == randomFactor
+            && radiusPosX != 0
+            && radiusPosY != 0
             && MushroomList.Count < MycelMaxMushrooms
-            && terrain.Grid![Parent.Position.X + radiusPosX, Parent.Position.Y].Resource.Type is ResourceType.None)
+            && terrain.Grid![Math.Clamp(Parent.Position.X + radiusPosX, 1, Terrain.MaxSizeX), Math.Clamp(Parent.Position.Y + radiusPosY / 4, 1, Terrain.MaxSizeY)].Resource.Type is ResourceType.None)
         {
             MushroomList.Add(
-                new Mushroom(this,new Position(Position.X + radiusPosX, Position.Y + radiusPosY / 4), terrain));
-            terrain.Grid![Parent.Position.X, Parent.Position.Y].Resource.Type = Resource;
+                new Mushroom(this,new Position(Math.Clamp(Parent.Position.X + radiusPosX, 1, Terrain.MaxSizeX), Math.Clamp(Parent.Position.Y + radiusPosY / 4, 1, Terrain.MaxSizeY)), terrain));
+            terrain.Grid![Math.Clamp(Parent.Position.X + radiusPosX, 1, Terrain.MaxSizeX), Math.Clamp(Parent.Position.Y + radiusPosY / 4, 1, Terrain.MaxSizeY)].Resource.Type = Resource;
             Console.Write("has been added");
         }
                 

@@ -50,15 +50,19 @@ class General
             {
                 await tree.GiveGrowthChance();
                 await tree.SelfSeeding(terrain, randomFactor: 1000); // 1000
-                await tree.CreateMycel(terrain, randomFactor: 2);
+                await tree.CreateMycel(terrain, randomFactor: 500);
 
                 if (tree.Mycel is not null) Console.Write($"{tree.Name} has mycel");
 
                 if (tree.Mycel is not null)
                 {
-                    await tree.Mycel.AddMushrooms(terrain, randomFactor: 2);
+                    await tree.Mycel.AddMushrooms(terrain, randomFactor: 50);
                     Console.Write($"{tree.Mycel.MushroomList.Count} mushrooms connected");
                 }
+                Console.Write($"MycelList: {terrain.MycelList.Count}");
+
+                /* foreach (Mycel mycel in terrain.MycelList)
+                    Console.Write(mycel.Position); */
 
                 terrain.Grid![tree.Position.X, tree.Position.Y].Resource.Type = tree.Resource;
                 terrain.Grid![tree.Position.X, tree.Position.Y].Resource.Status = tree.Status;
@@ -69,12 +73,12 @@ class General
             Volatile.Write(ref _isUpdating, 0);
             terrain.TreeList.Sort((a,b) =>
             {
-                int xComparison = a.Position.X.CompareTo(b.Position.X);
+                int yComparison = a.Position.Y.CompareTo(b.Position.Y);
 
-                if (xComparison != 0)
-                    return xComparison;
+                if (yComparison != 0)
+                    return yComparison;
 
-                return a.Position.Y.CompareTo(b.Position.Y);
+                return a.Position.X.CompareTo(b.Position.X);
             });
                 
         }
