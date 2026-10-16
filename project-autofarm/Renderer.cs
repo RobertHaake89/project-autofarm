@@ -42,7 +42,7 @@ class Renderer
         RenderEntity(human1, output);
         RenderEntity(human2, output);
         //RenderEntity(human3, output);
-        RenderEntity(squirrel1, output);
+        //RenderEntity(squirrel1, output);
 
         RenderTrees(terrain, output);
 

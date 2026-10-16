@@ -18,8 +18,8 @@ abstract class Vegetation
     public virtual Position Position {get; set
         {
             field = new Position(
-                Math.Clamp(value.X, 0, Terrain.MaxSizeX),
-                Math.Clamp(value.Y, 0, Terrain.MaxSizeY));
+                Math.Clamp(value.X, 1, Terrain.MaxSizeX - 1),
+                Math.Clamp(value.Y, 1, Terrain.MaxSizeY - 1));
         }}
 
     public Vegetation(PlantType type, Position position, GrowthProcess status, Terrain terrain)
@@ -101,8 +101,12 @@ class Tree : Vegetation
             && spreadSpectrumX > 4
             && spreadSpectrumY > 2);
 
-        setPosition.X = Math.Clamp(setPosition.X, borderDistanceX, Terrain.MaxSizeX - borderDistanceX);
-        setPosition.Y = Math.Clamp(setPosition.Y, borderDistanceY, Terrain.MaxSizeY - borderDistanceY - 1); // If removing, Pos Property Setter can't prevent crash !!
+        setPosition.X = Math.Clamp(
+            setPosition.X, borderDistanceX, 
+            Terrain.MaxSizeX - borderDistanceX);
+        setPosition.Y = Math.Clamp(
+            setPosition.Y, borderDistanceY, 
+            Terrain.MaxSizeY - borderDistanceY - 1); // If removing, Pos Property Setter can't prevent crash !!
 
         //Console.Write($"Oak Counter: {terrain.TreeList.Count(tree => tree.Type == PlantType.Oak)}");
         //Console.Write($"Spruce Counter: {terrain.TreeList.Count(tree => tree.Type == PlantType.Spruce)}"); // 18 max
@@ -137,17 +141,19 @@ class Tree : Vegetation
         if (terrain.TreeList.Count(
                 tree => tree.Type is PlantType.Spruce) 
                 >= Terrain.SpruceMaxQty * 90 / 100
+            && terrain.TreeList.Count(
+                tree => tree.Mycel is not null) <= Terrain.MycelMaxQty
             && Mycel is null
             && Status is GrowthProcess.Ripe
             && Type is PlantType.Spruce or PlantType.Oak
-            && terrain.MycelList.Count <= Terrain.MycelMaxQty
+            
             && randomNumber == randomFactor)
         {
             Mycel = new Mycel(this, terrain);
             //Console.Write("Create Mycel works");
-            terrain.MycelList.Add(Mycel);
+            //terrain.MycelList.Add(Mycel);
             //Console.ReadKey();
-            terrain.MycelList.Distinct().ToList();
+            //terrain.MycelList.Distinct().ToList();
 
         }   
     }
@@ -284,21 +290,21 @@ class Mycel : Vegetation
     {
         int randomNumber = Random.Shared.Next(randomFactor + 1);
         int radiusPosX = Random.Shared.Next(-MushroomMaxRadius, MushroomMaxRadius + 1);
-        int radiusPosY = Random.Shared.Next(-MushroomMaxRadius, MushroomMaxRadius + 1);
+        int radiusPosY = Random.Shared.Next(-(MushroomMaxRadius / 3), (MushroomMaxRadius + 1) / 3);
 
         Position setPosition = new Position(
-            Parent.Position.X + radiusPosX,
-            Parent.Position.Y + radiusPosY / 3);
+            Math.Clamp(Parent.Position.X + radiusPosX, 1, Terrain.MaxSizeX - 1),
+            Math.Clamp(Parent.Position.Y + radiusPosY, 1, Terrain.MaxSizeY - 1));
 
         if (randomNumber == randomFactor
             && radiusPosX != 0
             && radiusPosY != 0
-            && MushroomList.Count < MycelMaxMushrooms
+            && MushroomList.Count <= MycelMaxMushrooms
             && terrain.Grid![setPosition.X, setPosition.Y].Resource.Type is ResourceType.None)
         {
             MushroomList.Add(
                 new Mushroom(this,new Position(setPosition.X, setPosition.Y), terrain));
-            MushroomList[^1].Position = setPosition; // To trigger Clamped Setter
+            MushroomList[^1].Position = MushroomList[^1].Position; // To trigger Clamped Setter
 
             terrain.Grid![setPosition.X, setPosition.Y].Resource.Type = Resource;
             //Console.Write("has been added");
