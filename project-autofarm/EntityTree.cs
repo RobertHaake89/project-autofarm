@@ -1,4 +1,5 @@
 using System;
+using System.Runtime;
 
 namespace ProjectAutofarm;
 
@@ -16,7 +17,8 @@ public enum Gender
         Exhausted,
         Resting,
         Sleeping,
-        Chatting
+        Chatting,
+        Scampering
     }
     public enum Profession
     {
@@ -61,8 +63,11 @@ abstract partial class Entity : ITargetable
         }}
     public Position SpawnPoint {get; init;}
     public Position IdlePosition;
+    public virtual ResourceType TargetResource {get; set;}
     public Position TargetPosition;
+    public virtual List<Position> TargetMemory {get; set;} = new List<Position>();
     public Status Status {get; set;} = Status.Idle;
+    public ProcessingMode Mode {get; set;} = ProcessingMode.None;
 
     public Entity(string name, char icon, Gender gender, int speedMove, Position position)
     {
@@ -77,11 +82,31 @@ abstract partial class Entity : ITargetable
     }
 }
 
+abstract partial class Animal : Entity
+{
+    public bool IsAlive = true;
+    
+    public Animal(string name, char icon, Gender gender, int speedMove, Position position) : base(name, icon, gender, speedMove, position)
+    {
+        
+    }
+}
+
+partial class Squirrel : Animal
+{
+    public Squirrel(string name, char icon, int speedMove, Position position) : base(name, icon, Gender.Male, speedMove, position)
+    {
+        
+    }
+}
+
+
+
 partial class Human : Entity
 {
     public Profession Profession {get; set;}
     public Specialisation Specialisation {get; set;}
-    public ResourceType TargetResource {get => field = Mode == ProcessingMode.Planting 
+    public override ResourceType TargetResource {get => field = Mode == ProcessingMode.Planting 
         ? ResourceType.Fertile 
         : Specialisation switch
             {
@@ -91,9 +116,8 @@ partial class Human : Entity
                 Specialisation.Mushrooms => ResourceType.Mushrooms,
                 _ => ResourceType.None
             }; set;}
-    public ProcessingMode Mode {get; set;} = ProcessingMode.None;
     public int TargetMemorySize {get => field; set => field = Math.Max(field,value);}
-    public List<Position> TargetMemory {get; set;} = new List<Position>();
+    public override List<Position> TargetMemory {get; set;} = new List<Position>();
     public int SpeedWorking {get;
     set => field = Profession switch
     {

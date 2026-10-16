@@ -241,3 +241,54 @@ partial class Human : Entity
         }
     }
 }
+
+partial class Squirrel
+{
+    public override async Task RunSchedule(Terrain terrain)
+    {
+        
+    }
+    public override async Task GeneralConditioner(Terrain terrain)
+    {
+        
+    }
+    public override async Task ScanFor(Terrain terrain)
+    {
+        for (int y = 0; y < Terrain.MaxSizeY; y++)
+        {
+            int start = y % 2 == 0 ? 0 : Terrain.MaxSizeX - 1;
+            int end = y % 2 == 0 ? Terrain.MaxSizeX : - 1;
+            int step = y % 2 == 0 ? 1: -1;
+
+            for (int x = start; x != end; x += step)
+            {
+                if (terrain.Grid![x,y].Resource.Type == TargetResource)
+                {
+                    if (terrain.Grid![x,y].Resource.Status is GrowthProcess.Fallow)
+                    {
+                        TargetMemory.Add(new Position(terrain.Grid[x,y].Position.X, terrain.Grid[x,y].Position.Y));
+                    }
+                    else if (terrain.Grid![x,y].Resource.Status is GrowthProcess.Ripe or GrowthProcess.Mature or GrowthProcess.Young)
+                    {
+                        TargetMemory.Add(new Position(terrain.Grid[x,y].Position.X, terrain.Grid[x,y].Position.Y));                            
+                    }
+                    else if (terrain.Grid![x,y].Resource.Status is GrowthProcess.Plowed)
+                    {
+                        TargetMemory.Add(new Position(terrain.Grid[x,y].Position.X, terrain.Grid[x,y].Position.Y));
+                    }
+                    else if (terrain.Grid![x,y].Resource.Status is GrowthProcess.Harvested)
+                    {
+                        TargetMemory.Add(new Position(terrain.Grid[x,y].Position.X, terrain.Grid[x,y].Position.Y));
+                    }
+                }
+            }
+            TargetMemory = TargetMemory.Distinct().ToList();
+
+            //if (Profession is Profession.Forester && Mode is ProcessingMode.Harvesting) TargetMemory.Shuffle();
+        }        
+    }
+    public override async Task MoveTo(Terrain terrain)
+    {
+        
+    }
+}
