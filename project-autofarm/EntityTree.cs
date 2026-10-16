@@ -144,18 +144,22 @@ partial class Squirrel : Animal
 {
     public override Position Position {get; set
     {
-        field = value;
         SetIcon(value);
+        field = value;
     }}
 
     public Squirrel(string name, char icon, int speedMove, Position position) : base(name, icon, Gender.Male, speedMove, position)
     {
-        
+        TargetResource = ResourceType.Wheat;
     }
 
-    public async Task RunInCircles()
+    public async Task MoveInCircles()
     {
         Position = new Position(Position.X + 1, Position.Y); // East
+        await Task.Delay(200);
+        Position = new Position(Position.X + 1, Position.Y);
+        await Task.Delay(200);
+        Position = new Position(Position.X + 1, Position.Y);
         await Task.Delay(200);
         Position = new Position(Position.X + 1, Position.Y);
         await Task.Delay(200);
@@ -164,8 +168,16 @@ partial class Squirrel : Animal
         await Task.Delay(200);
         Position = new Position(Position.X + 1, Position.Y + 1);
         await Task.Delay(200);
+        Position = new Position(Position.X + 1, Position.Y + 1);
+        await Task.Delay(200);
+        Position = new Position(Position.X + 1, Position.Y + 1);
+        await Task.Delay(200);
 
         Position = new Position(Position.X, Position.Y + 1); // South
+        await Task.Delay(200);
+        Position = new Position(Position.X, Position.Y + 1);
+        await Task.Delay(200);
+        Position = new Position(Position.X, Position.Y + 1);
         await Task.Delay(200);
         Position = new Position(Position.X, Position.Y + 1);
         await Task.Delay(200);
@@ -174,8 +186,16 @@ partial class Squirrel : Animal
         await Task.Delay(200);
         Position = new Position(Position.X - 1, Position.Y + 1);
         await Task.Delay(200);
+        Position = new Position(Position.X - 1, Position.Y + 1);
+        await Task.Delay(200);
+        Position = new Position(Position.X - 1, Position.Y + 1);
+        await Task.Delay(200);
 
         Position = new Position(Position.X - 1, Position.Y); // West
+        await Task.Delay(200);
+        Position = new Position(Position.X - 1, Position.Y);
+        await Task.Delay(200);
+        Position = new Position(Position.X - 1, Position.Y);
         await Task.Delay(200);
         Position = new Position(Position.X - 1, Position.Y);
         await Task.Delay(200);
@@ -184,13 +204,25 @@ partial class Squirrel : Animal
         await Task.Delay(200);
         Position = new Position(Position.X - 1, Position.Y - 1);
         await Task.Delay(200);
+        Position = new Position(Position.X - 1, Position.Y - 1);
+        await Task.Delay(200);
+        Position = new Position(Position.X - 1, Position.Y - 1);
+        await Task.Delay(200);
 
         Position = new Position(Position.X, Position.Y - 1); // North
         await Task.Delay(200);
         Position = new Position(Position.X, Position.Y - 1);
         await Task.Delay(200);
+        Position = new Position(Position.X, Position.Y - 1);
+        await Task.Delay(200);
+        Position = new Position(Position.X, Position.Y - 1);
+        await Task.Delay(200);
 
         Position = new Position(Position.X + 1, Position.Y - 1); // NE
+        await Task.Delay(200);
+        Position = new Position(Position.X + 1, Position.Y - 1);
+        await Task.Delay(200);
+        Position = new Position(Position.X + 1, Position.Y - 1);
         await Task.Delay(200);
         Position = new Position(Position.X + 1, Position.Y - 1);
         await Task.Delay(200);

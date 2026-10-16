@@ -257,7 +257,9 @@ partial class Squirrel
     }
     public override async Task GeneralConditioner(Terrain terrain)
     {
-        await RunInCircles();
+        //await ScanFor(terrain);
+        await MoveInCircles();
+        //await MoveTo(terrain);
     }
     public override async Task ScanFor(Terrain terrain)
     {

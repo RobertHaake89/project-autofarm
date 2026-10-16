@@ -35,12 +35,14 @@ class Renderer
         var human1 = entityDict["human1"];
         var human2 = entityDict["human2"];
         //var human3 = entityDict["human3"];
+        var squirrel1 = entityDict["squirrel1"];
 
         RenderMushrooms(terrain, output);
 
         RenderEntity(human1, output);
         RenderEntity(human2, output);
         //RenderEntity(human3, output);
+        RenderEntity(squirrel1, output);
 
         RenderTrees(terrain, output);
 

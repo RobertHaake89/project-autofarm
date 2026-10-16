@@ -17,7 +17,7 @@ class General
             UpdateTiles(terrain);
             await UpdateGameAsync(terrain);
             Renderer.Screen(terrain, entityDict);
-
+            
             //Console.ReadKey();
             await Task.Delay(100); // 60
         }
