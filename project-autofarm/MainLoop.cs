@@ -50,7 +50,7 @@ class General
             {
                 await tree.GiveGrowthChance();
                 await tree.SelfSeeding(terrain, randomFactor: 1000); // 1000
-                await tree.CreateMycel(terrain, randomFactor: 1000);
+                await tree.CreateMycel(terrain, randomFactor: 200);
 
                 //if (tree.Mycel is not null) Console.Write($"Tree has mycel");
 

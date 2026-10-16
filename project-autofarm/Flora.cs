@@ -15,7 +15,12 @@ abstract class Vegetation
     public PlantType Type {get; init;}
     public ResourceType Resource {get; set;}
     public GrowthProcess Status {get; set;}
-    public Position Position {get; set;}
+    public virtual Position Position {get; set
+        {
+            field = new Position(
+                Math.Clamp(value.X, 0, Terrain.MaxSizeX),
+                Math.Clamp(value.Y, 0, Terrain.MaxSizeY));
+        }}
 
     public Vegetation(PlantType type, Position position, GrowthProcess status, Terrain terrain)
     {
@@ -29,9 +34,23 @@ abstract class Vegetation
 
 class Tree : Vegetation
 {
+    public override Position Position {get; set =>
+        field = Type switch
+        {
+            PlantType.Spruce => new Position(
+                Math.Clamp(value.X, 4, Terrain.MaxSizeX - 3), 
+                Math.Clamp(value.Y, 5, Terrain.MaxSizeY - 1)),
+            PlantType.Oak => new Position(
+                Math.Clamp(value.X, 7, Terrain.MaxSizeX - 6), 
+                Math.Clamp(value.Y, 7, Terrain.MaxSizeY - 1)),
+            _ => new Position(
+                Math.Clamp(value.X, 5, Terrain.MaxSizeX - 5), 
+                Math.Clamp(value.Y, 5, Terrain.MaxSizeY - 5))
+        };}
     public Mycel? Mycel {get; set;}
     public Tree(PlantType type, Position position, GrowthProcess status, Terrain terrain) :base(type, position, status, terrain)
     {
+        Type = type;
         Resource = type switch
         {
             PlantType.Spruce => ResourceType.SpruceWood,
@@ -83,7 +102,7 @@ class Tree : Vegetation
             && spreadSpectrumY > 2);
 
         setPosition.X = Math.Clamp(setPosition.X, borderDistanceX, Terrain.MaxSizeX - borderDistanceX);
-        setPosition.Y = Math.Clamp(setPosition.Y, borderDistanceY, Terrain.MaxSizeY - borderDistanceY - 1);
+        setPosition.Y = Math.Clamp(setPosition.Y, borderDistanceY, Terrain.MaxSizeY - borderDistanceY - 1); // If removing, Pos Property Setter can't prevent crash !!
 
         //Console.Write($"Oak Counter: {terrain.TreeList.Count(tree => tree.Type == PlantType.Oak)}");
         //Console.Write($"Spruce Counter: {terrain.TreeList.Count(tree => tree.Type == PlantType.Spruce)}"); // 18 max
@@ -268,8 +287,8 @@ class Mycel : Vegetation
         int radiusPosY = Random.Shared.Next(-MushroomMaxRadius, MushroomMaxRadius + 1);
 
         Position setPosition = new Position(
-            Math.Clamp(Parent.Position.X + radiusPosX, 1, Terrain.MaxSizeX -1),
-            Math.Clamp(Parent.Position.Y + radiusPosY / 4, 1, Terrain.MaxSizeY -1));
+            Parent.Position.X + radiusPosX,
+            Parent.Position.Y + radiusPosY / 3);
 
         if (randomNumber == randomFactor
             && radiusPosX != 0
@@ -290,6 +309,11 @@ class Mushroom : Vegetation
 {
     public Mycel Parent;
     public char Icon {get; set;}
+    /* public override Position Position { get; set => field = 
+            new Position(
+                Math.Clamp(value.X, 1, Terrain.MaxSizeX - 1), 
+                Math.Clamp(value.Y, 1, Terrain.MaxSizeY - 1));
+        } */
     public Mushroom(Mycel parent, Position position, Terrain terrain) : base(PlantType.Mushroom, position, GrowthProcess.Planted, terrain)
     {
         Icon = parent.Parent.Type is PlantType.Oak
