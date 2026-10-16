@@ -298,6 +298,8 @@ class Mycel : Vegetation
         {
             MushroomList.Add(
                 new Mushroom(this,new Position(setPosition.X, setPosition.Y), terrain));
+            MushroomList[^1].Position = setPosition; // To trigger Clamped Setter
+
             terrain.Grid![setPosition.X, setPosition.Y].Resource.Type = Resource;
             //Console.Write("has been added");
         }
