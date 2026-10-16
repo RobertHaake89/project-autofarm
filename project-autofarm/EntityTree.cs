@@ -55,7 +55,7 @@ abstract partial class Entity : ITargetable
     Status is Status.Exhausted 
         ? (int)(field * 1.5) 
         : field; set;}
-    public Position Position {get => field; set
+    public virtual Position Position {get => field; set
         {
             field = new Position(
                 Math.Clamp(value.X, 0, Terrain.MaxSizeX),
@@ -81,26 +81,6 @@ abstract partial class Entity : ITargetable
         TargetPosition = position;
     }
 }
-
-abstract partial class Animal : Entity
-{
-    public bool IsAlive = true;
-    
-    public Animal(string name, char icon, Gender gender, int speedMove, Position position) : base(name, icon, gender, speedMove, position)
-    {
-        
-    }
-}
-
-partial class Squirrel : Animal
-{
-    public Squirrel(string name, char icon, int speedMove, Position position) : base(name, icon, Gender.Male, speedMove, position)
-    {
-        
-    }
-}
-
-
 
 partial class Human : Entity
 {
@@ -135,3 +115,84 @@ partial class Human : Entity
     }
 }
 
+abstract partial class Animal : Entity
+{
+    public abstract override Position Position {get; set;}
+            
+    public bool IsAlive = true;
+    
+    public Animal(string name, char icon, Gender gender, int speedMove, Position position) : base(name, icon, gender, speedMove, position)
+    {
+        
+    }
+
+    public void SetIcon(Position value)
+    {
+        if (value.X < Position.X && value.Y < Position.Y) Icon = '૪'; // diagonal NW
+        else if (value.X < Position.X && value.Y > Position.Y) Icon = 'ꙮ'; // diagonal SW
+        else if (value.X > Position.X && value.Y < Position.Y) Icon = '૪'; // diagonal NE
+        else if (value.X > Position.X && value.Y > Position.Y) Icon = 'ꙮ'; // diagonal SE
+
+        else if (value.X < Position.X) Icon = 'ᘚ'; // Left
+        else if (value.X > Position.X) Icon = 'ᘛ'; // Right
+        else if (value.Y < Position.Y) Icon = '૪'; // Top
+        else if (value.Y > Position.Y) Icon = 'ꙮ'; // Bottom
+    }
+}
+
+partial class Squirrel : Animal
+{
+    public override Position Position {get; set
+    {
+        field = value;
+        SetIcon(value);
+    }}
+
+    public Squirrel(string name, char icon, int speedMove, Position position) : base(name, icon, Gender.Male, speedMove, position)
+    {
+        
+    }
+
+    public async Task RunInCircles()
+    {
+        Position = new Position(Position.X + 1, Position.Y); // East
+        await Task.Delay(200);
+        Position = new Position(Position.X + 1, Position.Y);
+        await Task.Delay(200);
+
+        Position = new Position(Position.X + 1, Position.Y + 1); // SE
+        await Task.Delay(200);
+        Position = new Position(Position.X + 1, Position.Y + 1);
+        await Task.Delay(200);
+
+        Position = new Position(Position.X, Position.Y + 1); // South
+        await Task.Delay(200);
+        Position = new Position(Position.X, Position.Y + 1);
+        await Task.Delay(200);
+
+        Position = new Position(Position.X - 1, Position.Y + 1); // SW
+        await Task.Delay(200);
+        Position = new Position(Position.X - 1, Position.Y + 1);
+        await Task.Delay(200);
+
+        Position = new Position(Position.X - 1, Position.Y); // West
+        await Task.Delay(200);
+        Position = new Position(Position.X - 1, Position.Y);
+        await Task.Delay(200);
+
+        Position = new Position(Position.X - 1, Position.Y - 1); // NW
+        await Task.Delay(200);
+        Position = new Position(Position.X - 1, Position.Y - 1);
+        await Task.Delay(200);
+
+        Position = new Position(Position.X, Position.Y - 1); // North
+        await Task.Delay(200);
+        Position = new Position(Position.X, Position.Y - 1);
+        await Task.Delay(200);
+
+        Position = new Position(Position.X + 1, Position.Y - 1); // NE
+        await Task.Delay(200);
+        Position = new Position(Position.X + 1, Position.Y - 1);
+        await Task.Delay(200);
+    }
+}

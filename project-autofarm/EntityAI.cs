@@ -242,15 +242,22 @@ partial class Human : Entity
     }
 }
 
+partial class Animal
+{
+    
+}
 partial class Squirrel
 {
     public override async Task RunSchedule(Terrain terrain)
     {
-        
+        while (true)
+        {
+            await GeneralConditioner(terrain);
+        }
     }
     public override async Task GeneralConditioner(Terrain terrain)
     {
-        
+        await RunInCircles();
     }
     public override async Task ScanFor(Terrain terrain)
     {

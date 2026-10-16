@@ -33,10 +33,8 @@ class General
 
                 terrain.Grid![x,y].UpdateAcre();
                 //terrain.Grid![x,y].UpdateAcre();
-
             }
         }
-
     }
 
     public static async Task UpdateGameAsync(Terrain terrain)

@@ -24,11 +24,14 @@ class Program
         Entity human2 = new Human("Jürgen", '♟', Gender.Male,speedMove: 95, Profession.Forester, Specialisation.SpruceWood, position: new Position(8,3));
         //Entity human3 = new Human("Gerda", '♙', Gender.Female, speedMove: 100, Profession.Forager, Specialisation.Mushrooms, position: new Position(8,3));
 
+        Entity squirrel1 = new Squirrel("Squirrel", 'ꙮ', speedMove: 200, new Position(10,5));
+
         Dictionary<string, Entity> entityList = new Dictionary<string, Entity>()
         {
             {"human1", human1},
             {"human2", human2},
             //{"human3", human3}
+            {"squirrel1", squirrel1}
         };
         
         await General.MainLoop(terrain, entityList);
