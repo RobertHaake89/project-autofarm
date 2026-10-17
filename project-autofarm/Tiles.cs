@@ -43,7 +43,7 @@ class Tile : ITargetable
         Texture.TextureName = Texture.TextureName;
     }
 
-    public void UpdateTrees(Terrain terrain)
+    /* public void UpdateTrees(Terrain terrain)
     {
         if (Resource != null)
         {
@@ -60,5 +60,5 @@ class Tile : ITargetable
             }
         }
         Texture.TextureName = Texture.TextureName;
-    }
+    } */
 }

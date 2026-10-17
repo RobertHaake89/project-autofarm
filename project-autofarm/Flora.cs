@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace ProjectAutofarm;
 
 public enum PlantType
@@ -92,8 +94,8 @@ class Tree : Vegetation
 
         do
         {
-            spreadSpectrumX = Random.Shared.Next(-8, 9);
-            spreadSpectrumY = Random.Shared.Next(-4, 5);
+            spreadSpectrumX = Random.Shared.Next(-10, 11);
+            spreadSpectrumY = Random.Shared.Next(-5, 6);
             setPosition = new Position(Position.X + spreadSpectrumX,Position.Y + spreadSpectrumY);
         }
         while (spreadSpectrumX < -4
@@ -316,19 +318,38 @@ class Mycel : Vegetation
 class Mushroom : Vegetation
 {
     public Mycel Parent;
-    public char Icon {get; set;}
-    /* public override Position Position { get; set => field = 
-            new Position(
-                Math.Clamp(value.X, 1, Terrain.MaxSizeX - 1), 
-                Math.Clamp(value.Y, 1, Terrain.MaxSizeY - 1));
-        } */
+    public char Icon {get
+    {
+        if (Status is GrowthProcess.Ripe)
+            return Parent.Parent.Type is PlantType.Oak
+                ? '♣' 
+                : '♧';
+        else if (Status is GrowthProcess.Mature) return '⌃';
+        else if (Status is GrowthProcess.Young) return '^';
+        else if (Status is GrowthProcess.Planted) return '.';
+
+        else return '?';
+    }}
+    
     public Mushroom(Mycel parent, Position position, Terrain terrain) : base(PlantType.Mushroom, position, GrowthProcess.Planted, terrain)
     {
-        Icon = parent.Parent.Type is PlantType.Oak
-            ? '♣' 
-            : '♧';
-
         Parent = parent;      
-        
+    }
+
+    public async Task GiveGrowthChance(int randomFactor)
+    {
+        int randomNumber = Random.Shared.Next(randomFactor + 1);
+
+        if (Status is not GrowthProcess.Ripe
+            && randomNumber == randomFactor)
+        {
+            Status = Status switch 
+            {
+                GrowthProcess.Mature => GrowthProcess.Ripe,
+                GrowthProcess.Young => GrowthProcess.Mature,
+                GrowthProcess.Planted => GrowthProcess.Young,
+                _ => GrowthProcess.Planted
+            };
+        }
     }
 }

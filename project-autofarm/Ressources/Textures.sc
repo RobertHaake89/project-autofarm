@@ -9,8 +9,9 @@ acre_wheat_mature,▒
 acre_wheat_ripe,▓
 acre_wheat_harvested,┄
 acre_carot,❦
-forage_mushroom_emerging,^
-forage_mushroom_growing,.
+forage_mushroom_emerging,.
+forage_mushroom_growing,^
+forage_mushroom_mature,⌃
 forage_mushroom1,♣
 forage_mushroom2,♧
 forage_acorn,❧
