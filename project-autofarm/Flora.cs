@@ -98,10 +98,10 @@ class Tree : Vegetation
             spreadSpectrumY = Random.Shared.Next(-5, 6);
             setPosition = new Position(Position.X + spreadSpectrumX,Position.Y + spreadSpectrumY);
         }
-        while (spreadSpectrumX < -4
-            && spreadSpectrumY < -2
-            && spreadSpectrumX > 4
-            && spreadSpectrumY > 2);
+        while (spreadSpectrumX < -6
+            && spreadSpectrumY < -3
+            && spreadSpectrumX > 7
+            && spreadSpectrumY > 4);
 
         setPosition.X = Math.Clamp(
             setPosition.X, borderDistanceX, 
@@ -119,7 +119,7 @@ class Tree : Vegetation
             && Type is PlantType.Spruce
             && Status is GrowthProcess.Ripe
             && terrain.Grid![setPosition.X, setPosition.Y]
-                .Resource.Type is ResourceType.Fertile/* Soil is Soil.SemiArid or Soil.Fertile */)
+                .Soil is Soil.Fertile or Soil.SemiArid/* Soil is Soil.SemiArid or Soil.Fertile */)
         {
             PlantType typeModifier =
                 terrain.TreeList.Count(tree => tree.Type == PlantType.Oak) < Terrain.OakMaxQty

@@ -143,7 +143,8 @@ partial class Human : Entity
 
         if (Status is not Status.Exhausted
         && Position == chosenTarget
-        && TargetMemory.Any()) TargetMemory.RemoveAt(0); 
+        && TargetMemory.Any())
+            TargetMemory.RemoveAt(0); 
     }
 
     public async Task DoFarmWork(Terrain terrain)
@@ -221,7 +222,10 @@ partial class Human : Entity
 
         int randomNumber = RandomNumberGenerator.GetInt32(randomFactor + 1); //Random.Shared.Next(randomFactor + 1);
 
-        if (terrain.Grid![Position.X, Position.Y].Resource.Type is ResourceType.Fertile)
+        if (terrain.Grid![Position.X, Position.Y].Soil
+            is Soil.Fertile or Soil.SemiArid
+        && terrain.Grid![Position.X, Position.Y].Resource.Type
+            is not ResourceType.Wheat)
         {
             if (randomNumber == randomFactor)
             {

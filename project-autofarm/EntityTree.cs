@@ -87,7 +87,7 @@ partial class Human : Entity
     public Profession Profession {get; set;}
     public Specialisation Specialisation {get; set;}
     public override ResourceType TargetResource {get => field = Mode == ProcessingMode.Planting 
-        ? ResourceType.Fertile 
+        ? ResourceType.HumusSoil
         : Specialisation switch
             {
                 Specialisation.Wheat => ResourceType.Wheat,

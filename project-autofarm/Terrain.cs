@@ -8,7 +8,7 @@ partial class Terrain // Data and Parameters
     public const int MaxSizeX = 90;
     public const int MaxSizeY = MaxSizeX * (16/9) / 4;
     public const int TreeMaxQty = SpruceMaxQty + OakMaxQty;
-    public const int SpruceMaxQty = 18;
+    public const int SpruceMaxQty = 20;
     public const int OakMaxQty = 1;
     public const int TreeCuttingThreshold = TreeMaxQty * 7 / 10;
     public const int MycelMaxQty = 3;
@@ -19,14 +19,14 @@ partial class Terrain // Data and Parameters
     {
         CreateTiles();
         CreateDirtFoundation();
-        CreateFertileSoil();
-        CreateGrassPatch(60,0,100,100,radius:8);
-        CreateGrassPatch(40,50,80,100,radius:5);
-        CreateGrassPatch(50,0,100,40,radius:5);
+        CreateSemiAridSoil();
+        CreateGrassPatch(xMin: 50,yMin: 0,xMax: 100,yMax: 40,radius:6);
+        CreateGrassPatch(xMin: 60, yMin: 0,xMax: 100,yMax: 100,radius:10);
+        CreateGrassPatch(xMin: 35,yMin: 50,xMax: 80,yMax: 100,radius:6);
         CreateFoliage(0,0,100,100,factor:80);
         CreateGrassShafts(0,0,100,100,factor:200);
         CreateStones(0,0,100,100,factor:100);
-        CreateField(xMin: 69,yMin: 35,xMax: 89,yMax: 80);
+        CreateField(xMin: 67,yMin: 35,xMax: 87,yMax: 80);
 
         //CreateTrees(TreeType.Spruce, qtyMin: 5, qtyMax: SpruceMaxQty, xMin:MaxSizeX / 3, yMin: 4, xMax: MaxSizeX - 5, yMax: MaxSizeY / 3);
         //CreateTrees(PlantType.Oak, qtyMin: 1, qtyMax: OakMaxQty + 1, xMin:5 , yMin: MaxSizeY * 2 / 3, xMax: MaxSizeX * 2 / 3, yMax: MaxSizeY - 1);
@@ -51,13 +51,13 @@ partial class Terrain // Creation Methods
         }
     }
 
-    private void CreateFertileSoil()
+    private void CreateSemiAridSoil()
     {
-        for (int y = 4; y < MaxSizeY; y++)
+        for (int y = 3; y < MaxSizeY; y++)
         {
-            for (int x = MaxSizeX / 3; x < MaxSizeX - 4; x++)
+            for (int x = MaxSizeX / 2; x < MaxSizeX - 1; x++)
             {
-                Grid![x,y].Resource.Type = ResourceType.Fertile;
+                Grid![x,y].Soil = Soil.SemiArid;
             }
         }
     }
@@ -80,12 +80,19 @@ partial class Terrain // Creation Methods
 
         for (int incY = OffsetMin.Y; incY < OffsetMax.Y; incY++)
         {
-            
             for (int incX = OffsetMin.X - GetSimpleNoise(-2,2); incX < OffsetMax.X - GetSimpleNoise(0,3); incX++)
             {
                 PatchGenerator(ref incX, ref incY, in OffsetMin, in OffsetMax, out int dx, out int dy);
                 
-                if (dx * dx + dy * dy <= Math.Pow(radius,2)) Grid![incX,incY].Texture.TextureName = "bot_grass1";
+                if (dx * dx + dy * dy <= Math.Pow(radius, 2))
+                {
+                    Grid![
+                        incX.ClampToTerrainAxis("x"),
+                        incX.ClampToTerrainAxis("y")].
+                            Resource.Type = ResourceType.HumusSoil;
+                    Grid![incX,incY].Texture.TextureName = "bot_grass1";
+                }
+                    
             }
         }
     }
