@@ -13,10 +13,12 @@ partial class Terrain // Data and Parameters
     public const int TreeCuttingThreshold = TreeMaxQty * 7 / 10;
     public const int MycelMaxQty = 3;
     public List<Tree> TreeList {get; set;} = [];
+    public List<Structure> StructureList {get; set;} = [];
 
     public void CreateMap() // xMin, yMin, xMax, yMax, radius?
     {
         CreateTiles();
+
         CreateDirtFoundation();
         CreateSemiAridSoil();
         CreateGrassPatch(xMin: 50,yMin: 0,xMax: 100,yMax: 40,radius:6);
@@ -26,11 +28,6 @@ partial class Terrain // Data and Parameters
         CreateGrassShafts(0,0,100,100,factor:200);
         CreateStones(0,0,100,100,factor:100);
         CreateField(xMin: 67,yMin: 35,xMax: 87,yMax: 80);
-
-        //CreateTrees(TreeType.Spruce, qtyMin: 5, qtyMax: SpruceMaxQty, xMin:MaxSizeX / 3, yMin: 4, xMax: MaxSizeX - 5, yMax: MaxSizeY / 3);
-        //CreateTrees(PlantType.Oak, qtyMin: 1, qtyMax: OakMaxQty + 1, xMin:5 , yMin: MaxSizeY * 2 / 3, xMax: MaxSizeX * 2 / 3, yMax: MaxSizeY - 1);
-
-        //CreateMushrooms(0,0,95,30,factor:60);
         
         CreateFarmHouse(5,0);
     }

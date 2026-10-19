@@ -54,7 +54,7 @@ partial class Human : Entity
                 else if (terrain.TreeList.Count < Terrain.TreeMaxQty)
                 {
                     Mode = ProcessingMode.Planting;
-                    await PlantTree(terrain,randomFactor: 45);
+                    await PlantTree(terrain,randomFactor: 50);
                     await Task.Delay(SpeedWorking);
                 }
             }

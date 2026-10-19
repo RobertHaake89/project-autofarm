@@ -32,7 +32,6 @@ class General
                 terrain.Grid![x,y].Resource.GiveGrowthChance();
 
                 terrain.Grid![x,y].UpdateAcre();
-                //terrain.Grid![x,y].UpdateAcre();
             }
         }
     }
@@ -59,8 +58,8 @@ class General
                     await tree.Mycel.AddMushrooms(terrain, randomFactor: 100);
                 }
 
-                terrain.Grid![tree.Position.X, tree.Position.Y].Resource.Type = tree.Resource;
-                terrain.Grid![tree.Position.X, tree.Position.Y].Resource.Status = tree.Status;
+                //terrain.Grid![tree.Position.X, tree.Position.Y].Resource.Type = tree.Resource;
+                //terrain.Grid![tree.Position.X, tree.Position.Y].Resource.Status = tree.Status;
             }
         }
         finally

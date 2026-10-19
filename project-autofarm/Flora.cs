@@ -107,7 +107,8 @@ class Tree : Vegetation
                         Resource.Type is ResourceType.SpruceWood or ResourceType.OakWood)
                 {
                     terrain.TreeList.Remove(this);
-                    terrain.Grid[Position.X.ClampToAxis(0), Position.Y.ClampToAxis(1)].Resource.Type = ResourceType.None;
+                    terrain.Grid[Position.X, Position.Y].Resource.Type = ResourceType.None;
+                    terrain.Grid![Position.X, Position.Y].Resource.Status = GrowthProcess.Fallow;
                 }
                 else
                 {
@@ -118,6 +119,7 @@ class Tree : Vegetation
             {
                 Status = GrowthProcess.Ripe;
                 terrain.Grid![Position.X,Position.Y].Resource.Type = Resource;
+                terrain.Grid![Position.X, Position.Y].Resource.Status = Status;
             }
                             
         }
@@ -196,18 +198,11 @@ class Tree : Vegetation
             && randomNumber == randomFactor)
         {
             Mycel = new Mycel(this, terrain);
-            //Console.Write("Create Mycel works");
-            //terrain.MycelList.Add(Mycel);
-            //Console.ReadKey();
-            //terrain.MycelList.Distinct().ToList();
-
         }   
     }
 
     public string[,] GetTreeTexture()
     {
-        //int randomizer = Random.Shared.Next(1,3);
-
         string[,] sprucePlanted =
         {
             {"skip", "skip", "skip", "skip", "skip", "skip", "skip"},

@@ -42,23 +42,4 @@ class Tile : ITargetable
 
         Texture.TextureName = Texture.TextureName;
     }
-
-    /* public void UpdateTrees(Terrain terrain)
-    {
-        if (Resource != null)
-        {
-            if (Resource.Type is ResourceType.SpruceWood or ResourceType.OakWood)
-            {
-                Texture.TextureName = Resource.Status switch
-                {   
-                    GrowthProcess.Planted => "tree_any_germinating",
-                    GrowthProcess.Young => "tree_any_sprouting",
-                    GrowthProcess.Mature => "tree_any_growing",
-                    GrowthProcess.Ripe => "bot_grass1",
-                    _ => "bot_grass1" // THIS NEEDS TO BE REWORKED!!
-                };
-            }
-        }
-        Texture.TextureName = Texture.TextureName;
-    } */
 }
