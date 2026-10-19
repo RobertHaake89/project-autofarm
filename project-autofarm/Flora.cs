@@ -56,7 +56,7 @@ class Tree : Vegetation
         Resource = type switch
         {
             PlantType.Spruce => ResourceType.SpruceWood,
-            PlantType.Oak => ResourceType.SpruceWood/* ResourceType.OakWood */, // Changed for testing
+            PlantType.Oak => ResourceType.OakWood,
             _ => ResourceType.None
         };
     }
@@ -81,18 +81,45 @@ class Tree : Vegetation
             if (Status == GrowthProcess.Planted) Status = GrowthProcess.Young;
             else if (Status == GrowthProcess.Young)
             {
-                if (terrain.Grid![(Position.X - 1).ClampToAxis(0), (Position.Y - 1).ClampToAxis(1)].Resource.Type is ResourceType.SpruceWood or ResourceType.OakWood
-                || terrain.Grid[(Position.X - 1).ClampToAxis(0), Position.Y.ClampToAxis(1)].Resource.Type is ResourceType.SpruceWood or ResourceType.OakWood
-                || terrain.Grid[(Position.X + 1).ClampToAxis(0), Position.Y.ClampToAxis(1)].Resource.Type is ResourceType.SpruceWood or ResourceType.OakWood
-                || terrain.Grid[(Position.X + 1).ClampToAxis(0), (Position.Y + 1).ClampToAxis(1)].Resource.Type is ResourceType.SpruceWood or ResourceType.OakWood)
+                if (terrain.Grid![
+                    (Position.X - 1).ClampToAxis(0),
+                    (Position.Y - 1).ClampToAxis(1)].
+                        Resource.Type is ResourceType.SpruceWood or ResourceType.OakWood
+                || terrain.Grid[
+                    (Position.X - 1).ClampToAxis(0),
+                    Position.Y.ClampToAxis(1)].
+                        Resource.Type is ResourceType.SpruceWood or ResourceType.OakWood
+                || terrain.Grid[
+                    Position.X.ClampToAxis(0),
+                    (Position.Y - 1).ClampToAxis(1)].
+                        Resource.Type is ResourceType.SpruceWood or ResourceType.OakWood
+                || terrain.Grid[
+                    Position.X.ClampToAxis(0),
+                    (Position.Y + 1).ClampToAxis(1)].
+                        Resource.Type is ResourceType.SpruceWood or ResourceType.OakWood
+                || terrain.Grid[
+                    (Position.X + 1).ClampToAxis(0),
+                    Position.Y.ClampToAxis(1)].
+                        Resource.Type is ResourceType.SpruceWood or ResourceType.OakWood
+                || terrain.Grid[(
+                    Position.X + 1).ClampToAxis(0),
+                    (Position.Y + 1).ClampToAxis(1)].
+                        Resource.Type is ResourceType.SpruceWood or ResourceType.OakWood)
                 {
                     terrain.TreeList.Remove(this);
-                    terrain.Grid[Position.X, Position.Y].Resource.Type = ResourceType.Humus; // could make problems
+                    terrain.Grid[Position.X.ClampToAxis(0), Position.Y.ClampToAxis(1)].Resource.Type = ResourceType.None;
                 }
-                else Status = GrowthProcess.Mature;
+                else
+                {
+                    Status = GrowthProcess.Mature;
+                }
             }
             else if (Status == GrowthProcess.Mature)
-                Status = GrowthProcess.Ripe;            
+            {
+                Status = GrowthProcess.Ripe;
+                terrain.Grid![Position.X,Position.Y].Resource.Type = Resource;
+            }
+                            
         }
     }
 

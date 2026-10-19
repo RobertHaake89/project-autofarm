@@ -13,7 +13,6 @@ partial class Terrain // Data and Parameters
     public const int TreeCuttingThreshold = TreeMaxQty * 7 / 10;
     public const int MycelMaxQty = 3;
     public List<Tree> TreeList {get; set;} = [];
-    //public List<Mycel> MycelList {get; set;} = [];
 
     public void CreateMap() // xMin, yMin, xMax, yMax, radius?
     {

@@ -1,6 +1,6 @@
 # Project Autofarm
 
-![Project Autofarm](Images/main_121026.png)
+![Project Autofarm](Images/project-autofarm-video.gif)
 
 ## About
 

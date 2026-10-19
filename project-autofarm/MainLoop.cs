@@ -57,12 +57,7 @@ class General
                 if (tree.Mycel is not null)
                 {
                     await tree.Mycel.AddMushrooms(terrain, randomFactor: 100);
-                    //Console.Write($"{tree.Mycel.MushroomList.Count} mushrooms connected");
                 }
-                //Console.Write($"MycelList: {terrain.MycelList.Count}");
-
-                /* foreach (Mycel mycel in terrain.MycelList)
-                    Console.Write(mycel.Position); */
 
                 terrain.Grid![tree.Position.X, tree.Position.Y].Resource.Type = tree.Resource;
                 terrain.Grid![tree.Position.X, tree.Position.Y].Resource.Status = tree.Status;

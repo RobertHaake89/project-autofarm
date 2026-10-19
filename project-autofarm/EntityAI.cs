@@ -72,7 +72,7 @@ partial class Human : Entity
         if (Status is Status.Resting)
         {
             TargetMemory.Clear();
-            await Task.Delay(10000);
+            await Task.Delay(10_000);
 
             Status = Status.Idle;
         }
@@ -223,7 +223,7 @@ partial class Human : Entity
         int randomNumber = RandomNumberGenerator.GetInt32(randomFactor + 1); //Random.Shared.Next(randomFactor + 1);
 
         if (Position.Y > 3
-        &&terrain.Grid![Position.X, Position.Y].Soil
+        && terrain.Grid![Position.X, Position.Y].Soil
             is Soil.Fertile
         && terrain.Grid![Position.X, Position.Y].Resource.Type
             is not ResourceType.Wheat)
