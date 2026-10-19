@@ -17,9 +17,9 @@ public static class SupportMethod
     public static int ClampToAxis(this int value, int axis)
     {
         if (axis is 0)
-            return Math.Clamp(value, 1, Terrain.MaxSizeX);
+            return Math.Clamp(value, 1, Terrain.MaxSizeX - 1);
         if (axis is 1)
-            return Math.Clamp(value, 1, Terrain.MaxSizeY);
+            return Math.Clamp(value, 1, Terrain.MaxSizeY - 1);
 
         else return 0;
 
