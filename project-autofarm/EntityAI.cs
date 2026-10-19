@@ -54,7 +54,7 @@ partial class Human : Entity
                 else if (terrain.TreeList.Count < Terrain.TreeMaxQty)
                 {
                     Mode = ProcessingMode.Planting;
-                    await PlantTree(terrain,randomFactor: 70);
+                    await PlantTree(terrain,randomFactor: 45);
                     await Task.Delay(SpeedWorking);
                 }
             }
@@ -222,8 +222,9 @@ partial class Human : Entity
 
         int randomNumber = RandomNumberGenerator.GetInt32(randomFactor + 1); //Random.Shared.Next(randomFactor + 1);
 
-        if (terrain.Grid![Position.X, Position.Y].Soil
-            is Soil.Fertile or Soil.SemiArid
+        if (Position.Y > 3
+        &&terrain.Grid![Position.X, Position.Y].Soil
+            is Soil.Fertile
         && terrain.Grid![Position.X, Position.Y].Resource.Type
             is not ResourceType.Wheat)
         {

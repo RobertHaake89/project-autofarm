@@ -14,12 +14,12 @@ public static class SupportMethod
         }
     }
 
-    public static int ClampToTerrainAxis(this int value, string axis)
+    public static int ClampToAxis(this int value, int axis)
     {
-        if (axis is "x" or "X")
-            return Math.Clamp(value, 0, Terrain.MaxSizeX - 1);
-        if (axis is "y" or "Y")
-            return Math.Clamp(value, 0, Terrain.MaxSizeY - 1);
+        if (axis is 0)
+            return Math.Clamp(value, 1, Terrain.MaxSizeX);
+        if (axis is 1)
+            return Math.Clamp(value, 1, Terrain.MaxSizeY);
 
         else return 0;
 

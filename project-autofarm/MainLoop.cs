@@ -46,8 +46,8 @@ class General
         {
             foreach (Tree tree in terrain.TreeList.ToList())
             {
-                await tree.GiveGrowthChance();
-                await tree.SelfSeeding(terrain, randomFactor: 2000); // 1000
+                await tree.GiveGrowthChance(terrain);
+                await tree.SelfSeeding(terrain, randomFactor: 1000); // 1000
                 await tree.CreateMycel(terrain, randomFactor: 200);
 
                 if (tree.Mycel is not null)

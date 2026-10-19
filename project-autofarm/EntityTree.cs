@@ -58,8 +58,8 @@ abstract partial class Entity : ITargetable
     public virtual Position Position {get => field; set
         {
             field = new Position(
-                Math.Clamp(value.X, 0, Terrain.MaxSizeX),
-                Math.Clamp(value.Y, 0, Terrain.MaxSizeY));
+                value.X.ClampToAxis(0),
+                value.Y.ClampToAxis(1));
         }}
     public Position SpawnPoint {get; init;}
     public Position IdlePosition;
@@ -86,18 +86,19 @@ partial class Human : Entity
 {
     public Profession Profession {get; set;}
     public Specialisation Specialisation {get; set;}
-    public override ResourceType TargetResource {get => field = Mode == ProcessingMode.Planting 
-        ? ResourceType.HumusSoil
-        : Specialisation switch
-            {
-                Specialisation.Wheat => ResourceType.Wheat,
-                Specialisation.SpruceWood => ResourceType.SpruceWood,
-                Specialisation.OakWood => ResourceType.OakWood,
-                Specialisation.Mushrooms => ResourceType.Mushrooms,
-                _ => ResourceType.None
-            }; set;}
-    public int TargetMemorySize {get => field; set => field = Math.Max(field,value);}
-    public override List<Position> TargetMemory {get; set;} = new List<Position>();
+    public override ResourceType TargetResource {get 
+        => field = Mode == ProcessingMode.Planting 
+            ? ResourceType.Humus
+            : Specialisation switch
+                {
+                    Specialisation.Wheat => ResourceType.Wheat,
+                    Specialisation.SpruceWood => ResourceType.SpruceWood,
+                    Specialisation.OakWood => ResourceType.OakWood,
+                    Specialisation.Mushrooms => ResourceType.Mushrooms,
+                    _ => ResourceType.None
+                }; set;}
+    public int TargetMemorySize {get; set => field = Math.Max(field,value);}
+    public override List<Position> TargetMemory {get; set;} = [];
     public int SpeedWorking {get;
     set => field = Profession switch
     {

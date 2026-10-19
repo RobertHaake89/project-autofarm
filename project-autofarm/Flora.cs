@@ -41,7 +41,7 @@ class Tree : Vegetation
         {
             PlantType.Spruce => new Position(
                 Math.Clamp(value.X, 4, Terrain.MaxSizeX - 3), 
-                Math.Clamp(value.Y, 5, Terrain.MaxSizeY - 1)),
+                Math.Clamp(value.Y, 4, Terrain.MaxSizeY - 1)),
             PlantType.Oak => new Position(
                 Math.Clamp(value.X, 7, Terrain.MaxSizeX - 6), 
                 Math.Clamp(value.Y, 7, Terrain.MaxSizeY - 1)),
@@ -62,8 +62,11 @@ class Tree : Vegetation
     }
     public string[,]? Texture {get => field = GetTreeTexture(); set;}
 
-    public async Task GiveGrowthChance()
+    public async Task GiveGrowthChance(Terrain terrain)
     {
+        if (Status == GrowthProcess.Ripe)
+            return;
+
         int factor = Type switch
         {
             PlantType.Spruce => 100,
@@ -73,12 +76,23 @@ class Tree : Vegetation
 
         int RandomNumber = Random.Shared.Next(factor + 1);
 
-        if (Status == GrowthProcess.Ripe) return;
-        else if (RandomNumber == factor)
+        if (RandomNumber == factor)
         {
             if (Status == GrowthProcess.Planted) Status = GrowthProcess.Young;
-            else if (Status == GrowthProcess.Young) Status = GrowthProcess.Mature;
-            else if (Status == GrowthProcess.Mature) Status = GrowthProcess.Ripe;
+            else if (Status == GrowthProcess.Young)
+            {
+                if (terrain.Grid![(Position.X - 1).ClampToAxis(0), (Position.Y - 1).ClampToAxis(1)].Resource.Type is ResourceType.SpruceWood or ResourceType.OakWood
+                || terrain.Grid[(Position.X - 1).ClampToAxis(0), Position.Y.ClampToAxis(1)].Resource.Type is ResourceType.SpruceWood or ResourceType.OakWood
+                || terrain.Grid[(Position.X + 1).ClampToAxis(0), Position.Y.ClampToAxis(1)].Resource.Type is ResourceType.SpruceWood or ResourceType.OakWood
+                || terrain.Grid[(Position.X + 1).ClampToAxis(0), (Position.Y + 1).ClampToAxis(1)].Resource.Type is ResourceType.SpruceWood or ResourceType.OakWood)
+                {
+                    terrain.TreeList.Remove(this);
+                    terrain.Grid[Position.X, Position.Y].Resource.Type = ResourceType.Humus; // could make problems
+                }
+                else Status = GrowthProcess.Mature;
+            }
+            else if (Status == GrowthProcess.Mature)
+                Status = GrowthProcess.Ripe;            
         }
     }
 
@@ -96,7 +110,8 @@ class Tree : Vegetation
         {
             spreadSpectrumX = Random.Shared.Next(-10, 11);
             spreadSpectrumY = Random.Shared.Next(-5, 6);
-            setPosition = new Position(Position.X + spreadSpectrumX,Position.Y + spreadSpectrumY);
+            setPosition = new Position(
+                Position.X + spreadSpectrumX,Position.Y + spreadSpectrumY);
         }
         while (spreadSpectrumX < -6
             && spreadSpectrumY < -3
@@ -119,7 +134,9 @@ class Tree : Vegetation
             && Type is PlantType.Spruce
             && Status is GrowthProcess.Ripe
             && terrain.Grid![setPosition.X, setPosition.Y]
-                .Soil is Soil.Fertile or Soil.SemiArid/* Soil is Soil.SemiArid or Soil.Fertile */)
+                .Soil is Soil.Fertile or Soil.SemiArid
+            && terrain.Grid![setPosition.X, setPosition.Y]
+                .Resource.Type is not (ResourceType.Wheat or ResourceType.SpruceWood or ResourceType.OakWood))
         {
             PlantType typeModifier =
                 terrain.TreeList.Count(tree => tree.Type == PlantType.Oak) < Terrain.OakMaxQty
@@ -162,7 +179,7 @@ class Tree : Vegetation
 
     public string[,] GetTreeTexture()
     {
-        int randomizer = Random.Shared.Next(1,3);
+        //int randomizer = Random.Shared.Next(1,3);
 
         string[,] sprucePlanted =
         {

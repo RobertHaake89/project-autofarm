@@ -51,28 +51,29 @@ partial class Terrain // Creation Methods
         }
     }
 
-    private void CreateSemiAridSoil()
-    {
-        for (int y = 3; y < MaxSizeY; y++)
-        {
-            for (int x = MaxSizeX / 2; x < MaxSizeX - 1; x++)
-            {
-                Grid![x,y].Soil = Soil.SemiArid;
-            }
-        }
-    }
-
     private void CreateDirtFoundation()
     {
         for (int y = 0; y < MaxSizeY; y++)
         {
             for (int x = 0; x < MaxSizeX; x++)
             {
+                Grid![x.ClampToAxis(0),y.ClampToAxis(1)].Soil = Soil.Barren;
                 Grid![x,y].Texture.TextureName = "bot_dirt1";
             }
         }
     }
-    
+
+    private void CreateSemiAridSoil()
+    {
+        for (int y = 0; y < MaxSizeY; y++)
+        {
+            for (int x = MaxSizeX / 3; x < MaxSizeX; x++)
+            {
+                Grid![x.ClampToAxis(0),y.ClampToAxis(1)].Soil = Soil.SemiArid;
+            }
+        }
+    }
+
     private void CreateGrassPatch(int xMin, int yMin, int xMax, int yMax, int radius)
     {
         var OffsetMin = (X:MaxSizeX * xMin/100, Y:MaxSizeY * yMin/100);
@@ -87,9 +88,13 @@ partial class Terrain // Creation Methods
                 if (dx * dx + dy * dy <= Math.Pow(radius, 2))
                 {
                     Grid![
-                        incX.ClampToTerrainAxis("x"),
-                        incX.ClampToTerrainAxis("y")].
-                            Resource.Type = ResourceType.HumusSoil;
+                        incX.ClampToAxis(0),
+                        incY.ClampToAxis(1)].
+                            Soil = Soil.Fertile;
+                    Grid![
+                        incX.ClampToAxis(0),
+                        incY.ClampToAxis(1)].
+                            Resource.Type = ResourceType.Humus;
                     Grid![incX,incY].Texture.TextureName = "bot_grass1";
                 }
                     
