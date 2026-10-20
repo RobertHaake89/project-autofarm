@@ -262,11 +262,11 @@ partial class Squirrel
     }
     public override async Task GeneralConditioner(Terrain terrain)
     {
-        //await ScanFor(terrain);
-        await MoveInCircles();
+        //await MoveInCircles();
         //await MoveTo(terrain);
+        await ScamperAround(terrain);
     }
-    public override async Task ScanFor(Terrain terrain)
+    /* public override async Task ScanFor(Terrain terrain)
     {
         for (int y = 0; y < Terrain.MaxSizeY; y++)
         {
@@ -300,9 +300,145 @@ partial class Squirrel
 
             //if (Profession is Profession.Forester && Mode is ProcessingMode.Harvesting) TargetMemory.Shuffle();
         }        
-    }
+    } */
     public override async Task MoveTo(Terrain terrain)
     {
         
+    }
+
+    public async Task ScamperAround(Terrain terrain)
+    {
+        int scamperLengthX = Random.Shared.Next(6,9);
+        int scamperLengthY = Random.Shared.Next(3,6);
+
+        for (int y = 0; y < scamperLengthY; y++)
+        {
+            int randomY = Random.Shared.Next(-1, 2);
+
+            for (int x = 0; x < scamperLengthX; x++)
+            {
+                int randomX = Random.Shared.Next(-2, 3);
+
+                if (randomX != LastPosition.X
+                && randomY != LastPosition.Y)
+                    Position = new Position(
+                        Position.X + randomX, 
+                        Position.Y + randomY);
+                else continue;
+
+                await Task.Delay(600);
+
+                
+            };
+            //await ScanFor(terrain);
+        }
+
+        
+        await Task.Delay(600);
+    }
+
+    public override async Task ScanFor(Terrain terrain)
+    {
+        int focusdirection;
+        int focusDuration = 300;
+        int pastScanThinking = Random.Shared.Next(400, 800);
+        int scanAmount = Random.Shared.Next(2,7);
+
+        for (int x = 0; x < scanAmount; x++)
+        {
+            focusdirection = Random.Shared.Next(0,2);
+
+            if (focusdirection == 0)
+            {
+                Icon = IconList[4];
+                await Task.Delay(focusDuration);
+                Icon = IconList[6];
+                await Task.Delay(focusDuration);
+            }
+            else if (focusdirection == 1)
+            {
+                Icon = IconList[8];
+                await Task.Delay(focusDuration);
+                Icon = IconList[2];
+                await Task.Delay(focusDuration);
+            }
+
+            await Task.Delay(pastScanThinking);
+        }
+    }
+
+    public async Task MoveInCircles()
+    {
+        Position = new Position(Position.X + 1, Position.Y); // East
+        await Task.Delay(200);
+        Position = new Position(Position.X + 1, Position.Y);
+        await Task.Delay(200);
+        Position = new Position(Position.X + 1, Position.Y);
+        await Task.Delay(200);
+        Position = new Position(Position.X + 1, Position.Y);
+        await Task.Delay(200);
+
+        Position = new Position(Position.X + 1, Position.Y + 1); // SE
+        await Task.Delay(200);
+        Position = new Position(Position.X + 1, Position.Y + 1);
+        await Task.Delay(200);
+        Position = new Position(Position.X + 1, Position.Y + 1);
+        await Task.Delay(200);
+        Position = new Position(Position.X + 1, Position.Y + 1);
+        await Task.Delay(200);
+
+        Position = new Position(Position.X, Position.Y + 1); // South
+        await Task.Delay(200);
+        Position = new Position(Position.X, Position.Y + 1);
+        await Task.Delay(200);
+        Position = new Position(Position.X, Position.Y + 1);
+        await Task.Delay(200);
+        Position = new Position(Position.X, Position.Y + 1);
+        await Task.Delay(200);
+
+        Position = new Position(Position.X - 1, Position.Y + 1); // SW
+        await Task.Delay(200);
+        Position = new Position(Position.X - 1, Position.Y + 1);
+        await Task.Delay(200);
+        Position = new Position(Position.X - 1, Position.Y + 1);
+        await Task.Delay(200);
+        Position = new Position(Position.X - 1, Position.Y + 1);
+        await Task.Delay(200);
+
+        Position = new Position(Position.X - 1, Position.Y); // West
+        await Task.Delay(200);
+        Position = new Position(Position.X - 1, Position.Y);
+        await Task.Delay(200);
+        Position = new Position(Position.X - 1, Position.Y);
+        await Task.Delay(200);
+        Position = new Position(Position.X - 1, Position.Y);
+        await Task.Delay(200);
+
+        Position = new Position(Position.X - 1, Position.Y - 1); // NW
+        await Task.Delay(200);
+        Position = new Position(Position.X - 1, Position.Y - 1);
+        await Task.Delay(200);
+        Position = new Position(Position.X - 1, Position.Y - 1);
+        await Task.Delay(200);
+        Position = new Position(Position.X - 1, Position.Y - 1);
+        await Task.Delay(200);
+
+        Position = new Position(Position.X, Position.Y - 1); // North
+        await Task.Delay(200);
+        Position = new Position(Position.X, Position.Y - 1);
+        await Task.Delay(200);
+        Position = new Position(Position.X, Position.Y - 1);
+        await Task.Delay(200);
+        Position = new Position(Position.X, Position.Y - 1);
+        await Task.Delay(200);
+
+        Position = new Position(Position.X + 1, Position.Y - 1); // NE
+        await Task.Delay(200);
+        Position = new Position(Position.X + 1, Position.Y - 1);
+        await Task.Delay(200);
+        Position = new Position(Position.X + 1, Position.Y - 1);
+        await Task.Delay(200);
+        Position = new Position(Position.X + 1, Position.Y - 1);
+        await Task.Delay(200);
     }
 }

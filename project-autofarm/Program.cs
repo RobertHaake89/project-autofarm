@@ -24,7 +24,7 @@ class Program
         Entity human2 = new Human("Jürgen", '♟', Gender.Male,speedMove: 95, Profession.Forester, Specialisation.SpruceWood, position: new Position(8,3));
         //Entity human3 = new Human("Gerda", '♙', Gender.Female, speedMove: 100, Profession.Forager, Specialisation.Mushrooms, position: new Position(8,3));
 
-        Entity squirrel1 = new Squirrel("Squirrel", 'ꙮ', speedMove: 200, new Position(10,5));
+        Entity squirrel1 = new Squirrel("Squirrel", speedMove: 200, new Position(Terrain.MaxSizeX / 2, Terrain.MaxSizeY / 2));
 
         Dictionary<string, Entity> entityList = new Dictionary<string, Entity>()
         {

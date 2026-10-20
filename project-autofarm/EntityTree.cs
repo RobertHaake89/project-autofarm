@@ -119,7 +119,6 @@ partial class Human : Entity
 abstract partial class Animal : Entity
 {
     public abstract override Position Position {get; set;}
-            
     public bool IsAlive = true;
     
     public Animal(string name, char icon, Gender gender, int speedMove, Position position) : base(name, icon, gender, speedMove, position)
@@ -127,7 +126,7 @@ abstract partial class Animal : Entity
         
     }
 
-    public void SetIcon(Position value)
+    public virtual void SetIcon(Position value)
     {
         if (value.X < Position.X && value.Y < Position.Y) Icon = '૪'; // diagonal NW
         else if (value.X < Position.X && value.Y > Position.Y) Icon = 'ꙮ'; // diagonal SW
@@ -143,89 +142,45 @@ abstract partial class Animal : Entity
 
 partial class Squirrel : Animal
 {
+    public char[] IconList {get; set;} = new char[9];
+    /* public char IconUp = '૪';
+    public char IconRight = 'ᘛ';
+    public char IconSouth = 'ꙮ';
+    public char IconWest = 'ᘚ'; */
     public override Position Position {get; set
     {
         SetIcon(value);
+        LastPosition = value;
+
+        value = new Position(
+            value.X.ClampToAxis(0), 
+            value.Y.ClampToAxis(1));
+        
         field = value;
     }}
+    public Position LastPosition {get; set;}
 
-    public Squirrel(string name, char icon, int speedMove, Position position) : base(name, icon, Gender.Male, speedMove, position)
+    public Squirrel(string name, int speedMove, Position position) : base(name, 'ꙮ', Gender.Male, speedMove, position)
     {
         TargetResource = ResourceType.Wheat;
+
+        IconList[8] = '૪';
+        IconList[6] = 'ᘛ';
+        IconList[2] = 'ꙮ';
+        IconList[4] = 'ᘚ';
     }
 
-    public async Task MoveInCircles()
+    public override void SetIcon(Position value)
     {
-        Position = new Position(Position.X + 1, Position.Y); // East
-        await Task.Delay(200);
-        Position = new Position(Position.X + 1, Position.Y);
-        await Task.Delay(200);
-        Position = new Position(Position.X + 1, Position.Y);
-        await Task.Delay(200);
-        Position = new Position(Position.X + 1, Position.Y);
-        await Task.Delay(200);
+        if (value.X < Position.X && value.Y < Position.Y) Icon = IconList[8]; // diagonal NW
+        else if (value.X < Position.X && value.Y > Position.Y) Icon = IconList[2]; // diagonal SW
+        else if (value.X > Position.X && value.Y < Position.Y) Icon = IconList[8]; // diagonal NE
+        else if (value.X > Position.X && value.Y > Position.Y) Icon = IconList[2]; // diagonal SE
 
-        Position = new Position(Position.X + 1, Position.Y + 1); // SE
-        await Task.Delay(200);
-        Position = new Position(Position.X + 1, Position.Y + 1);
-        await Task.Delay(200);
-        Position = new Position(Position.X + 1, Position.Y + 1);
-        await Task.Delay(200);
-        Position = new Position(Position.X + 1, Position.Y + 1);
-        await Task.Delay(200);
-
-        Position = new Position(Position.X, Position.Y + 1); // South
-        await Task.Delay(200);
-        Position = new Position(Position.X, Position.Y + 1);
-        await Task.Delay(200);
-        Position = new Position(Position.X, Position.Y + 1);
-        await Task.Delay(200);
-        Position = new Position(Position.X, Position.Y + 1);
-        await Task.Delay(200);
-
-        Position = new Position(Position.X - 1, Position.Y + 1); // SW
-        await Task.Delay(200);
-        Position = new Position(Position.X - 1, Position.Y + 1);
-        await Task.Delay(200);
-        Position = new Position(Position.X - 1, Position.Y + 1);
-        await Task.Delay(200);
-        Position = new Position(Position.X - 1, Position.Y + 1);
-        await Task.Delay(200);
-
-        Position = new Position(Position.X - 1, Position.Y); // West
-        await Task.Delay(200);
-        Position = new Position(Position.X - 1, Position.Y);
-        await Task.Delay(200);
-        Position = new Position(Position.X - 1, Position.Y);
-        await Task.Delay(200);
-        Position = new Position(Position.X - 1, Position.Y);
-        await Task.Delay(200);
-
-        Position = new Position(Position.X - 1, Position.Y - 1); // NW
-        await Task.Delay(200);
-        Position = new Position(Position.X - 1, Position.Y - 1);
-        await Task.Delay(200);
-        Position = new Position(Position.X - 1, Position.Y - 1);
-        await Task.Delay(200);
-        Position = new Position(Position.X - 1, Position.Y - 1);
-        await Task.Delay(200);
-
-        Position = new Position(Position.X, Position.Y - 1); // North
-        await Task.Delay(200);
-        Position = new Position(Position.X, Position.Y - 1);
-        await Task.Delay(200);
-        Position = new Position(Position.X, Position.Y - 1);
-        await Task.Delay(200);
-        Position = new Position(Position.X, Position.Y - 1);
-        await Task.Delay(200);
-
-        Position = new Position(Position.X + 1, Position.Y - 1); // NE
-        await Task.Delay(200);
-        Position = new Position(Position.X + 1, Position.Y - 1);
-        await Task.Delay(200);
-        Position = new Position(Position.X + 1, Position.Y - 1);
-        await Task.Delay(200);
-        Position = new Position(Position.X + 1, Position.Y - 1);
-        await Task.Delay(200);
+        else if (value.X < Position.X) Icon = IconList[4]; // Left
+        else if (value.X > Position.X) Icon = IconList[6]; // Right
+        else if (value.Y < Position.Y) Icon = IconList[8]; // Top
+        else if (value.Y > Position.Y) Icon = IconList[2]; // Bottom
     }
+    
 }
