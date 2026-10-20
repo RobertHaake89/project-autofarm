@@ -33,7 +33,9 @@ class Program
             //{"human3", human3}
             {"squirrel1", squirrel1}
         };
+
+        terrain.EntityDict = entityList;
         
-        await General.MainLoop(terrain, entityList);
+        await General.MainLoop(terrain);
     }
 }

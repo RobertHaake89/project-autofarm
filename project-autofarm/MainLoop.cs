@@ -3,11 +3,11 @@ namespace ProjectAutofarm;
 class General
 {
     private static int _isUpdating = 0;
-    public static async Task MainLoop(Terrain terrain, Dictionary<string, Entity> entityDict)
+    public static async Task MainLoop(Terrain terrain)
     {
         Console.Clear();
         
-        foreach (Entity entity in entityDict.Values)
+        foreach (Entity entity in terrain.EntityDict.Values)
         {
             _ = entity.RunSchedule(terrain);
         }
@@ -16,7 +16,7 @@ class General
         {
             UpdateTiles(terrain);
             await UpdateGameAsync(terrain);
-            Renderer.Screen(terrain, entityDict);
+            Renderer.Screen(terrain);
             
             //Console.ReadKey();
             await Task.Delay(100); // 60

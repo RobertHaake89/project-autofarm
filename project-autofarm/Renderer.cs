@@ -1,12 +1,10 @@
-using System;
-using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace ProjectAutofarm;
 
 class Renderer
 {
-    public static void Screen(Terrain terrain, Dictionary<string, Entity> entityDict)
+    public static void Screen(Terrain terrain)
     {
         Console.SetCursorPosition(0, 0);
 
@@ -32,10 +30,10 @@ class Renderer
 
         output.AppendLine();
 
-        var human1 = entityDict["human1"];
-        var human2 = entityDict["human2"];
+        var human1 = terrain.EntityDict["human1"];
+        var human2 = terrain.EntityDict["human2"];
         //var human3 = entityDict["human3"];
-        var squirrel1 = entityDict["squirrel1"];
+        var squirrel1 = terrain.EntityDict["squirrel1"];
 
         RenderMushrooms(terrain, output);
 

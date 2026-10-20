@@ -308,12 +308,12 @@ partial class Squirrel
 
     public async Task ScamperAround(Terrain terrain)
     {
-        int scamperLengthX = Random.Shared.Next(6,9);
+        int scamperLengthX = Random.Shared.Next(9,12);
         int scamperLengthY = Random.Shared.Next(3,6);
 
         for (int y = 0; y < scamperLengthY; y++)
         {
-            int randomY = Random.Shared.Next(-1, 2);
+            int randomY = Random.Shared.Next(-2, 3);
 
             for (int x = 0; x < scamperLengthX; x++)
             {
@@ -326,22 +326,22 @@ partial class Squirrel
                         Position.Y + randomY);
                 else continue;
 
-                await Task.Delay(600);
-
+                await Task.Delay(400);
+                //await ScanFor(terrain);
                 
             };
             //await ScanFor(terrain);
         }
-
+        await ScanFor(terrain);
         
-        await Task.Delay(600);
+        //await Task.Delay(600);
     }
 
     public override async Task ScanFor(Terrain terrain)
     {
         int focusdirection;
-        int focusDuration = 300;
-        int pastScanThinking = Random.Shared.Next(400, 800);
+        int focusDuration = 500;
+        int pastScanThinking = Random.Shared.Next(600, 1000);
         int scanAmount = Random.Shared.Next(2,7);
 
         for (int x = 0; x < scanAmount; x++)
@@ -442,3 +442,4 @@ partial class Squirrel
         await Task.Delay(200);
     }
 }
+

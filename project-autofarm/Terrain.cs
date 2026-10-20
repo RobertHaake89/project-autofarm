@@ -15,6 +15,8 @@ partial class Terrain // Data and Parameters
     public List<Tree> TreeList {get; set;} = [];
     public List<Structure> StructureList {get; set;} = [];
 
+    public Dictionary<string, Entity> EntityDict = [];
+
     public void CreateMap() // xMin, yMin, xMax, yMax, radius?
     {
         CreateTiles();
