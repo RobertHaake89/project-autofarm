@@ -199,9 +199,13 @@ partial class Human : Entity
                 {
                     Position = new Position(Position.X - 1, Position.Y);
                     await Task.Delay(10_000); // 10000
-                    terrain.TreeList.RemoveAll(tree 
+
+                    lock (terrain.TreeListLock)
+                    {
+                        terrain.TreeList.RemoveAll(tree 
                     => tree.Position.X == TargetPosition.X
                     && tree.Position.Y == TargetPosition.Y);
+                    }
 
                     terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Status = GrowthProcess.Fallow;
                     terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Type = ResourceType.None;
@@ -232,7 +236,11 @@ partial class Human : Entity
         {
             if (randomNumber == randomFactor)
             {
-                terrain.TreeList.Add(new Tree(PlantType.Spruce, new Position(Position.X, Position.Y), GrowthProcess.Planted, terrain));
+                lock (terrain.TreeListLock)
+                {
+                    terrain.TreeList.Add(
+                        new Tree(PlantType.Spruce, new Position(Position.X, Position.Y), GrowthProcess.Planted, terrain));
+                }
             }
 
             if (!TargetMemory.Any()) Status = Status.Exhausted;

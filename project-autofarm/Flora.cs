@@ -106,9 +106,12 @@ class Tree : Vegetation
                     (Position.Y + 1).ClampToAxis(1)].
                         Resource.Type is ResourceType.SpruceWood or ResourceType.OakWood)
                 {
-                    terrain.TreeList.Remove(this);
-                    terrain.Grid[Position.X, Position.Y].Resource.Type = ResourceType.None;
-                    terrain.Grid![Position.X, Position.Y].Resource.Status = GrowthProcess.Fallow;
+                    lock (terrain.TreeListLock)
+                    {
+                        terrain.TreeList.Remove(this);
+                        terrain.Grid[Position.X, Position.Y].Resource.Type = ResourceType.None;
+                        terrain.Grid![Position.X, Position.Y].Resource.Status = GrowthProcess.Fallow;
+                    }
                 }
                 else
                 {
@@ -132,7 +135,7 @@ class Tree : Vegetation
         int spreadSpectrumX;
         int spreadSpectrumY;
         int borderDistanceX = 6;
-        int borderDistanceY = 4;
+        int borderDistanceY = 1;
         Position setPosition;
 
         do
@@ -176,7 +179,11 @@ class Tree : Vegetation
 
                     if (typeModifier == PlantType.Oak) Math.Clamp(Position.Y, 7, Terrain.MaxSizeY - 1);
 
-            terrain.TreeList.Add(new Tree(typeModifier, setPosition, GrowthProcess.Planted, terrain));
+            lock (terrain.TreeListLock)
+            {
+                terrain.TreeList.Add(
+                    new Tree(typeModifier, setPosition, GrowthProcess.Planted, terrain));
+            }
         }        
 
         return Task.CompletedTask;

@@ -1,4 +1,5 @@
-﻿global using System.Security.Cryptography;
+﻿global using System.Globalization;
+global using System.Security.Cryptography;
 
 namespace ProjectAutofarm;
 
@@ -6,6 +7,9 @@ class Program
 {
     public static async Task Main()
     {
+        CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+        CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
+
         Console.OutputEncoding = System.Text.Encoding.UTF8;
         Console.CursorVisible = false;
         Console.BackgroundColor = ConsoleColor.Black;
