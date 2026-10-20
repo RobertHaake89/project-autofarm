@@ -1,3 +1,5 @@
+using System.Reflection.Emit;
+
 namespace ProjectAutofarm;
 
 abstract partial class Entity : ITargetable // AI
@@ -265,42 +267,9 @@ partial class Squirrel
         //await MoveInCircles();
         //await MoveTo(terrain);
         await ScamperAround(terrain);
+        
     }
-    /* public override async Task ScanFor(Terrain terrain)
-    {
-        for (int y = 0; y < Terrain.MaxSizeY; y++)
-        {
-            int start = y % 2 == 0 ? 0 : Terrain.MaxSizeX - 1;
-            int end = y % 2 == 0 ? Terrain.MaxSizeX : - 1;
-            int step = y % 2 == 0 ? 1: -1;
-
-            for (int x = start; x != end; x += step)
-            {
-                if (terrain.Grid![x,y].Resource.Type == TargetResource)
-                {
-                    if (terrain.Grid![x,y].Resource.Status is GrowthProcess.Fallow)
-                    {
-                        TargetMemory.Add(new Position(terrain.Grid[x,y].Position.X, terrain.Grid[x,y].Position.Y));
-                    }
-                    else if (terrain.Grid![x,y].Resource.Status is GrowthProcess.Ripe or GrowthProcess.Mature or GrowthProcess.Young)
-                    {
-                        TargetMemory.Add(new Position(terrain.Grid[x,y].Position.X, terrain.Grid[x,y].Position.Y));                            
-                    }
-                    else if (terrain.Grid![x,y].Resource.Status is GrowthProcess.Plowed)
-                    {
-                        TargetMemory.Add(new Position(terrain.Grid[x,y].Position.X, terrain.Grid[x,y].Position.Y));
-                    }
-                    else if (terrain.Grid![x,y].Resource.Status is GrowthProcess.Harvested)
-                    {
-                        TargetMemory.Add(new Position(terrain.Grid[x,y].Position.X, terrain.Grid[x,y].Position.Y));
-                    }
-                }
-            }
-            TargetMemory = TargetMemory.Distinct().ToList();
-
-            //if (Profession is Profession.Forester && Mode is ProcessingMode.Harvesting) TargetMemory.Shuffle();
-        }        
-    } */
+    
     public override async Task MoveTo(Terrain terrain)
     {
         
@@ -308,25 +277,40 @@ partial class Squirrel
 
     public async Task ScamperAround(Terrain terrain)
     {
-        int scamperLengthX = Random.Shared.Next(9,12);
-        int scamperLengthY = Random.Shared.Next(3,6);
+        int scamperLengthX = Random.Shared.Next(4,9);
+        int scamperLengthY = Random.Shared.Next(2,4);
+        bool shouldTurnX;
+        bool shouldTurnY;
 
         for (int y = 0; y < scamperLengthY; y++)
         {
-            int randomY = Random.Shared.Next(-2, 3);
+            int randomY = Random.Shared.Next(-1, 2);
+            //scamperLengthY = Random.Shared.Next(-5,6);
 
             for (int x = 0; x < scamperLengthX; x++)
             {
                 int randomX = Random.Shared.Next(-2, 3);
+                
+                shouldTurnX =
+                    Random.Shared.Next(2) == 1
+                        ? true
+                        : false;
+                shouldTurnY =
+                    Random.Shared.Next(2) == 1
+                        ? true
+                        : false;
 
-                if (randomX != LastPosition.X
-                && randomY != LastPosition.Y)
+                if (Position.X + randomX != LastPosition.X
+                || shouldTurnX
+                && Position.Y + randomY != LastPosition.Y
+                || shouldTurnY)
                     Position = new Position(
                         Position.X + randomX, 
                         Position.Y + randomY);
                 else continue;
 
-                await Task.Delay(400);
+                await Task.Delay(SpeedMove);
+                await CheckForDanger(terrain);
                 //await ScanFor(terrain);
                 
             };
@@ -341,12 +325,14 @@ partial class Squirrel
     {
         int focusdirection;
         int focusDuration = 500;
-        int pastScanThinking = Random.Shared.Next(600, 1000);
+        int pastScanThinking = Random.Shared.Next(600, 1500);
         int scanAmount = Random.Shared.Next(2,7);
 
         for (int x = 0; x < scanAmount; x++)
         {
             focusdirection = Random.Shared.Next(0,2);
+
+            await CheckForDanger(terrain);
 
             if (focusdirection == 0)
             {
@@ -364,6 +350,63 @@ partial class Squirrel
             }
 
             await Task.Delay(pastScanThinking);
+        }
+    }
+
+    public async Task CheckForDanger(Terrain terrain)
+    {
+        foreach (Human human in terrain.EntityDict.Values.OfType<Human>())
+        {
+            if (human.Position == Position
+            || Math.Abs(human.Position.X - Position.X) <= 3
+            || Math.Abs(human.Position.Y - Position.Y) <= 1)
+            {
+                int fleeDistanceX = Random.Shared.Next(3,5);
+                int fleeDistanceY = Random.Shared.Next(1,3);
+
+                if (Position.X <= human.Position.X)
+                    fleeDistanceX = 
+                        Position.X <= Terrain.MaxSizeX.ClampToAxis(0) / 2
+                        ? fleeDistanceX
+                        : -fleeDistanceX;
+                else if (Position.X > human.Position.X)
+                    fleeDistanceX = 
+                        Position.X <= Terrain.MaxSizeX.ClampToAxis(0) / 2
+                        ? fleeDistanceX
+                        : -fleeDistanceX;
+                if (Position.Y <= human.Position.Y)
+                    fleeDistanceY = 
+                        Position.Y <= Terrain.MaxSizeY.ClampToAxis(1) / 2
+                        ? fleeDistanceY
+                        : -fleeDistanceY;
+                else if (Position.Y > human.Position.Y)
+                    fleeDistanceY = 
+                        Position.Y <= Terrain.MaxSizeY.ClampToAxis(1) / 2
+                        ? fleeDistanceY
+                        : -fleeDistanceY;
+
+                /* fleeDistanceX = 
+                    Position.X <= human.Position.X
+                    && Position.X >= Terrain.MaxSizeX.ClampToAxis(0) / 2
+                        ? -fleeDistanceX 
+                        : fleeDistanceX;
+                
+                fleeDistanceY = 
+                    Position.Y <= human.Position.Y
+                    && Position.Y >= Terrain.MaxSizeY.ClampToAxis(1) / 2
+                        ? -fleeDistanceY 
+                        : fleeDistanceY; */
+
+                for (int y = 0; y < fleeDistanceY; y++)
+                {
+                    for (int x = 0; x < fleeDistanceX; x++)
+                    {
+                        Position = new Position(Position.X + x, Position.Y + y);
+                        await Task.Delay(SpeedMove / 2);
+                    }
+                }
+            }
+                
         }
     }
 
@@ -441,5 +484,6 @@ partial class Squirrel
         Position = new Position(Position.X + 1, Position.Y - 1);
         await Task.Delay(200);
     }
+
 }
 
