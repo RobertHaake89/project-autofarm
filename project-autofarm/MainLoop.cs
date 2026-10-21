@@ -44,9 +44,9 @@ class General
             }
         }
 
-        if (terrain.CropTileList.Count(
-        crop => crop.Resource.Status is GrowthProcess.Ripe) 
-        == terrain.CropTileList.Count)
+        if (terrain.CropTileList.Count > 0
+        && terrain.CropTileList.All(
+        crop => crop.Resource.Status is GrowthProcess.Ripe))
         {
             lock (EntityListLock)
             {
