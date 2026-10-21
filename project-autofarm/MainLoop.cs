@@ -1,20 +1,32 @@
+using System.Dynamic;
+
 namespace ProjectAutofarm;
 
 class General
 {
+    public static readonly object EntityListLock = new();
+    public static event EventHandler? OnCropsAreRipe;
     private static int _isUpdating = 0;
     public static async Task MainLoop(Terrain terrain)
     {
         Console.Clear();
         
-        foreach (Entity entity in terrain.EntityDict.Values)
+        lock (EntityListLock)
         {
-            _ = entity.RunSchedule(terrain);
+            foreach (Entity entity in terrain.EntityDict.Values)
+            {
+                _ = entity.RunSchedule(terrain);
+            }
         }
+        
 
         while (true)
         {
             UpdateTiles(terrain);
+
+            
+                    
+
             await UpdateGameAsync(terrain);
             Renderer.Screen(terrain);
             
@@ -34,6 +46,21 @@ class General
                 terrain.Grid![x,y].UpdateAcre();
             }
         }
+
+        if (terrain.CropTileList.Count(
+        crop => crop.Resource.Status is GrowthProcess.Ripe) 
+        == terrain.CropTileList.Count)
+        {
+            lock (EntityListLock)
+            {
+                foreach(Human human in terrain.EntityDict.Values.OfType<Human>())
+                {
+                    if (human.Profession is Profession.Farmer
+                    && human.Status is Status.Idle)
+                        OnCropsAreRipe?.Invoke(terrain, EventArgs.Empty);
+                }
+            }
+        }     
     }
 
     public static async Task UpdateGameAsync(Terrain terrain)
@@ -57,9 +84,6 @@ class General
                 {
                     await tree.Mycel.AddMushrooms(terrain, randomFactor: 100);
                 }
-
-                //terrain.Grid![tree.Position.X, tree.Position.Y].Resource.Type = tree.Resource;
-                //terrain.Grid![tree.Position.X, tree.Position.Y].Resource.Status = tree.Status;
             }
         }
         finally
@@ -73,8 +97,7 @@ class General
                     return yComparison;
 
                 return a.Position.X.CompareTo(b.Position.X);
-            });
-                
+            }); 
         }
     }
 }

@@ -15,7 +15,9 @@ partial class Terrain // Data and Parameters
     public const int MycelMaxQty = 3;
     public List<Tree> TreeList {get; set;} = [];
     public readonly object TreeListLock = new();
-
+    public List<Tile> CropTileList {get; set;} = [];
+    //public readonly object CropTilesLock = new();
+    
     public List<Structure> StructureList {get; set;} = [];
     public Dictionary<string, Entity> EntityDict = [];
 
@@ -112,6 +114,7 @@ partial class Terrain // Creation Methods
             for (int incX = OffsetMin.X; incX < OffsetMax.X; incX++)
             {
                 Grid![incX,incY].Resource = new Resource(ResourceType.Wheat, GrowthProcess.Fallow, (incX,incY));
+                CropTileList.Add(Grid![incX,incY]);
             }
         }
     }

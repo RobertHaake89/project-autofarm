@@ -23,8 +23,8 @@ partial class Human : Entity
     {
         if (Status is Status.Idle)
         {
-            if (Profession is not Profession.None)
-                Status = Status.Working;
+            /* if (Profession is not Profession.None)
+                Status = Status.Working; */
 
             if (Profession is Profession.Forester
                 && terrain.TreeList.Count( tree => tree.Status is GrowthProcess.Ripe)
@@ -80,7 +80,10 @@ partial class Human : Entity
         }
     }
 
-
+    public void CallToWork(object? sender, EventArgs e)
+    {
+        Status = Status.Working;
+    }
 
     public override async Task ScanFor(Terrain terrain)
     {
@@ -180,7 +183,6 @@ partial class Human : Entity
                         TargetMemorySize = 0;                     
                     }
                 }
-                //Console.WriteLine(Stamina);      
             }
         }
     }
@@ -203,8 +205,8 @@ partial class Human : Entity
                     lock (terrain.TreeListLock)
                     {
                         terrain.TreeList.RemoveAll(tree 
-                    => tree.Position.X == TargetPosition.X
-                    && tree.Position.Y == TargetPosition.Y);
+                            => tree.Position.X == TargetPosition.X
+                            && tree.Position.Y == TargetPosition.Y);
                     }
 
                     terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Status = GrowthProcess.Fallow;
@@ -259,109 +261,7 @@ partial class Human : Entity
 
 partial class Animal
 {
-    
-}
-partial class Squirrel
-{
-    public override async Task RunSchedule(Terrain terrain)
-    {
-        while (true)
-        {
-            await GeneralConditioner(terrain);
-        }
-    }
-    public override async Task GeneralConditioner(Terrain terrain)
-    {
-        //await MoveInCircles();
-        //await MoveTo(terrain);
-        await ScamperAround(terrain);
-        
-    }
-    
-    public override async Task MoveTo(Terrain terrain)
-    {
-        
-    }
-
-    public async Task ScamperAround(Terrain terrain)
-    {
-        int scamperLengthX = Random.Shared.Next(4,9);
-        int scamperLengthY = Random.Shared.Next(2,4);
-        bool shouldTurnX;
-        bool shouldTurnY;
-
-        for (int y = 0; y < scamperLengthY; y++)
-        {
-            int randomY = Random.Shared.Next(-1, 2);
-            //scamperLengthY = Random.Shared.Next(-5,6);
-
-            for (int x = 0; x < scamperLengthX; x++)
-            {
-                int randomX = Random.Shared.Next(-2, 3);
-                
-                shouldTurnX =
-                    Random.Shared.Next(2) == 1
-                        ? true
-                        : false;
-                shouldTurnY =
-                    Random.Shared.Next(2) == 1
-                        ? true
-                        : false;
-
-                if (Position.X + randomX != LastPosition.X
-                || shouldTurnX
-                && Position.Y + randomY != LastPosition.Y
-                || shouldTurnY)
-                    Position = new Position(
-                        Position.X + randomX, 
-                        Position.Y + randomY);
-                else continue;
-
-                await Task.Delay(SpeedMove);
-                await CheckForDanger(terrain);
-                //await ScanFor(terrain);
-                
-            };
-            //await ScanFor(terrain);
-        }
-        await ScanFor(terrain);
-        
-        //await Task.Delay(600);
-    }
-
-    public override async Task ScanFor(Terrain terrain)
-    {
-        int focusdirection;
-        int focusDuration = 500;
-        int pastScanThinking = Random.Shared.Next(600, 1500);
-        int scanAmount = Random.Shared.Next(2,7);
-
-        for (int x = 0; x < scanAmount; x++)
-        {
-            focusdirection = Random.Shared.Next(0,2);
-
-            await CheckForDanger(terrain);
-
-            if (focusdirection == 0)
-            {
-                Icon = IconList[4];
-                await Task.Delay(focusDuration);
-                Icon = IconList[6];
-                await Task.Delay(focusDuration);
-            }
-            else if (focusdirection == 1)
-            {
-                Icon = IconList[8];
-                await Task.Delay(focusDuration);
-                Icon = IconList[2];
-                await Task.Delay(focusDuration);
-            }
-
-            await Task.Delay(pastScanThinking);
-        }
-    }
-
-    public async Task CheckForDanger(Terrain terrain)
+    public virtual async Task CheckForDanger(Terrain terrain)
     {
         foreach (Human human in terrain.EntityDict.Values.OfType<Human>())
         {
@@ -413,19 +313,6 @@ partial class Squirrel
                         Position.Y > Terrain.MaxSizeY.ClampToAxis(1) / 2
                         ? -fleeDistanceY
                         : fleeDistanceY;
-                        
-
-                /* fleeDistanceX = 
-                    Position.X <= human.Position.X
-                    && Position.X >= Terrain.MaxSizeX.ClampToAxis(0) / 2
-                        ? -fleeDistanceX 
-                        : fleeDistanceX;
-                
-                fleeDistanceY = 
-                    Position.Y <= human.Position.Y
-                    && Position.Y >= Terrain.MaxSizeY.ClampToAxis(1) / 2
-                        ? -fleeDistanceY 
-                        : fleeDistanceY; */
 
                 for (int y = 0; y < fleeDistanceY; y++)
                 {
@@ -435,8 +322,101 @@ partial class Squirrel
                         await Task.Delay(SpeedMove / 2);
                     }
                 }
-            }
+            }    
+        }
+    }
+}
+partial class Squirrel
+{
+    public override async Task RunSchedule(Terrain terrain)
+    {
+        while (true)
+        {
+            await GeneralConditioner(terrain);
+        }
+    }
+    public override async Task GeneralConditioner(Terrain terrain)
+    {
+        //await MoveInCircles();
+        //await MoveTo(terrain);
+        await ScamperAround(terrain);
+        
+    }
+    
+    public override async Task MoveTo(Terrain terrain)
+    {
+        
+    }
+
+    public async Task ScamperAround(Terrain terrain)
+    {
+        int scamperLengthX = Random.Shared.Next(4,9);
+        int scamperLengthY = Random.Shared.Next(2,4);
+        bool shouldTurnX;
+        bool shouldTurnY;
+
+        for (int y = 0; y < scamperLengthY; y++)
+        {
+            int randomY = Random.Shared.Next(-1, 2);
+
+            for (int x = 0; x < scamperLengthX; x++)
+            {
+                int randomX = Random.Shared.Next(-2, 3);
                 
+                shouldTurnX =
+                    Random.Shared.Next(2) == 1
+                        ? true
+                        : false;
+                shouldTurnY =
+                    Random.Shared.Next(2) == 1
+                        ? true
+                        : false;
+
+                if (Position.X + randomX != LastPosition.X
+                || shouldTurnX
+                && Position.Y + randomY != LastPosition.Y
+                || shouldTurnY)
+                    Position = new Position(
+                        Position.X + randomX, 
+                        Position.Y + randomY);
+                else continue;
+
+                await Task.Delay(SpeedMove);
+                await CheckForDanger(terrain);                
+            };
+        }
+        await ScanFor(terrain);
+    }
+
+    public override async Task ScanFor(Terrain terrain)
+    {
+        int focusdirection;
+        int focusDuration = 500;
+        int pastScanThinking = Random.Shared.Next(600, 1500);
+        int scanAmount = Random.Shared.Next(2,7);
+
+        for (int x = 0; x < scanAmount; x++)
+        {
+            focusdirection = Random.Shared.Next(0,2);
+
+            await CheckForDanger(terrain);
+
+            if (focusdirection == 0)
+            {
+                Icon = IconList[4];
+                await Task.Delay(focusDuration);
+                Icon = IconList[6];
+                await Task.Delay(focusDuration);
+            }
+            else if (focusdirection == 1)
+            {
+                Icon = IconList[8];
+                await Task.Delay(focusDuration);
+                Icon = IconList[2];
+                await Task.Delay(focusDuration);
+            }
+
+            await Task.Delay(pastScanThinking);
         }
     }
 

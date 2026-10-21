@@ -1,6 +1,3 @@
-using System;
-using System.Runtime;
-
 namespace ProjectAutofarm;
 
 
@@ -66,7 +63,7 @@ abstract partial class Entity : ITargetable
     public virtual ResourceType TargetResource {get; set;}
     public Position TargetPosition;
     public virtual List<Position> TargetMemory {get; set;} = new List<Position>();
-    public Status Status {get; set;} = Status.Idle;
+    public Status Status {get; set;} = Status.Working;
     public ProcessingMode Mode {get; set;} = ProcessingMode.None;
 
     public Entity(string name, char icon, Gender gender, int speedMove, Position position)
