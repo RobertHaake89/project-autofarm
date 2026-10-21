@@ -134,7 +134,7 @@ partial class Terrain // Creation Methods
         var OffsetMin = (X:MaxSizeX * xMin/100, Y:MaxSizeY * yMin/100);
         var OffsetMax = (X:MaxSizeX * xMax/100, Y:MaxSizeY * yMax/100);
 
-        string[] foliageArray = {"plant_flower1", "plant_flower2", "plant_flower3","plant_flower4", "plant_bush1"};
+        string[] foliageArray = {"plant_flower1", "plant_flower2", "plant_flower3", "plant_bush1"};
 
         for (int incY = OffsetMin.Y; incY < OffsetMax.Y; incY++)
         {
