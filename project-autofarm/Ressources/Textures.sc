@@ -15,6 +15,11 @@ forage_mushroom_mature,⌃
 forage_mushroom1,♣
 forage_mushroom2,♧
 forage_acorn,❧
+forage_berrybush_planted,⌃
+forage_berrybush_young,ʎ
+forage_berrybush_growing,♆
+forage_berrybush_mature,ഴ
+forage_berrybush_ripe,ფ
 npc_person,♟
 obj_stone1,˙
 obj_stone2,·
@@ -29,6 +34,7 @@ obj_shaft2,\
 plant_flower1,⚘
 plant_flower2,❀
 plant_flower3,✿
+plant_flower4,დ
 plant_bush1,✾
 struct_chimney1,░
 struct_roof1,▰

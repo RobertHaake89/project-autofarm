@@ -13,8 +13,11 @@ partial class Terrain // Data and Parameters
     public const int OakMaxQty = 1;
     public const int TreeCuttingThreshold = TreeMaxQty * 7 / 10;
     public const int MycelMaxQty = 3;
+    public const int BlueberryBushMaxQty = 3;
     public List<Tree> TreeList {get; set;} = [];
     public readonly object TreeListLock = new();
+    public List<Bush> BushList {get; set;} = [];
+    public readonly object BushListLock = new();
     public List<Tile> CropTileList {get; set;} = [];
     //public readonly object CropTilesLock = new();
     
@@ -133,7 +136,7 @@ partial class Terrain // Creation Methods
         var OffsetMin = (X:MaxSizeX * xMin/100, Y:MaxSizeY * yMin/100);
         var OffsetMax = (X:MaxSizeX * xMax/100, Y:MaxSizeY * yMax/100);
 
-        string[] foliageArray = {"plant_flower1", "plant_flower2", "plant_flower3", "plant_bush1"};
+        string[] foliageArray = {"plant_flower1", "plant_flower2", "plant_flower3","plant_flower4", "plant_bush1"};
 
         for (int incY = OffsetMin.Y; incY < OffsetMax.Y; incY++)
         {

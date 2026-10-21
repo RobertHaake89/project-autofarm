@@ -8,7 +8,8 @@ public enum PlantType
     Spruce,
     Oak,
     Mycel,
-    Mushroom
+    Mushroom,
+    Blueberry
 }
 
 abstract class Vegetation
@@ -32,37 +33,8 @@ abstract class Vegetation
         Position = position;
         terrain.Grid![Position.X, Position.Y ].Resource.Type = Resource;
     }
-}
 
-class Tree : Vegetation
-{
-    public override Position Position {get; set =>
-        field = Type switch
-        {
-            PlantType.Spruce => new Position(
-                Math.Clamp(value.X, 4, Terrain.MaxSizeX - 3), 
-                Math.Clamp(value.Y, 4, Terrain.MaxSizeY - 1)),
-            PlantType.Oak => new Position(
-                Math.Clamp(value.X, 7, Terrain.MaxSizeX - 6), 
-                Math.Clamp(value.Y, 7, Terrain.MaxSizeY - 1)),
-            _ => new Position(
-                Math.Clamp(value.X, 5, Terrain.MaxSizeX - 5), 
-                Math.Clamp(value.Y, 5, Terrain.MaxSizeY - 5))
-        };}
-    public Mycel? Mycel {get; set;}
-    public Tree(PlantType type, Position position, GrowthProcess status, Terrain terrain) :base(type, position, status, terrain)
-    {
-        Type = type;
-        Resource = type switch
-        {
-            PlantType.Spruce => ResourceType.SpruceWood,
-            PlantType.Oak => ResourceType.OakWood,
-            _ => ResourceType.None
-        };
-    }
-    public string[,]? Texture {get => field = GetTreeTexture(); set;}
-
-    public async Task GiveGrowthChance(Terrain terrain)
+    public virtual async Task GiveGrowthChance(Terrain terrain)
     {
         if (Status == GrowthProcess.Ripe)
             return;
@@ -106,11 +78,25 @@ class Tree : Vegetation
                     (Position.Y + 1).ClampToAxis(1)].
                         Resource.Type is ResourceType.SpruceWood or ResourceType.OakWood)
                 {
-                    lock (terrain.TreeListLock)
+                    if (Type is PlantType.Spruce or PlantType.Oak or PlantType.Blueberry)
                     {
-                        terrain.TreeList.Remove(this);
-                        terrain.Grid[Position.X, Position.Y].Resource.Type = ResourceType.None;
-                        terrain.Grid![Position.X, Position.Y].Resource.Status = GrowthProcess.Fallow;
+                        object chosenLock = Type switch
+                        {
+                            PlantType.Spruce or PlantType.Oak => terrain.TreeListLock,
+                            PlantType.Blueberry => terrain.BushListLock,
+                            _ => terrain.TreeListLock
+                        };
+                        
+                        lock (chosenLock)
+                        {
+                            if (Type is PlantType.Spruce or PlantType.Oak)
+                                terrain.TreeList.Remove((Tree)this);
+                            if (Type is PlantType.Blueberry)
+                                terrain.BushList.Remove((Bush)this);
+
+                            terrain.Grid[Position.X, Position.Y].Resource.Type = ResourceType.None;
+                            terrain.Grid![Position.X, Position.Y].Resource.Status = GrowthProcess.Fallow;
+                        }
                     }
                 }
                 else
@@ -123,10 +109,38 @@ class Tree : Vegetation
                 Status = GrowthProcess.Ripe;
                 terrain.Grid![Position.X,Position.Y].Resource.Type = Resource;
                 terrain.Grid![Position.X, Position.Y].Resource.Status = Status;
-            }
-                            
+            }            
         }
     }
+}
+
+class Tree : Vegetation
+{
+    public override Position Position {get; set =>
+        field = Type switch
+        {
+            PlantType.Spruce => new Position(
+                Math.Clamp(value.X, 4, Terrain.MaxSizeX - 3), 
+                Math.Clamp(value.Y, 4, Terrain.MaxSizeY - 1)),
+            PlantType.Oak => new Position(
+                Math.Clamp(value.X, 7, Terrain.MaxSizeX - 6), 
+                Math.Clamp(value.Y, 7, Terrain.MaxSizeY - 1)),
+            _ => new Position(
+                Math.Clamp(value.X, 5, Terrain.MaxSizeX - 5), 
+                Math.Clamp(value.Y, 5, Terrain.MaxSizeY - 5))
+        };}
+    public Mycel? Mycel {get; set;}
+    public Tree(PlantType type, Position position, GrowthProcess status, Terrain terrain) :base(type, position, status, terrain)
+    {
+        Type = type;
+        Resource = type switch
+        {
+            PlantType.Spruce => ResourceType.SpruceWood,
+            PlantType.Oak => ResourceType.OakWood,
+            _ => ResourceType.None
+        };
+    }
+    public string[,]? Texture {get => field = GetTreeTexture(); set;}
 
     public Task SelfSeeding(Terrain terrain, int randomFactor)
     {
@@ -140,8 +154,8 @@ class Tree : Vegetation
 
         do
         {
-            spreadSpectrumX = Random.Shared.Next(-10, 11);
-            spreadSpectrumY = Random.Shared.Next(-5, 6);
+            spreadSpectrumX = Random.Shared.Next(-12, 13);
+            spreadSpectrumY = Random.Shared.Next(-6, 7);
             setPosition = new Position(
                 Position.X + spreadSpectrumX,Position.Y + spreadSpectrumY);
         }
@@ -156,10 +170,6 @@ class Tree : Vegetation
         setPosition.Y = Math.Clamp(
             setPosition.Y, borderDistanceY, 
             Terrain.MaxSizeY - borderDistanceY - 1); // If removing, Pos Property Setter can't prevent crash !!
-
-        //Console.Write($"Oak Counter: {terrain.TreeList.Count(tree => tree.Type == PlantType.Oak)}");
-        //Console.Write($"Spruce Counter: {terrain.TreeList.Count(tree => tree.Type == PlantType.Spruce)}"); // 18 max
-        //Console.Write($"SpruceRipe: {terrain.TreeList.Count(tree => tree.Status is GrowthProcess.Ripe)}");
 
         if (terrain.TreeList.Count < Terrain.TreeMaxQty
             && randomNumber == randomFactor
@@ -397,5 +407,13 @@ class Mushroom : Vegetation
                 _ => GrowthProcess.Planted
             };
         }
+    }
+}
+
+class Bush : Vegetation
+{
+    public Bush(Position position, Terrain terrain) : base(PlantType.Blueberry, position, GrowthProcess.Planted, terrain)
+    {
+        Position = position;
     }
 }

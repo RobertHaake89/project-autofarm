@@ -1,6 +1,3 @@
-using System;
-using System.Security.Cryptography.X509Certificates;
-
 namespace ProjectAutofarm;
 
 public enum ResourceType
@@ -10,7 +7,8 @@ public enum ResourceType
         Wheat,
         SpruceWood,
         OakWood,
-        Mushrooms
+        Mushrooms,
+        Blueberry
     }
     public enum GrowthProcess
     {
@@ -45,6 +43,7 @@ class Resource : ITargetable, IHarvestable
             ResourceType.Mushrooms => 60,
             ResourceType.SpruceWood => 30,
             ResourceType.OakWood => 30,
+            ResourceType.Blueberry => 30,
             _ => 10
         };
 
