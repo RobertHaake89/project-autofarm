@@ -1,5 +1,3 @@
-using System;
-
 namespace ProjectAutofarm;
 
 partial class Terrain // Data and Parameters
@@ -13,7 +11,7 @@ partial class Terrain // Data and Parameters
     public const int OakMaxQty = 1;
     public const int TreeCuttingThreshold = TreeMaxQty * 7 / 10;
     public const int MycelMaxQty = 3;
-    public const int BlueberryBushMaxQty = 3;
+    public const int BushMaxQty = 3;
     public List<Tree> TreeList {get; set;} = [];
     public readonly object TreeListLock = new();
     public List<Bush> BushList {get; set;} = [];

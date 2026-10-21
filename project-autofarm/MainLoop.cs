@@ -24,9 +24,6 @@ class General
         {
             UpdateTiles(terrain);
 
-            
-                    
-
             await UpdateGameAsync(terrain);
             Renderer.Screen(terrain);
             
@@ -84,6 +81,12 @@ class General
                 {
                     await tree.Mycel.AddMushrooms(terrain, randomFactor: 100);
                 }
+            }
+
+            foreach (Bush bush in terrain.BushList.ToList())
+            {
+                await bush.GiveGrowthChance(terrain);
+                await bush.SelfSeeding(terrain, randomFactor: 1000); // 1000
             }
         }
         finally

@@ -26,7 +26,7 @@ class Program
         // ♟ ♙ 
         Entity human1 = new Human("Hans", '♟', Gender.Male,speedMove: 100, Profession.Farmer, Specialisation.Wheat, position: new Position(8,3));
         Entity human2 = new Human("Jürgen", '♟', Gender.Male,speedMove: 95, Profession.Forester, Specialisation.SpruceWood, position: new Position(8,3));
-        //Entity human3 = new Human("Gerda", '♙', Gender.Female, speedMove: 100, Profession.Forager, Specialisation.Mushrooms, position: new Position(8,3));
+        Entity human3 = new Human("Gerda", '♙', Gender.Female, speedMove: 100, Profession.Forager, Specialisation.Mushrooms, position: new Position(8,3));
 
         Entity squirrel1 = new Squirrel("Squirrel", speedMove: 400, new Position(Terrain.MaxSizeX / 2, Terrain.MaxSizeY / 2));
 
@@ -34,7 +34,7 @@ class Program
         {
             {"human1", human1},
             {"human2", human2},
-            //{"human3", human3}
+            {"human3", human3},
             {"squirrel1", squirrel1}
         };
 

@@ -32,7 +32,8 @@ public enum Gender
         Wheat,
         SpruceWood,
         OakWood,
-        Mushrooms
+        Mushrooms,
+        Berries
     }
 
     public enum ProcessingMode
@@ -92,6 +93,7 @@ partial class Human : Entity
                     Specialisation.SpruceWood => ResourceType.SpruceWood,
                     Specialisation.OakWood => ResourceType.OakWood,
                     Specialisation.Mushrooms => ResourceType.Mushrooms,
+                    Specialisation.Berries => ResourceType.Blueberry,
                     _ => ResourceType.None
                 }; set;}
     public int TargetMemorySize {get; set => field = Math.Max(field,value);}

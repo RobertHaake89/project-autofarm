@@ -15,11 +15,11 @@ forage_mushroom_mature,⌃
 forage_mushroom1,♣
 forage_mushroom2,♧
 forage_acorn,❧
-forage_berrybush_planted,⌃
-forage_berrybush_young,ʎ
-forage_berrybush_growing,♆
-forage_berrybush_mature,ഴ
-forage_berrybush_ripe,ფ
+forage_blueberry_planted,⌃
+forage_blueberry_young,ʎ
+forage_blueberry_growing,♆
+forage_blueberry_mature,ഴ
+forage_blueberry_ripe,ფ
 npc_person,♟
 obj_stone1,˙
 obj_stone2,·

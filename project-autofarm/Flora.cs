@@ -34,7 +34,7 @@ abstract class Vegetation
         terrain.Grid![Position.X, Position.Y ].Resource.Type = Resource;
     }
 
-    public virtual async Task GiveGrowthChance(Terrain terrain)
+    public async Task GiveGrowthChance(Terrain terrain)
     {
         if (Status == GrowthProcess.Ripe)
             return;
@@ -43,6 +43,7 @@ abstract class Vegetation
         {
             PlantType.Spruce => 100,
             PlantType.Oak => 200,
+            PlantType.Blueberry => 150,
             _ => 10
         };
 
@@ -78,39 +79,37 @@ abstract class Vegetation
                     (Position.Y + 1).ClampToAxis(1)].
                         Resource.Type is ResourceType.SpruceWood or ResourceType.OakWood)
                 {
-                    if (Type is PlantType.Spruce or PlantType.Oak or PlantType.Blueberry)
-                    {
-                        object chosenLock = Type switch
-                        {
-                            PlantType.Spruce or PlantType.Oak => terrain.TreeListLock,
-                            PlantType.Blueberry => terrain.BushListLock,
-                            _ => terrain.TreeListLock
-                        };
-                        
-                        lock (chosenLock)
-                        {
-                            if (Type is PlantType.Spruce or PlantType.Oak)
-                                terrain.TreeList.Remove((Tree)this);
-                            if (Type is PlantType.Blueberry)
-                                terrain.BushList.Remove((Bush)this);
 
-                            terrain.Grid[Position.X, Position.Y].Resource.Type = ResourceType.None;
-                            terrain.Grid![Position.X, Position.Y].Resource.Status = GrowthProcess.Fallow;
-                        }
+                    object chosenLock = Type switch
+                    {
+                        PlantType.Spruce or PlantType.Oak => terrain.TreeListLock,
+                        PlantType.Blueberry => terrain.BushListLock,
+                        _ => terrain.TreeListLock
+                    };
+
+                    lock (chosenLock)
+                    {
+                        if (Type is PlantType.Spruce or PlantType.Oak)
+                            terrain.TreeList.Remove((Tree)this);
+                        if (Type is PlantType.Blueberry)
+                            terrain.BushList.Remove((Bush)this);
+
+                        terrain.Grid[Position.X, Position.Y].Resource.Type = ResourceType.None;
+                        terrain.Grid![Position.X, Position.Y].Resource.Status = GrowthProcess.Fallow;
                     }
                 }
                 else
-                {
-                    Status = GrowthProcess.Mature;
-                }
-            }
-            else if (Status == GrowthProcess.Mature)
             {
-                Status = GrowthProcess.Ripe;
-                terrain.Grid![Position.X,Position.Y].Resource.Type = Resource;
-                terrain.Grid![Position.X, Position.Y].Resource.Status = Status;
-            }            
+                Status = GrowthProcess.Mature;
+            }
+            }
         }
+        else if (Status == GrowthProcess.Mature)
+        {
+            Status = GrowthProcess.Ripe;
+            terrain.Grid![Position.X,Position.Y].Resource.Type = Resource;
+            terrain.Grid![Position.X, Position.Y].Resource.Status = Status;
+        }            
     }
 }
 
@@ -130,6 +129,7 @@ class Tree : Vegetation
                 Math.Clamp(value.Y, 5, Terrain.MaxSizeY - 5))
         };}
     public Mycel? Mycel {get; set;}
+    public string[,]? Texture {get => field = GetTreeTexture(); set;}
     public Tree(PlantType type, Position position, GrowthProcess status, Terrain terrain) :base(type, position, status, terrain)
     {
         Type = type;
@@ -139,64 +139,6 @@ class Tree : Vegetation
             PlantType.Oak => ResourceType.OakWood,
             _ => ResourceType.None
         };
-    }
-    public string[,]? Texture {get => field = GetTreeTexture(); set;}
-
-    public Task SelfSeeding(Terrain terrain, int randomFactor)
-    {
-        int randomNumber = Random.Shared.Next(randomFactor + 1);
-
-        int spreadSpectrumX;
-        int spreadSpectrumY;
-        int borderDistanceX = 6;
-        int borderDistanceY = 1;
-        Position setPosition;
-
-        do
-        {
-            spreadSpectrumX = Random.Shared.Next(-12, 13);
-            spreadSpectrumY = Random.Shared.Next(-6, 7);
-            setPosition = new Position(
-                Position.X + spreadSpectrumX,Position.Y + spreadSpectrumY);
-        }
-        while (spreadSpectrumX < -6
-            && spreadSpectrumY < -3
-            && spreadSpectrumX > 7
-            && spreadSpectrumY > 4);
-
-        setPosition.X = Math.Clamp(
-            setPosition.X, borderDistanceX, 
-            Terrain.MaxSizeX - borderDistanceX);
-        setPosition.Y = Math.Clamp(
-            setPosition.Y, borderDistanceY, 
-            Terrain.MaxSizeY - borderDistanceY - 1); // If removing, Pos Property Setter can't prevent crash !!
-
-        if (terrain.TreeList.Count < Terrain.TreeMaxQty
-            && randomNumber == randomFactor
-            && Type is PlantType.Spruce
-            && Status is GrowthProcess.Ripe
-            && terrain.Grid![setPosition.X, setPosition.Y]
-                .Soil is Soil.Fertile or Soil.SemiArid
-            && terrain.Grid![setPosition.X, setPosition.Y]
-                .Resource.Type is not (ResourceType.Wheat or ResourceType.SpruceWood or ResourceType.OakWood))
-        {
-            PlantType typeModifier =
-                terrain.TreeList.Count(tree => tree.Type == PlantType.Oak) < Terrain.OakMaxQty
-                && terrain.TreeList.Count(tree => tree.Type is PlantType.Spruce) == Terrain.SpruceMaxQty
-                && terrain.TreeList.Count(tree => tree.Status is GrowthProcess.Ripe) == Terrain.SpruceMaxQty
-                    ? PlantType.Oak 
-                    : PlantType.Spruce;
-
-                    if (typeModifier == PlantType.Oak) Math.Clamp(Position.Y, 7, Terrain.MaxSizeY - 1);
-
-            lock (terrain.TreeListLock)
-            {
-                terrain.TreeList.Add(
-                    new Tree(typeModifier, setPosition, GrowthProcess.Planted, terrain));
-            }
-        }        
-
-        return Task.CompletedTask;
     }
 
     public async Task CreateMycel(Terrain terrain, int randomFactor)
@@ -331,7 +273,65 @@ class Tree : Vegetation
 
         return chosenTexture;
     }
+
+    public async Task SelfSeeding(Terrain terrain, int randomFactor)
+    {
+        int randomNumber = Random.Shared.Next(randomFactor + 1);
+
+        int spreadSpectrumX;
+        int spreadSpectrumY;
+        int borderDistanceX = 6;
+        int borderDistanceY = 1;
+        Position setPosition;
+
+        do
+        {
+            spreadSpectrumX = Random.Shared.Next(-12, 13);
+            spreadSpectrumY = Random.Shared.Next(-6, 7);
+            setPosition = new Position(
+                Position.X + spreadSpectrumX,Position.Y + spreadSpectrumY);
+        }
+        while (spreadSpectrumX < -6
+            && spreadSpectrumY < -3
+            && spreadSpectrumX > 7
+            && spreadSpectrumY > 4);
+
+        setPosition.X = Math.Clamp(
+            setPosition.X, borderDistanceX, 
+            Terrain.MaxSizeX - borderDistanceX);
+        setPosition.Y = Math.Clamp(
+            setPosition.Y, borderDistanceY, 
+            Terrain.MaxSizeY - borderDistanceY - 1); // If removing, Pos Property Setter can't prevent crash !!
+
+        if (terrain.TreeList.Count < Terrain.TreeMaxQty
+            && randomNumber == randomFactor
+            && Type is PlantType.Spruce
+            && Status is GrowthProcess.Ripe
+            && terrain.Grid![setPosition.X, setPosition.Y]
+                .Soil is Soil.Fertile or Soil.SemiArid
+            && terrain.Grid![setPosition.X, setPosition.Y]
+                .Resource.Type is not (ResourceType.Wheat or ResourceType.SpruceWood or ResourceType.OakWood))
+        {
+            PlantType typeModifier =
+                terrain.TreeList.Count(tree => tree.Type == PlantType.Oak) < Terrain.OakMaxQty
+                && terrain.TreeList.Count(tree => tree.Type is PlantType.Spruce) == Terrain.SpruceMaxQty
+                && terrain.TreeList.Count(tree => tree.Status is GrowthProcess.Ripe) == Terrain.SpruceMaxQty
+                    ? PlantType.Oak 
+                    : PlantType.Spruce;
+
+                    if (typeModifier == PlantType.Oak) Math.Clamp(Position.Y, 7, Terrain.MaxSizeY - 1);
+
+            lock (terrain.TreeListLock)
+            {
+                terrain.TreeList.Add(
+                    new Tree(typeModifier, setPosition, GrowthProcess.Planted, terrain));
+            }
+        }        
+
+        await Task.CompletedTask;
+    }
 }
+
 
 class Mycel : Vegetation
 {
@@ -412,8 +412,102 @@ class Mushroom : Vegetation
 
 class Bush : Vegetation
 {
-    public Bush(Position position, Terrain terrain) : base(PlantType.Blueberry, position, GrowthProcess.Planted, terrain)
+    public int MaxClusterSize {get; init;} = Random.Shared.Next(3, 8);
+    public int CurrentClusterSize = 0;
+    public Bush(PlantType type, Position position, Terrain terrain) : base(type, position, GrowthProcess.Planted, terrain)
     {
+        Type = type;
         Position = position;
+    }
+
+    public string[,]? Texture {get => field = GetBushTexture(); set;}
+
+    public async Task SelfSeeding(Terrain terrain, int randomFactor)
+    {
+        if (CurrentClusterSize == MaxClusterSize) return;
+
+        int randomNumber = Random.Shared.Next(randomFactor + 1);
+
+        int spreadSpectrumX;
+        int spreadSpectrumY;
+        int borderDistanceX = 1;
+        int borderDistanceY = 1;
+        Position setPosition;
+
+        do
+        {
+            spreadSpectrumX = Random.Shared.Next(-2, 3);
+            spreadSpectrumY = Random.Shared.Next(-1, 2);
+            setPosition = new Position(
+                Position.X + spreadSpectrumX,Position.Y + spreadSpectrumY);
+        }
+        while (spreadSpectrumX != 0
+            && spreadSpectrumY != 0);
+
+        setPosition.X = Math.Clamp(
+            setPosition.X, borderDistanceX, 
+            Terrain.MaxSizeX - borderDistanceX);
+        setPosition.Y = Math.Clamp(
+            setPosition.Y, borderDistanceY, 
+            Terrain.MaxSizeY - borderDistanceY - 1); // If removing, Pos Property Setter can't prevent crash !!
+
+        if (terrain.BushList.Count < Terrain.BushMaxQty
+            && randomNumber == randomFactor
+            && Type is PlantType.Blueberry
+            && Status is GrowthProcess.Ripe
+            && terrain.Grid![setPosition.X, setPosition.Y]
+                .Soil is Soil.Fertile or Soil.SemiArid
+            && terrain.Grid![setPosition.X, setPosition.Y]
+                .Resource.Type is not (ResourceType.Wheat or ResourceType.SpruceWood or ResourceType.OakWood or ResourceType.Blueberry))
+        {
+            lock (terrain.BushListLock)
+            {
+                terrain.BushList.Add(
+                    new Bush(PlantType.Blueberry, setPosition, terrain));
+                    CurrentClusterSize++;
+            }
+        }        
+
+        await Task.CompletedTask;
+    }
+    public string[,] GetBushTexture()
+    {
+        string[,] blueBerryPlanted =
+        {
+            {"forage_blueberry_planted"},
+        };
+
+        string[,] blueBerryGerm =
+        {
+            {"forage_blueberry_young"},
+        };
+
+        string[,] blueBerryMature =
+        {
+            {"forage_blueberry_mature"},
+        };
+
+        string[,] blueBerryRipe =
+        {
+            {"forage_blueberry_ripe"},
+        };
+
+        string[,] chosenTexture;
+
+        if (Type is PlantType.Blueberry)
+        {
+            chosenTexture = Status switch
+            {
+                GrowthProcess.Planted => blueBerryPlanted,
+                GrowthProcess.Young => blueBerryGerm,
+                GrowthProcess.Mature => blueBerryMature,
+                GrowthProcess.Ripe => blueBerryRipe,
+                _ => blueBerryRipe
+            };
+        }
+        
+        else chosenTexture = blueBerryRipe;
+
+        return chosenTexture;
     }
 }

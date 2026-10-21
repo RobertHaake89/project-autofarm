@@ -30,6 +30,10 @@ partial class Human : Entity
                 && terrain.TreeList.Count( tree => tree.Status is GrowthProcess.Ripe)
                 >= Terrain.TreeCuttingThreshold)
                 Status = Status.Working;
+            if (Profession is Profession.Forager
+                && terrain.BushList.Count( bush => bush.Status is GrowthProcess.Ripe)
+                == terrain.BushList.Count)
+                Status = Status.Working;
         }
 
         if (Status is Status.Working)
@@ -57,6 +61,21 @@ partial class Human : Entity
                 {
                     Mode = ProcessingMode.Planting;
                     await PlantTree(terrain,randomFactor: 50);
+                    await Task.Delay(SpeedWorking);
+                }
+            }
+            if (Profession is Profession.Forager)
+            {
+                if (terrain.BushList.Count == Terrain.BushMaxQty)
+                {
+                    Mode = ProcessingMode.Harvesting;
+                    await ChopWood(terrain);
+                    await Task.Delay(SpeedWorking);
+                }
+                else if (terrain.TreeList.Count < Terrain.TreeMaxQty)
+                {
+                    Mode = ProcessingMode.Planting;
+                    await PlantTree(terrain,randomFactor: 100);
                     await Task.Delay(SpeedWorking);
                 }
             }
@@ -247,6 +266,40 @@ partial class Human : Entity
 
             if (!TargetMemory.Any()) Status = Status.Exhausted;
             if (terrain.TreeList.Count >= Terrain.TreeCuttingThreshold)
+            {
+                
+                Mode = ProcessingMode.Harvesting;
+                Status = Status.Exhausted;
+                TargetMemory.Clear();
+            }
+            else await ScanFor(terrain);
+            
+        }
+    }
+    public async Task PlantBush(Terrain terrain, int randomFactor)
+    {
+        if (Status is Status.Exhausted)
+            return;
+
+        int randomNumber = RandomNumberGenerator.GetInt32(randomFactor + 1); //Random.Shared.Next(randomFactor + 1);
+
+        if (Position.Y > 3
+        && terrain.Grid![Position.X, Position.Y].Soil
+            is Soil.Fertile or Soil.SemiArid
+        && terrain.Grid![Position.X, Position.Y].Resource.Type
+            is not ResourceType.Wheat)
+        {
+            if (randomNumber == randomFactor)
+            {
+                lock (terrain.BushListLock)
+                {
+                    terrain.BushList.Add(
+                        new Bush(PlantType.Blueberry, new Position(Position.X, Position.Y), terrain));
+                }
+            }
+
+            if (!TargetMemory.Any()) Status = Status.Exhausted;
+            if (terrain.BushList.Count <= Terrain.BushMaxQty)
             {
                 
                 Mode = ProcessingMode.Harvesting;
