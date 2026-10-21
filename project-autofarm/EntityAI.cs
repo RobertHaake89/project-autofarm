@@ -366,11 +366,11 @@ partial class Squirrel
         foreach (Human human in terrain.EntityDict.Values.OfType<Human>())
         {
             if (human.Position == Position
-            || Math.Abs(human.Position.X - Position.X) <= 3
-            || Math.Abs(human.Position.Y - Position.Y) <= 1)
+            || Math.Abs(Position.X - human.Position.X) <= 3
+            && Math.Abs(Position.Y - human.Position.Y) <= 1)
             {
                 int fleeDistanceX = Random.Shared.Next(3,5);
-                int fleeDistanceY = Random.Shared.Next(1,3);
+                int fleeDistanceY = Random.Shared.Next(2,3);
 
                 if (Position.X <= human.Position.X)
                     fleeDistanceX = 
@@ -380,8 +380,19 @@ partial class Squirrel
                 else if (Position.X > human.Position.X)
                     fleeDistanceX = 
                         Position.X <= Terrain.MaxSizeX.ClampToAxis(0) / 2
-                        ? fleeDistanceX
-                        : -fleeDistanceX;
+                        ? -fleeDistanceX
+                        : fleeDistanceX;
+                else if (Position.X <= human.Position.X)
+                    fleeDistanceX = 
+                        Position.X > Terrain.MaxSizeX.ClampToAxis(0) / 2
+                        ? -fleeDistanceX
+                        : fleeDistanceX;
+                else if (Position.X > human.Position.X)
+                    fleeDistanceX = 
+                        Position.X > Terrain.MaxSizeX.ClampToAxis(0) / 2
+                        ? -fleeDistanceX
+                        : fleeDistanceX;
+
                 if (Position.Y <= human.Position.Y)
                     fleeDistanceY = 
                         Position.Y <= Terrain.MaxSizeY.ClampToAxis(1) / 2
@@ -390,8 +401,19 @@ partial class Squirrel
                 else if (Position.Y > human.Position.Y)
                     fleeDistanceY = 
                         Position.Y <= Terrain.MaxSizeY.ClampToAxis(1) / 2
-                        ? fleeDistanceY
-                        : -fleeDistanceY;
+                        ? -fleeDistanceY
+                        : fleeDistanceY;
+                else if (Position.Y <= human.Position.Y)
+                    fleeDistanceY = 
+                        Position.Y > Terrain.MaxSizeY.ClampToAxis(1) / 2
+                        ? -fleeDistanceY
+                        : fleeDistanceY;
+                else if (Position.Y > human.Position.Y)
+                    fleeDistanceY = 
+                        Position.Y > Terrain.MaxSizeY.ClampToAxis(1) / 2
+                        ? -fleeDistanceY
+                        : fleeDistanceY;
+                        
 
                 /* fleeDistanceX = 
                     Position.X <= human.Position.X
