@@ -1,3 +1,4 @@
+using System.Net.NetworkInformation;
 using System.Reflection.Emit;
 
 namespace ProjectAutofarm;
@@ -26,14 +27,21 @@ partial class Human : Entity
             /* if (Profession is not Profession.None)
                 Status = Status.Working; */
 
+            if (Profession is Profession.Farmer
+                && terrain.CropTileList.All(
+                crop => crop.Resource.Status is GrowthProcess.Ripe))
+                    Status = Status.Working;
+            
             if (Profession is Profession.Forester
                 && terrain.TreeList.Count( tree => tree.Status is GrowthProcess.Ripe)
                 >= Terrain.TreeCuttingThreshold)
-                Status = Status.Working;
+                    Status = Status.Working;
             if (Profession is Profession.Forager
                 && terrain.BushList.Count( bush => bush.Status is GrowthProcess.Ripe)
                 == terrain.BushList.Count)
-                Status = Status.Working;
+                    Status = Status.Working;
+
+            await Task.Delay(Random.Shared.Next(3000, 6000));
         }
 
         if (Status is Status.Working)

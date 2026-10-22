@@ -38,8 +38,6 @@ class Program
             {"squirrel1", squirrel1}
         };
 
-        General.OnCropsAreRipe += ((Human)human1).CallToWork;
-
         terrain.EntityDict = entityList;
         
         await General.MainLoop(terrain);

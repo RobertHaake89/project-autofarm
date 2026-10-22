@@ -5,7 +5,6 @@ namespace ProjectAutofarm;
 class General
 {
     public static readonly object EntityListLock = new();
-    public static event EventHandler? OnCropsAreRipe;
     private static int _isUpdating = 0;
     public static async Task MainLoop(Terrain terrain)
     {
@@ -43,21 +42,6 @@ class General
                 terrain.Grid![x,y].UpdateAcre();
             }
         }
-
-        if (terrain.CropTileList.Count > 0
-        && terrain.CropTileList.All(
-        crop => crop.Resource.Status is GrowthProcess.Ripe))
-        {
-            lock (EntityListLock)
-            {
-                foreach(Human human in terrain.EntityDict.Values.OfType<Human>())
-                {
-                    if (human.Profession is Profession.Farmer
-                    && human.Status is Status.Idle)
-                        OnCropsAreRipe?.Invoke(terrain, EventArgs.Empty);
-                }
-            }
-        }     
     }
 
     public static async Task UpdateGameAsync(Terrain terrain)
