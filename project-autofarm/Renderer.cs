@@ -42,6 +42,8 @@ class Renderer
         //RenderEntity(human3, output);
         RenderEntity(squirrel1, output);
 
+        RenderBushes(terrain, output);
+
         RenderTrees(terrain, output);
 
         Console.Write(output);
@@ -60,6 +62,33 @@ class Renderer
                         + entity.Position.X;
         
         output[index] = entity.Icon;
+    }
+
+    public static void RenderBushes(Terrain terrain, StringBuilder output)
+    {     
+        foreach (var bush in terrain.BushList.ToList())
+        {
+            int startX = bush.Position.X - bush.Texture!.GetLength(1) / 2;
+            int startY = bush.Position.Y - (bush.Texture.GetLength(0) - 1);
+
+            for (int y = 0; y < bush.Texture!.GetLength(0); y++)
+            {  
+                for (int x = 0; x < bush.Texture.GetLength(1); x++)
+                {
+                    string textureName = bush.Texture[y,x];
+                    
+                    if (textureName == "skip")
+                        continue;
+                    
+                    int screenX = startX + x;
+                    int screenY = startY + y;
+
+                    int index = screenY * (Terrain.MaxSizeX + Environment.NewLine.Length) + screenX;
+
+                    output[index] = Texture.List[textureName];
+                }
+            }
+        }
     }
 
     public static void RenderTrees(Terrain terrain, StringBuilder output)

@@ -15,8 +15,8 @@ forage_mushroom_mature,⌃
 forage_mushroom1,♣
 forage_mushroom2,♧
 forage_acorn,❧
-forage_blueberry_planted,⌃
-forage_blueberry_young,ʎ
+forage_blueberry_planted,^
+forage_blueberry_young,'
 forage_blueberry_growing,♆
 forage_blueberry_mature,ഴ
 forage_blueberry_ripe,ფ

@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace ProjectAutofarm;
 
 public enum PlantType
@@ -34,16 +32,16 @@ abstract class Vegetation
         terrain.Grid![Position.X, Position.Y ].Resource.Type = Resource;
     }
 
-    public async Task GiveGrowthChance(Terrain terrain)
+    public virtual async Task GiveGrowthChance(Terrain terrain)
     {
         if (Status == GrowthProcess.Ripe)
             return;
 
         int factor = Type switch
         {
-            PlantType.Spruce => 100,
-            PlantType.Oak => 200,
-            PlantType.Blueberry => 150,
+            PlantType.Spruce => 150,
+            PlantType.Oak => 300,
+            PlantType.Blueberry => 100,
             _ => 10
         };
 
@@ -89,10 +87,10 @@ abstract class Vegetation
 
                     lock (chosenLock)
                     {
-                        if (Type is PlantType.Spruce or PlantType.Oak)
-                            terrain.TreeList.Remove((Tree)this);
-                        if (Type is PlantType.Blueberry)
-                            terrain.BushList.Remove((Bush)this);
+                        if (this is Tree tree)
+                            terrain.TreeList.Remove(tree);
+                        if (this is Bush bush)
+                            terrain.BushList.Remove(bush);
 
                         terrain.Grid[Position.X, Position.Y].Resource.Type = ResourceType.None;
                         terrain.Grid![Position.X, Position.Y].Resource.Status = GrowthProcess.Fallow;
@@ -111,7 +109,83 @@ abstract class Vegetation
             terrain.Grid![Position.X, Position.Y].Resource.Status = Status;
         }            
     }
+
+    public virtual async Task SelfSeeding(int spreadMinX, int spreadMaxX, int spreadMinY, int spreadMaxY, int randomFactor, Terrain terrain)
+    {
+        int randomNumber = Random.Shared.Next(randomFactor + 1);
+
+        int spreadSpectrumX;
+        int spreadSpectrumY;
+        int borderDistanceX = 6;
+        int borderDistanceY = 1;
+        Position setPosition;
+
+        do
+        {
+            spreadSpectrumX = Random.Shared.Next(spreadMinX, spreadMaxX); // -12, 13
+            spreadSpectrumY = Random.Shared.Next(spreadMinY, spreadMaxY); // -6, 7
+            setPosition = new Position(
+                Position.X + spreadSpectrumX,Position.Y + spreadSpectrumY);
+        }
+        while (spreadSpectrumX < -6
+            && spreadSpectrumY < -3
+            && spreadSpectrumX > 7
+            && spreadSpectrumY > 4);
+
+        setPosition.X = Math.Clamp(
+            setPosition.X, borderDistanceX, 
+            Terrain.MaxSizeX - borderDistanceX);
+        setPosition.Y = Math.Clamp(
+            setPosition.Y, borderDistanceY, 
+            Terrain.MaxSizeY - borderDistanceY - 1); // If removing, Pos Property Setter can't prevent crash !!
+
+        if (terrain.TreeList.Count < Terrain.TreeMaxQty
+            && randomNumber == randomFactor
+            && Type is PlantType.Spruce or PlantType.Blueberry
+            && Status is GrowthProcess.Ripe
+            && terrain.Grid![setPosition.X, setPosition.Y]
+                .Soil is Soil.Fertile or Soil.SemiArid
+            && terrain.Grid![setPosition.X, setPosition.Y]
+                .Resource.Type is not (ResourceType.Wheat or ResourceType.SpruceWood or ResourceType.OakWood or ResourceType.Blueberry))
+        {
+            PlantType typeModifier =
+                terrain.TreeList.Count(tree => tree.Type == PlantType.Oak) < Terrain.OakMaxQty
+                && terrain.TreeList.Count(tree => tree.Type is PlantType.Spruce) == Terrain.SpruceMaxQty
+                && terrain.TreeList.Count(tree => tree.Status is GrowthProcess.Ripe) == Terrain.SpruceMaxQty
+                    ? PlantType.Oak 
+                    : PlantType.Spruce;
+
+                    if (typeModifier == PlantType.Oak) Math.Clamp(Position.Y, 7, Terrain.MaxSizeY - 1);
+
+            object chosenLock = Type switch
+            {
+                PlantType.Spruce or PlantType.Oak => terrain.TreeListLock,
+                PlantType.Blueberry => terrain.BushListLock,
+                _ => terrain.TreeListLock
+            };
+
+            lock (chosenLock)
+            {
+                if (this is Tree tree)
+                    terrain.TreeList.Add(
+                        new Tree(typeModifier, setPosition, GrowthProcess.Planted, terrain));
+                if (this is Bush bush
+                && terrain.BushList.Count < Terrain.BushMaxQty
+                && bush.CurrentClusterSize < bush.MaxClusterSize)
+                {
+                    terrain.BushList.Add(new Bush(PlantType.Blueberry, setPosition, terrain));
+                    bush.CurrentClusterSize++;
+                }
+                    
+                terrain.Grid[Position.X, Position.Y].Resource.Type = ResourceType.None;
+                terrain.Grid![Position.X, Position.Y].Resource.Status = GrowthProcess.Fallow;
+            }
+        }        
+
+        await Task.CompletedTask;
+    }
 }
+
 
 class Tree : Vegetation
 {
@@ -156,7 +230,10 @@ class Tree : Vegetation
             
             && randomNumber == randomFactor)
         {
-            Mycel = new Mycel(this, terrain);
+            lock (terrain.TreeListLock)
+            {
+                Mycel = new Mycel(this, terrain);
+            }
         }   
     }
 
@@ -273,65 +350,7 @@ class Tree : Vegetation
 
         return chosenTexture;
     }
-
-    public async Task SelfSeeding(Terrain terrain, int randomFactor)
-    {
-        int randomNumber = Random.Shared.Next(randomFactor + 1);
-
-        int spreadSpectrumX;
-        int spreadSpectrumY;
-        int borderDistanceX = 6;
-        int borderDistanceY = 1;
-        Position setPosition;
-
-        do
-        {
-            spreadSpectrumX = Random.Shared.Next(-12, 13);
-            spreadSpectrumY = Random.Shared.Next(-6, 7);
-            setPosition = new Position(
-                Position.X + spreadSpectrumX,Position.Y + spreadSpectrumY);
-        }
-        while (spreadSpectrumX < -6
-            && spreadSpectrumY < -3
-            && spreadSpectrumX > 7
-            && spreadSpectrumY > 4);
-
-        setPosition.X = Math.Clamp(
-            setPosition.X, borderDistanceX, 
-            Terrain.MaxSizeX - borderDistanceX);
-        setPosition.Y = Math.Clamp(
-            setPosition.Y, borderDistanceY, 
-            Terrain.MaxSizeY - borderDistanceY - 1); // If removing, Pos Property Setter can't prevent crash !!
-
-        if (terrain.TreeList.Count < Terrain.TreeMaxQty
-            && randomNumber == randomFactor
-            && Type is PlantType.Spruce
-            && Status is GrowthProcess.Ripe
-            && terrain.Grid![setPosition.X, setPosition.Y]
-                .Soil is Soil.Fertile or Soil.SemiArid
-            && terrain.Grid![setPosition.X, setPosition.Y]
-                .Resource.Type is not (ResourceType.Wheat or ResourceType.SpruceWood or ResourceType.OakWood))
-        {
-            PlantType typeModifier =
-                terrain.TreeList.Count(tree => tree.Type == PlantType.Oak) < Terrain.OakMaxQty
-                && terrain.TreeList.Count(tree => tree.Type is PlantType.Spruce) == Terrain.SpruceMaxQty
-                && terrain.TreeList.Count(tree => tree.Status is GrowthProcess.Ripe) == Terrain.SpruceMaxQty
-                    ? PlantType.Oak 
-                    : PlantType.Spruce;
-
-                    if (typeModifier == PlantType.Oak) Math.Clamp(Position.Y, 7, Terrain.MaxSizeY - 1);
-
-            lock (terrain.TreeListLock)
-            {
-                terrain.TreeList.Add(
-                    new Tree(typeModifier, setPosition, GrowthProcess.Planted, terrain));
-            }
-        }        
-
-        await Task.CompletedTask;
-    }
 }
-
 
 class Mycel : Vegetation
 {
@@ -412,6 +431,7 @@ class Mushroom : Vegetation
 
 class Bush : Vegetation
 {
+
     public int MaxClusterSize {get; init;} = Random.Shared.Next(3, 8);
     public int CurrentClusterSize = 0;
     public Bush(PlantType type, Position position, Terrain terrain) : base(type, position, GrowthProcess.Planted, terrain)
@@ -422,54 +442,6 @@ class Bush : Vegetation
 
     public string[,]? Texture {get => field = GetBushTexture(); set;}
 
-    public async Task SelfSeeding(Terrain terrain, int randomFactor)
-    {
-        if (CurrentClusterSize == MaxClusterSize) return;
-
-        int randomNumber = Random.Shared.Next(randomFactor + 1);
-
-        int spreadSpectrumX;
-        int spreadSpectrumY;
-        int borderDistanceX = 1;
-        int borderDistanceY = 1;
-        Position setPosition;
-
-        do
-        {
-            spreadSpectrumX = Random.Shared.Next(-2, 3);
-            spreadSpectrumY = Random.Shared.Next(-1, 2);
-            setPosition = new Position(
-                Position.X + spreadSpectrumX,Position.Y + spreadSpectrumY);
-        }
-        while (spreadSpectrumX != 0
-            && spreadSpectrumY != 0);
-
-        setPosition.X = Math.Clamp(
-            setPosition.X, borderDistanceX, 
-            Terrain.MaxSizeX - borderDistanceX);
-        setPosition.Y = Math.Clamp(
-            setPosition.Y, borderDistanceY, 
-            Terrain.MaxSizeY - borderDistanceY - 1); // If removing, Pos Property Setter can't prevent crash !!
-
-        if (terrain.BushList.Count < Terrain.BushMaxQty
-            && randomNumber == randomFactor
-            && Type is PlantType.Blueberry
-            && Status is GrowthProcess.Ripe
-            && terrain.Grid![setPosition.X, setPosition.Y]
-                .Soil is Soil.Fertile or Soil.SemiArid
-            && terrain.Grid![setPosition.X, setPosition.Y]
-                .Resource.Type is not (ResourceType.Wheat or ResourceType.SpruceWood or ResourceType.OakWood or ResourceType.Blueberry))
-        {
-            lock (terrain.BushListLock)
-            {
-                terrain.BushList.Add(
-                    new Bush(PlantType.Blueberry, setPosition, terrain));
-                    CurrentClusterSize++;
-            }
-        }        
-
-        await Task.CompletedTask;
-    }
     public string[,] GetBushTexture()
     {
         string[,] blueBerryPlanted =
@@ -502,7 +474,7 @@ class Bush : Vegetation
                 GrowthProcess.Young => blueBerryGerm,
                 GrowthProcess.Mature => blueBerryMature,
                 GrowthProcess.Ripe => blueBerryRipe,
-                _ => blueBerryRipe
+                _ => blueBerryMature
             };
         }
         

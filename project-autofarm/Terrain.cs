@@ -11,9 +11,9 @@ partial class Terrain // Data and Parameters
     public const int OakMaxQty = 1;
     public const int TreeCuttingThreshold = TreeMaxQty * 7 / 10;
     public const int MycelMaxQty = 3;
-    public const int BushMaxQty = 3;
     public List<Tree> TreeList {get; set;} = [];
     public readonly object TreeListLock = new();
+    public const int BushMaxQty = 15;
     public List<Bush> BushList {get; set;} = [];
     public readonly object BushListLock = new();
     public List<Tile> CropTileList {get; set;} = [];
@@ -34,8 +34,11 @@ partial class Terrain // Data and Parameters
         CreateFoliage(0,0,100,100,factor:80);
         CreateGrassShafts(0,0,100,100,factor:200);
         CreateStones(0,0,100,100,factor:100);
+
         CreateField(xMin: 67,yMin: 35,xMax: 87,yMax: 80);
-        
+
+        PlaceBushes(200);
+
         CreateFarmHouse(5,0);
     }
 
@@ -180,40 +183,27 @@ partial class Terrain // Creation Methods
         }
     }
 
-    private void CreateTrees(PlantType treeType,int qtyMin, int qtyMax, int xMin, int yMin, int xMax, int yMax)
+    private void PlaceBushes(int randomFactor)
     {
-        int quantityTrees = Random.Shared.Next(qtyMin, qtyMax);
-        int startingIndex = TreeList.Count;
-        int maxQuantityTrees = startingIndex + quantityTrees;
-
-        int posX = Random.Shared.Next(xMin, xMax + 1);
-        int posY = Random.Shared.Next(yMin, yMax + 1);
-
-        for (int incY = 0; incY < qtyMax; incY++)
-        {
-            TreeList.Add(new Tree(treeType, new Position(posX,posY), GrowthProcess.Ripe, this));
-        }
-        
-
-        TreeList.Distinct();
-    }
-
-    /* private void CreateMushrooms(int xMin, int yMin, int xMax, int yMax, int factor)
-    {
-        var OffsetMin = (X:MaxSizeX * xMin/100, Y:MaxSizeY * yMin/100);
-        var OffsetMax = (X:MaxSizeX * xMax/100, Y:MaxSizeY * yMax/100);
-
-        string[] mushroomArray = {"forage_mushroom1", "forage_mushroom2"};
-
-        for (int incY = OffsetMin.Y; incY < OffsetMax.Y; incY++)
-        {
-            for (int incX = OffsetMin.X; incX < OffsetMax.X; incX++)
+        for (int y = 0; y < MaxSizeY.ClampToAxis(1); y++)
+            for (int x = 0; x < MaxSizeX.ClampToAxis(0); x++)
             {
-                if (1 == GetSimpleNoise(1,factor) && Grid![incX,incY].Texture.TextureName == "bot_grass1")
-                Grid![incX,incY].Texture.TextureName = mushroomArray[Random.Shared.Next(0,mushroomArray.Length)];
+                int randomNumber = Random.Shared.Next(randomFactor + 1);
+
+                if (randomNumber == randomFactor
+                    && BushList.Count < BushMaxQty
+                    && Grid![x,y].Soil is Soil.Fertile
+                    && Grid[x,y].Resource.Type is ResourceType.Humus
+                    and not ResourceType.Wheat)
+                {
+                    BushList.Add(
+                        new Bush(PlantType.Blueberry, new Position(
+                            x.ClampToAxis(0),y.ClampToAxis(1)), this));
+                    Grid![x.ClampToAxis(0),y.ClampToAxis(1)].Resource.Type = ResourceType.Blueberry;
+                }
+
             }
-        }
-    } */
+    }
     
     private void CreateFarmHouse(int posX, int posY)
     {

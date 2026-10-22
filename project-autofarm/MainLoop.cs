@@ -18,7 +18,6 @@ class General
             }
         }
         
-
         while (true)
         {
             UpdateTiles(terrain);
@@ -26,6 +25,8 @@ class General
             await UpdateGameAsync(terrain);
             Renderer.Screen(terrain);
             
+            //Console.Write(terrain.BushList.Count);
+
             //Console.ReadKey();
             await Task.Delay(100); // 60
         }
@@ -54,7 +55,12 @@ class General
             foreach (Tree tree in terrain.TreeList.ToList())
             {
                 await tree.GiveGrowthChance(terrain);
-                await tree.SelfSeeding(terrain, randomFactor: 1000); // 1000
+
+                await tree.SelfSeeding(
+                    spreadMinX: -12, spreadMaxX: 13,
+                    spreadMinY: -6, spreadMaxY: 7,
+                    randomFactor: 1000, terrain); // 1000
+
                 await tree.CreateMycel(terrain, randomFactor: 200);
 
                 if (tree.Mycel is not null)
@@ -70,7 +76,10 @@ class General
             foreach (Bush bush in terrain.BushList.ToList())
             {
                 await bush.GiveGrowthChance(terrain);
-                await bush.SelfSeeding(terrain, randomFactor: 1000); // 1000
+
+                await bush.SelfSeeding(spreadMinX: -1, spreadMaxX: 2,
+                    spreadMinY: -1, spreadMaxY: 2,
+                    randomFactor: 1000, terrain); // 1000
             }
         }
         finally
