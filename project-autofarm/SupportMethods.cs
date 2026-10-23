@@ -21,7 +21,7 @@ public static class SupportMethod
         if (axis is 1)
             return Math.Clamp(value, 1, Terrain.MaxSizeY - 1);
 
-        else return 0;
+        else return 1;
 
     }
 }

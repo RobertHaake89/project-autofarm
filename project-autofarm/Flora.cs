@@ -19,8 +19,8 @@ abstract class Vegetation
     public virtual Position Position {get; set
         {
             field = new Position(
-                Math.Clamp(value.X, 1, Terrain.MaxSizeX - 1),
-                Math.Clamp(value.Y, 1, Terrain.MaxSizeY - 1));
+                field.X = value.X.ClampToAxis(0) - 1,
+                field.Y = value.Y.ClampToAxis(1) - 1);
         }}
 
     public Vegetation(PlantType type, Position position, GrowthProcess status, Terrain terrain)
@@ -29,7 +29,7 @@ abstract class Vegetation
         Type = type;
         Status = status;
         Position = position;
-        terrain.Grid![Position.X, Position.Y ].Resource.Type = Resource;
+        terrain.Grid![Position.X, Position.Y].Resource.Type = Resource;
     }
 
     public virtual async Task GiveGrowthChance(Terrain terrain)
@@ -95,19 +95,21 @@ abstract class Vegetation
                         terrain.Grid[Position.X, Position.Y].Resource.Type = ResourceType.None;
                         terrain.Grid![Position.X, Position.Y].Resource.Status = GrowthProcess.Fallow;
                     }
+                    
                 }
-                else
-            {
-                Status = GrowthProcess.Mature;
+                else if (Status == GrowthProcess.Young)
+                {
+                    Status = GrowthProcess.Mature;
+                }                 
             }
-            }
-        }
-        else if (Status == GrowthProcess.Mature)
+            else if (Status == GrowthProcess.Mature)
         {
             Status = GrowthProcess.Ripe;
             terrain.Grid![Position.X,Position.Y].Resource.Type = Resource;
             terrain.Grid![Position.X, Position.Y].Resource.Status = Status;
         }            
+        }
+        
     }
 
     public virtual async Task SelfSeeding()
@@ -475,24 +477,24 @@ class Bush : Vegetation
 
         int spreadSpectrumX;
         int spreadSpectrumY;
-        int borderDistanceX = 1;
-        int borderDistanceY = 1;
+        //int borderDistanceX = 1;
+        //int borderDistanceY = 1;
         Position setPosition;
 
         do
         {
-            spreadSpectrumX = Random.Shared.Next(spreadMinX, spreadMaxX + 1); // -1, 1
-            spreadSpectrumY = Random.Shared.Next(spreadMinY, spreadMaxY + 1); // -1, 1
-            setPosition = new Position(
-                Position.X + spreadSpectrumX, Position.Y + spreadSpectrumY);
+            spreadSpectrumX = Random.Shared.Next(-spreadMinX, spreadMaxX + 1); // -1, 1
+            spreadSpectrumY = Random.Shared.Next(-spreadMinY, spreadMaxY + 1); // -1, 1
         }
         while ((spreadSpectrumX == 0
-        && spreadSpectrumY != 0)
-        || (spreadSpectrumX != 0
-        && spreadSpectrumY == 0));
+            && spreadSpectrumY == 0)
+            ||
+            (spreadSpectrumX == 1
+            && spreadSpectrumY == 1));
 
-        setPosition.X = setPosition.X.ClampToAxis(0) - borderDistanceX;
-        setPosition.Y = setPosition.Y.ClampToAxis(1) - borderDistanceY; // If removing, Pos Property Setter can't prevent crash !!
+        setPosition = new Position(
+                (Position.X + spreadSpectrumX).ClampToAxis(0),
+                (Position.Y + spreadSpectrumY).ClampToAxis(1));
 
         if (terrain.BushList.Count < Terrain.BushMaxQty
             && randomNumber == randomFactor
@@ -501,24 +503,21 @@ class Bush : Vegetation
                 .Soil is Soil.Fertile or Soil.SemiArid
             && terrain.Grid![setPosition.X, setPosition.Y]
                 .Resource.Type is not (
-                    ResourceType.Wheat or ResourceType.SpruceWood
-                    or ResourceType.OakWood or ResourceType.Blueberry))
+                ResourceType.Wheat or ResourceType.SpruceWood
+                or ResourceType.OakWood or ResourceType.Blueberry))
+                if (terrain.BushList.Count < Terrain.BushMaxQty
+                    && CurrentClusterSize < MaxClusterSize)
         {
-
             lock (terrain.BushListLock)
             {
-                if (terrain.BushList.Count < Terrain.BushMaxQty
-                && CurrentClusterSize < MaxClusterSize)
                 {
                     terrain.BushList.Add(new Bush(Type, setPosition, terrain));
                     CurrentClusterSize++;
                 }
-                    
-                terrain.Grid[Position.X, Position.Y].Resource.Type = ResourceType.None;
-                terrain.Grid![Position.X, Position.Y].Resource.Status = GrowthProcess.Fallow;
             }
+            //terrain.Grid[Position.X, Position.Y].Resource.Type = ResourceType.None;
+            //terrain.Grid![Position.X, Position.Y].Resource.Status = GrowthProcess.Fallow;
         }        
-
         await Task.CompletedTask;
     }
 }

@@ -36,10 +36,26 @@ partial class Human : Entity
                 && terrain.TreeList.Count( tree => tree.Status is GrowthProcess.Ripe)
                 >= Terrain.TreeCuttingThreshold)
                     Status = Status.Working;
-            if (Profession is Profession.Forager
-                && terrain.BushList.Count( bush => bush.Status is GrowthProcess.Ripe)
-                == terrain.BushList.Count)
+                    
+            if (Profession is Profession.Forager)
+            {
+                if (terrain.BushList.Count( bush => bush.Status is GrowthProcess.Ripe)
+                == terrain.BushList.Count * (2/3))
+                {
+                    Specialisation = Specialisation.BlueBerries;
                     Status = Status.Working;
+                }
+                else if (terrain.TreeList.Count( tree => tree.Mycel?.MushroomList.Count == Mycel.MycelMaxMushrooms * (1/3))
+                == terrain.TreeList.Count * (2/3))
+                {
+                    Specialisation = Specialisation.Mushrooms;
+                    Status = Status.Working;
+                }
+                
+            }
+
+                
+                    
 
             await Task.Delay(Random.Shared.Next(3000, 6000));
         }
@@ -285,7 +301,6 @@ partial class Human : Entity
                 TargetMemory.Clear();
             }
             else await ScanFor(terrain);
-            
         }
     }
     /* public async Task PlantBush(Terrain terrain, int randomFactor)
@@ -313,15 +328,56 @@ partial class Human : Entity
             if (!TargetMemory.Any()) Status = Status.Exhausted;
             if (terrain.BushList.Count <= Terrain.BushMaxQty)
             {
-                
                 Mode = ProcessingMode.Harvesting;
                 Status = Status.Exhausted;
                 TargetMemory.Clear();
             }
             else await ScanFor(terrain);
-            
         }
     } */
+
+    public async Task DoForaging(Terrain terrain)
+    {
+        if (Mode is ProcessingMode.Harvesting
+            && Specialisation is Specialisation.BlueBerries or Specialisation.Mushrooms
+            && TargetResource is ResourceType.Blueberry or ResourceType.Mushrooms
+            && Position.X == TargetPosition.X
+            && Position.Y == TargetPosition.Y)
+        {
+            if (terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Type == TargetResource)
+            {
+                if (terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Status is GrowthProcess.Ripe)
+                {
+                    Position = new Position(Position.X - 1, Position.Y);
+                    await Task.Delay(5000); // 5000
+
+                    Bush bush = terrain.BushList.FirstOrDefault(bush
+                            => bush.Position.X == TargetPosition.X
+                            && bush.Position.Y == TargetPosition.Y
+                            && bush.Status is GrowthProcess.Ripe)
+                                ?? throw new InvalidOperationException("bush not found");
+
+                    if (bush is not null)
+                    {
+                        lock (terrain.BushListLock)
+                        {
+                            bush.Status = GrowthProcess.Harvested;
+                        }
+                        terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Status = GrowthProcess.Fallow;
+                        terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Type = ResourceType.None;
+                        Stamina--;
+                    }
+                }
+
+                if (TargetMemory.Count == 0)
+                {
+                    Status = Status.Exhausted;
+                    TargetMemory.Clear();
+                    /* TargetMemorySize = 0; */                     
+                }
+            }
+        }
+    }
 }
 
 partial class Animal

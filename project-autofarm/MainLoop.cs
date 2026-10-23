@@ -77,9 +77,9 @@ class General
             {
                 await bush.GiveGrowthChance(terrain);
 
-                await bush.SelfSeeding(spreadMinX: -1, spreadMaxX: 2,
-                    spreadMinY: -1, spreadMaxY: 2,
-                    randomFactor: 1000, terrain); // 1000
+                await bush.SelfSeeding(spreadMinX: 1, spreadMaxX: 1,
+                    spreadMinY: 1, spreadMaxY: 1,
+                    randomFactor: 100, terrain); // 1000
             }
         }
         finally

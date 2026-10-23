@@ -13,7 +13,7 @@ partial class Terrain // Data and Parameters
     public const int MycelMaxQty = 3;
     public List<Tree> TreeList {get; set;} = [];
     public readonly object TreeListLock = new();
-    public const int BushMaxQty = 15;
+    public const int BushMaxQty = 20;
     public List<Bush> BushList {get; set;} = [];
     public readonly object BushListLock = new();
     public List<Tile> CropTileList {get; set;} = [];
@@ -185,7 +185,7 @@ partial class Terrain // Creation Methods
 
     private void PlaceBushes(int randomFactor)
     {
-        for (int y = 0; y < MaxSizeY.ClampToAxis(1); y++)
+        for (int y = 1; y < MaxSizeY.ClampToAxis(1); y++)
             for (int x = 0; x < MaxSizeX.ClampToAxis(0); x++)
             {
                 int randomNumber = Random.Shared.Next(randomFactor + 1);
