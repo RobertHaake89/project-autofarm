@@ -19,8 +19,8 @@ abstract class Vegetation
     public virtual Position Position {get; set
         {
             field = new Position(
-                field.X = value.X.ClampToAxis(0) - 1,
-                field.Y = value.Y.ClampToAxis(1) - 1);
+                field.X = value.X.ClampToAxis(0),
+                field.Y = value.Y.ClampToAxis(1));
         }}
 
     public Vegetation(PlantType type, Position position, GrowthProcess status, Terrain terrain)
@@ -145,6 +145,7 @@ class Tree : Vegetation
             PlantType.Oak => ResourceType.SpruceWood, // Should be Oak but fixed forester targeting
             _ => ResourceType.None
         };
+        terrain.Grid![Position.X, Position.Y].Resource.Type = Resource;
     }
 
     public async Task SelfSeeding(int spreadMinX, int spreadMaxX, int spreadMinY, int spreadMaxY, int randomFactor, Terrain terrain)
@@ -195,8 +196,8 @@ class Tree : Vegetation
                 terrain.TreeList.Add(
                     new Tree(typeModifier, setPosition, GrowthProcess.Planted, terrain));
                 
-                terrain.Grid[Position.X, Position.Y].Resource.Type = ResourceType.None;
-                terrain.Grid![Position.X, Position.Y].Resource.Status = GrowthProcess.Fallow;
+                //terrain.Grid[Position.X, Position.Y].Resource.Type = ResourceType.None;
+                //terrain.Grid![Position.X, Position.Y].Resource.Status = GrowthProcess.Fallow;
             }
         }        
 
@@ -344,7 +345,7 @@ class Mycel : Vegetation
 {
     public Tree Parent;
     public const int MycelMaxMushrooms = 6;
-    public const int MushroomMaxRadius = 10;
+    public const int MushroomMaxRadius = 9;
     public List<Mushroom> MushroomList {get; set;} = [];
     public Mycel(Tree parent, Terrain terrain) : base(PlantType.Mycel, parent.Position, GrowthProcess.Planted, terrain)
     {
@@ -425,9 +426,9 @@ class Bush : Vegetation
     public Bush(PlantType type, Position position, Terrain terrain) : base(type, position, GrowthProcess.Planted, terrain)
     {
         Type = type;
-        Position = position;
+        Position = new Position(position.X, position.Y);
+        terrain.Grid![Position.X, Position.Y].Resource.Type = ResourceType.Blueberry;
     }
-
     public string[,]? Texture {get => field = GetBushTexture(); set;}
 
     public string[,] GetBushTexture()
@@ -497,6 +498,7 @@ class Bush : Vegetation
                 (Position.Y + spreadSpectrumY).ClampToAxis(1));
 
         if (terrain.BushList.Count < Terrain.BushMaxQty
+            && CurrentClusterSize < MaxClusterSize
             && randomNumber == randomFactor
             && Status is GrowthProcess.Ripe
             && terrain.Grid![setPosition.X, setPosition.Y]
@@ -505,8 +507,7 @@ class Bush : Vegetation
                 .Resource.Type is not (
                 ResourceType.Wheat or ResourceType.SpruceWood
                 or ResourceType.OakWood or ResourceType.Blueberry))
-                if (terrain.BushList.Count < Terrain.BushMaxQty
-                    && CurrentClusterSize < MaxClusterSize)
+                if (terrain.BushList.Count < Terrain.BushMaxQty)
         {
             lock (terrain.BushListLock)
             {

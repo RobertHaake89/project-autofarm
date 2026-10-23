@@ -281,7 +281,7 @@ partial class Human : Entity
         && terrain.Grid![Position.X, Position.Y].Soil
             is Soil.Fertile
         && terrain.Grid![Position.X, Position.Y].Resource.Type
-            is not ResourceType.Wheat)
+            is not (ResourceType.Wheat or ResourceType.Blueberry))
         {
             if (randomNumber == randomFactor)
             {
@@ -303,38 +303,6 @@ partial class Human : Entity
             else await ScanFor(terrain);
         }
     }
-    /* public async Task PlantBush(Terrain terrain, int randomFactor)
-    {
-        if (Status is Status.Exhausted)
-            return;
-
-        int randomNumber = RandomNumberGenerator.GetInt32(randomFactor + 1); //Random.Shared.Next(randomFactor + 1);
-
-        if (Position.Y > 3
-        && terrain.Grid![Position.X, Position.Y].Soil
-            is Soil.Fertile or Soil.SemiArid
-        && terrain.Grid![Position.X, Position.Y].Resource.Type
-            is not ResourceType.Wheat)
-        {
-            if (randomNumber == randomFactor)
-            {
-                lock (terrain.BushListLock)
-                {
-                    terrain.BushList.Add(
-                        new Bush(PlantType.Blueberry, new Position(Position.X, Position.Y), terrain));
-                }
-            }
-
-            if (!TargetMemory.Any()) Status = Status.Exhausted;
-            if (terrain.BushList.Count <= Terrain.BushMaxQty)
-            {
-                Mode = ProcessingMode.Harvesting;
-                Status = Status.Exhausted;
-                TargetMemory.Clear();
-            }
-            else await ScanFor(terrain);
-        }
-    } */
 
     public async Task DoForaging(Terrain terrain)
     {
@@ -372,8 +340,7 @@ partial class Human : Entity
                 if (TargetMemory.Count == 0)
                 {
                     Status = Status.Exhausted;
-                    TargetMemory.Clear();
-                    /* TargetMemorySize = 0; */                     
+                    TargetMemory.Clear();                 
                 }
             }
         }
@@ -501,7 +468,7 @@ partial class Squirrel
                         Position.X + randomX, 
                         Position.Y + randomY);
                 else continue;
-
+                
                 await Task.Delay(SpeedMove);
                 await CheckForDanger(terrain);                
             };
@@ -520,21 +487,25 @@ partial class Squirrel
         {
             focusdirection = Random.Shared.Next(0,2);
 
-            await CheckForDanger(terrain);
+            //await CheckForDanger(terrain);
 
             if (focusdirection == 0)
             {
                 Icon = IconList[4];
                 await Task.Delay(focusDuration);
+                await CheckForDanger(terrain);
                 Icon = IconList[6];
                 await Task.Delay(focusDuration);
+                await CheckForDanger(terrain);
             }
             else if (focusdirection == 1)
             {
                 Icon = IconList[8];
                 await Task.Delay(focusDuration);
+                await CheckForDanger(terrain);
                 Icon = IconList[2];
                 await Task.Delay(focusDuration);
+                await CheckForDanger(terrain);
             }
 
             await Task.Delay(pastScanThinking);
