@@ -419,7 +419,7 @@ class Bush : Vegetation
 {
 
     public int MaxClusterSize {get; init;} = Random.Shared.Next(3, 8);
-    public int CurrentClusterSize = 0;
+    public int CurrentClusterSize = 1;
     public Bush(PlantType type, Position position, Terrain terrain) : base(type, position, GrowthProcess.Planted, terrain)
     {
         Type = type;
@@ -494,7 +494,7 @@ class Bush : Vegetation
         setPosition.X = setPosition.X.ClampToAxis(0) - borderDistanceX;
         setPosition.Y = setPosition.Y.ClampToAxis(1) - borderDistanceY; // If removing, Pos Property Setter can't prevent crash !!
 
-        if (terrain.TreeList.Count < Terrain.TreeMaxQty
+        if (terrain.BushList.Count < Terrain.BushMaxQty
             && randomNumber == randomFactor
             && Status is GrowthProcess.Ripe
             && terrain.Grid![setPosition.X, setPosition.Y]

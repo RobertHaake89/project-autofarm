@@ -103,6 +103,8 @@ partial class Human : Entity
             TargetMemory.Clear();
             await Task.Delay(10_000);
 
+            Stamina = StaminaMax;
+
             Status = Status.Idle;
         }
     }
@@ -239,13 +241,15 @@ partial class Human : Entity
                     terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Status = GrowthProcess.Fallow;
                     terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Type = ResourceType.None;
 
-                    Status = Status.Exhausted;
-                    TargetMemory.Clear();
+                    Stamina--;
+
+                    /* Status = Status.Exhausted;
+                    TargetMemory.Clear(); */
                 }
                 if (TargetMemory.Count == 0)
                 {
                     Status = Status.Exhausted;
-                    TargetMemorySize = 0;                     
+                    /* TargetMemorySize = 0; */                     
                 }
             }
         }
@@ -284,7 +288,7 @@ partial class Human : Entity
             
         }
     }
-    public async Task PlantBush(Terrain terrain, int randomFactor)
+    /* public async Task PlantBush(Terrain terrain, int randomFactor)
     {
         if (Status is Status.Exhausted)
             return;
@@ -317,7 +321,7 @@ partial class Human : Entity
             else await ScanFor(terrain);
             
         }
-    }
+    } */
 }
 
 partial class Animal

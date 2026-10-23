@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace ProjectAutofarm;
 
 
@@ -106,12 +108,29 @@ partial class Human : Entity
         Profession.Forager => 4000,
         _ => 500
     };}
+    public int StaminaMax {get; set;}
+    public int Stamina {get; set 
+        {
+            field = value > 0 ? value : 0;
+            if (field == 0)
+                Status = Status.Exhausted;
+                TargetMemory.Clear();
+                TargetMemorySize = 0;
+        }}
 
     public Human(string name, char icon, Gender gender, int speedMove, Profession profession, Specialisation specialisation, Position position)
         : base(name, icon, gender, speedMove, position)
     {
         Profession = profession;
         Specialisation = specialisation;
+        StaminaMax = Profession switch
+        {
+            Profession.Farmer => 30,
+            Profession.Forester => 1,
+            Profession.Forager => 10,
+            _ => 10
+        };
+        Stamina = StaminaMax;
     }
 }
 
