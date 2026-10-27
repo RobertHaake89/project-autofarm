@@ -329,11 +329,9 @@ partial class Human : Entity
                     {
                         lock (terrain.BushListLock)
                         {
-                            bush.Status = GrowthProcess.Harvested;
+                            bush.Status = GrowthProcess.Mature;
+                            Stamina--;
                         }
-                        terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Status = GrowthProcess.Fallow;
-                        terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Type = ResourceType.None;
-                        Stamina--;
                     }
                 }
 
@@ -357,8 +355,8 @@ partial class Animal
             || Math.Abs(Position.X - human.Position.X) <= 3
             && Math.Abs(Position.Y - human.Position.Y) <= 1)
             {
-                int fleeDistanceX = Random.Shared.Next(3,5);
-                int fleeDistanceY = Random.Shared.Next(2,3);
+                int fleeDistanceX = Random.Shared.Next(4,7);
+                int fleeDistanceY = Random.Shared.Next(2,4);
 
                 if (Position.X <= human.Position.X)
                     fleeDistanceX = 

@@ -13,7 +13,7 @@ partial class Terrain // Data and Parameters
     public const int MycelMaxQty = 3;
     public List<Tree> TreeList {get; set;} = [];
     public readonly object TreeListLock = new();
-    public const int BushMaxQty = 20;
+    public const int BushMaxQty = 15;
     public List<Bush> BushList {get; set;} = [];
     public readonly object BushListLock = new();
     public List<Tile> CropTileList {get; set;} = [];

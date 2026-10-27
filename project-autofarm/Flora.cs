@@ -359,8 +359,8 @@ class Mycel : Vegetation
         int radiusPosY = Random.Shared.Next(-(MushroomMaxRadius / 3), (MushroomMaxRadius + 1) / 3);
 
         Position setPosition = new Position(
-            Math.Clamp(Parent.Position.X + radiusPosX, 1, Terrain.MaxSizeX - 1),
-            Math.Clamp(Parent.Position.Y + radiusPosY, 1, Terrain.MaxSizeY - 1));
+            (Parent.Position.X + radiusPosX).ClampToAxis(0),
+            (Parent.Position.Y + radiusPosY).ClampToAxis(1));
 
         if (randomNumber == randomFactor
             && radiusPosX != 0

@@ -85,7 +85,10 @@ abstract partial class Entity : ITargetable
 partial class Human : Entity
 {
     public Profession Profession {get; set;}
-    public Specialisation Specialisation {get; set;}
+    public Specialisation Specialisation
+    {
+        get;
+         set;}
     public override ResourceType TargetResource {get 
         => field = Mode == ProcessingMode.Planting 
             ? ResourceType.Humus
@@ -161,10 +164,6 @@ abstract partial class Animal : Entity
 partial class Squirrel : Animal
 {
     public char[] IconList {get; set;} = new char[9];
-    /* public char IconUp = '૪';
-    public char IconRight = 'ᘛ';
-    public char IconSouth = 'ꙮ';
-    public char IconWest = 'ᘚ'; */
     public override Position Position {get; set
     {
         SetIcon(value);

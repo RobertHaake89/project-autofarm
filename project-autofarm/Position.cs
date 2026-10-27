@@ -2,8 +2,8 @@ using System;
 
 namespace ProjectAutofarm;
 
-record struct Position(int x, int y)
+record struct Position(int X, int Y)
 {
-    public int X {get; set;} = x;
-    public int Y {get; set;} = y;
+    public int X {get; set;} = X;
+    public int Y {get; set;} = Y;
 }
