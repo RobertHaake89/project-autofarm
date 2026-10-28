@@ -66,7 +66,7 @@ abstract partial class Entity : ITargetable
     public virtual ResourceType TargetResource {get; set;}
     public Position TargetPosition;
     public virtual List<Position> TargetMemory {get; set;} = new List<Position>();
-    public Status Status {get; set;} = Status.Working;
+    public Status Status {get; set;} = Status.Idle;
     public ProcessingMode Mode {get; set;} = ProcessingMode.None;
 
     public Entity(string name, char icon, Gender gender, int speedMove, Position position)
@@ -87,8 +87,17 @@ partial class Human : Entity
     public Profession Profession {get; set;}
     public Specialisation Specialisation
     {
-        get;
-         set;}
+        get
+        {
+            if (field is Specialisation.Mushrooms)
+                return Specialisation.BlueBerries;
+            else if (field is Specialisation.BlueBerries)
+                return Specialisation.Mushrooms;
+            
+            else return field;
+
+        }
+        set;}
     public override ResourceType TargetResource {get 
         => field = Mode == ProcessingMode.Planting 
             ? ResourceType.Humus
@@ -130,7 +139,7 @@ partial class Human : Entity
         {
             Profession.Farmer => 30,
             Profession.Forester => 1,
-            Profession.Forager => 10,
+            Profession.Forager => 5,
             _ => 10
         };
         Stamina = StaminaMax;

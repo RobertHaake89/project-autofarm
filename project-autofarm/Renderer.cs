@@ -32,14 +32,14 @@ class Renderer
 
         var human1 = terrain.EntityDict["human1"];
         var human2 = terrain.EntityDict["human2"];
-        //var human3 = terrain.EntityDict["human3"];
+        var human3 = terrain.EntityDict["human3"];
         var squirrel1 = terrain.EntityDict["squirrel1"];
 
         RenderMushrooms(terrain, output);
 
         RenderEntity(human1, output);
         RenderEntity(human2, output);
-        //RenderEntity(human3, output);
+        RenderEntity(human3, output);
         RenderEntity(squirrel1, output);
 
         RenderBushes(terrain, output);

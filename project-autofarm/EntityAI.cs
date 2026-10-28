@@ -1,5 +1,6 @@
 using System.Net.NetworkInformation;
 using System.Reflection.Emit;
+using Microsoft.VisualBasic.FileIO;
 
 namespace ProjectAutofarm;
 
@@ -29,7 +30,7 @@ partial class Human : Entity
 
             if (Profession is Profession.Farmer
                 && terrain.CropTileList.All(
-                crop => crop.Resource.Status is GrowthProcess.Ripe))
+                crop => crop.Resource.Status is GrowthProcess.Ripe or GrowthProcess.Fallow))
                     Status = Status.Working;
             
             if (Profession is Profession.Forester
@@ -245,7 +246,7 @@ partial class Human : Entity
                 if (terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Status is GrowthProcess.Ripe)
                 {
                     Position = new Position(Position.X - 1, Position.Y);
-                    await Task.Delay(10_000); // 10000
+                    await Task.Delay(SpeedWorking);
 
                     lock (terrain.TreeListLock)
                     {
@@ -306,31 +307,53 @@ partial class Human : Entity
 
     public async Task DoForaging(Terrain terrain)
     {
-        if (Mode is ProcessingMode.Harvesting
-            && Specialisation is Specialisation.BlueBerries or Specialisation.Mushrooms
-            && TargetResource is ResourceType.Blueberry or ResourceType.Mushrooms
+        if (Mode is ProcessingMode.Harvesting 
             && Position.X == TargetPosition.X
-            && Position.Y == TargetPosition.Y)
+            && Position.Y == TargetPosition.Y
+            && terrain.Grid![Position.X,Position.Y].Resource.Type == TargetResource)
         {
             if (terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Type == TargetResource)
             {
                 if (terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Status is GrowthProcess.Ripe)
                 {
                     Position = new Position(Position.X - 1, Position.Y);
-                    await Task.Delay(5000); // 5000
+                    await Task.Delay(SpeedWorking);
 
-                    Bush bush = terrain.BushList.FirstOrDefault(bush
+                    if (Specialisation is Specialisation.BlueBerries)
+                    {
+                        Bush bush = terrain.BushList.FirstOrDefault(bush
                             => bush.Position.X == TargetPosition.X
                             && bush.Position.Y == TargetPosition.Y
                             && bush.Status is GrowthProcess.Ripe)
                                 ?? throw new InvalidOperationException("bush not found");
 
-                    if (bush is not null)
-                    {
-                        lock (terrain.BushListLock)
+                        if (bush is not null)
                         {
-                            bush.Status = GrowthProcess.Mature;
-                            Stamina--;
+                            lock (terrain.BushListLock)
+                            {
+                                bush.Status = GrowthProcess.Mature;
+                                Stamina--;
+                            }
+                        }
+                    }
+                    if (Specialisation is Specialisation.Mushrooms)
+                    {
+                        foreach (Tree tree in terrain.TreeList)
+
+                        if (tree.Mycel is not null)
+                        {
+                            Mushroom mushroom = tree.Mycel.MushroomList.FirstOrDefault(mushroom
+                            => mushroom.Position.X == TargetPosition.X
+                            && mushroom.Position.Y == TargetPosition.Y
+                            && mushroom.Status is GrowthProcess.Ripe)
+                                ?? throw new InvalidOperationException("bush not found");
+
+                            lock (terrain.TreeListLock)
+                            {
+                                //tree.Mycel.MushroomList
+                                mushroom = null;
+                                Stamina--;
+                            }
                         }
                     }
                 }

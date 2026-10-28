@@ -62,7 +62,7 @@ class General
                     randomFactor: 1000, terrain); // 1000
 
                 await tree.CreateMycel(terrain, randomFactor: 200);
-
+                
                 if (tree.Mycel is not null)
                     foreach (Mushroom mushroom in tree.Mycel.MushroomList)
                         await mushroom.GiveGrowthChance(randomFactor: 100);
@@ -75,7 +75,7 @@ class General
 
             foreach (Bush bush in terrain.BushList.ToList())
             {
-                await bush.GiveGrowthChance(terrain);
+                await bush.GiveGrowthChance(terrain, fruitDelayFactor: 20);
 
                 await bush.SelfSeeding(spreadMinX: 1, spreadMaxX: 1,
                     spreadMinY: 1, spreadMaxY: 1,

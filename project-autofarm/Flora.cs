@@ -10,12 +10,13 @@ public enum PlantType
     Blueberry
 }
 
-abstract class Vegetation
+abstract partial class Vegetation
 {
     public string Name {get; set;}
     public PlantType Type {get; init;}
     public ResourceType Resource {get; set;}
     public GrowthProcess Status {get; set;}
+    public virtual bool canBearFruit {get; set;} = false;
     public virtual Position Position {get; set
         {
             field = new Position(
@@ -32,22 +33,27 @@ abstract class Vegetation
         terrain.Grid![Position.X, Position.Y].Resource.Type = Resource;
     }
 
-    public virtual async Task GiveGrowthChance(Terrain terrain)
+    public virtual async Task GiveGrowthChance(Terrain terrain, int fruitDelayFactor = 1)
     {
         if (Status == GrowthProcess.Ripe)
             return;
 
-        int factor = Type switch
+
+        int growthFactor = Type switch
         {
             PlantType.Spruce => 150,
             PlantType.Oak => 300,
-            PlantType.Blueberry => 100,
+            PlantType.Blueberry => 150,
             _ => 10
         };
 
-        int RandomNumber = Random.Shared.Next(factor + 1);
+        if (canBearFruit && Status is GrowthProcess.Mature)
+            growthFactor = growthFactor * fruitDelayFactor;
 
-        if (RandomNumber == factor)
+
+        int RandomNumber = Random.Shared.Next(growthFactor + 1);
+
+        if (RandomNumber == growthFactor)
         {
             if (Status == GrowthProcess.Planted) Status = GrowthProcess.Young;
             else if (Status == GrowthProcess.Young)
@@ -135,6 +141,7 @@ class Tree : Vegetation
                 Math.Clamp(value.Y, 5, Terrain.MaxSizeY - 5))
         };}
     public Mycel? Mycel {get; set;}
+    public readonly object MycelLock = new();
     public string[,]? Texture {get => field = GetTreeTexture(); set;}
     public Tree(PlantType type, Position position, GrowthProcess status, Terrain terrain) :base(type, position, status, terrain)
     {
@@ -368,12 +375,15 @@ class Mycel : Vegetation
             && MushroomList.Count <= MycelMaxMushrooms
             && terrain.Grid![setPosition.X, setPosition.Y].Resource.Type is ResourceType.None)
         {
-            MushroomList.Add(
+            lock (Parent.MycelLock)
+            {
+                MushroomList.Add(
                 new Mushroom(this,new Position(setPosition.X, setPosition.Y), terrain));
-            MushroomList[^1].Position = MushroomList[^1].Position; // To trigger Clamped Setter
+                MushroomList[^1].Position = MushroomList[^1].Position; // To trigger Clamped Setter
 
-            terrain.Grid![setPosition.X, setPosition.Y].Resource.Type = Resource;
-            //Console.Write("has been added");
+                terrain.Grid![setPosition.X, setPosition.Y].Resource.Type = Resource;
+                //Console.Write("has been added");
+            }
         }
                 
     }
@@ -421,8 +431,10 @@ class Mushroom : Vegetation
 class Bush : Vegetation
 {
 
-    public int MaxClusterSize {get; init;} = Random.Shared.Next(3, 8);
+    public int MaxClusterSize {get; init;} = Random.Shared.Next(1,3);
     public int CurrentClusterSize = 1;
+    public override bool canBearFruit {get; set;} = true;
+
     public Bush(PlantType type, Position position, Terrain terrain) : base(type, position, GrowthProcess.Planted, terrain)
     {
         Type = type;
@@ -521,4 +533,10 @@ class Bush : Vegetation
         }        
         await Task.CompletedTask;
     }
+}
+
+
+abstract partial class Vegetation // abstract Methods
+{
+    
 }
