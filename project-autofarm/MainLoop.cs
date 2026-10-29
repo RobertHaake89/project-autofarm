@@ -59,7 +59,7 @@ class General
                 await tree.SelfSeeding(
                     spreadMinX: -12, spreadMaxX: 13,
                     spreadMinY: -6, spreadMaxY: 7,
-                    randomFactor: 1000, terrain); // 1000
+                    randomFactor: 800, terrain); // 1000
 
                 await tree.CreateMycel(terrain, randomFactor: 200);
                 

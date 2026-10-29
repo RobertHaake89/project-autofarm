@@ -85,19 +85,7 @@ abstract partial class Entity : ITargetable
 partial class Human : Entity
 {
     public Profession Profession {get; set;}
-    public Specialisation Specialisation
-    {
-        get
-        {
-            if (field is Specialisation.Mushrooms)
-                return Specialisation.BlueBerries;
-            else if (field is Specialisation.BlueBerries)
-                return Specialisation.Mushrooms;
-            
-            else return field;
-
-        }
-        set;}
+    public Specialisation Specialisation {get;set;}
     public override ResourceType TargetResource {get 
         => field = Mode == ProcessingMode.Planting 
             ? ResourceType.Humus
@@ -112,14 +100,7 @@ partial class Human : Entity
                 }; set;}
     public int TargetMemorySize {get; set => field = Math.Max(field,value);}
     public override List<Position> TargetMemory {get; set;} = [];
-    public int SpeedWorking {get;
-    set => field = Profession switch
-    {
-        Profession.Farmer => 100,
-        Profession.Forester => 10000,
-        Profession.Forager => 4000,
-        _ => 500
-    };}
+    public int SpeedWorking;
     public int StaminaMax {get; set;}
     public int Stamina {get; set 
         {
@@ -143,6 +124,13 @@ partial class Human : Entity
             _ => 10
         };
         Stamina = StaminaMax;
+        SpeedWorking = Profession switch
+        {
+            Profession.Farmer => 100,
+            Profession.Forester => 10000,
+            Profession.Forager => 4000,
+            _ => 500
+        };
     }
 }
 

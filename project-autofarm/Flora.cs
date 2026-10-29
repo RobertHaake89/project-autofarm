@@ -16,7 +16,7 @@ abstract partial class Vegetation
     public PlantType Type {get; init;}
     public ResourceType Resource {get; set;}
     public GrowthProcess Status {get; set;}
-    public virtual bool canBearFruit {get; set;} = false;
+    public virtual bool canBearFruit {get; init;} = false;
     public virtual Position Position {get; set
         {
             field = new Position(
@@ -433,7 +433,7 @@ class Bush : Vegetation
 
     public int MaxClusterSize {get; init;} = Random.Shared.Next(1,3);
     public int CurrentClusterSize = 1;
-    public override bool canBearFruit {get; set;} = true;
+    public override bool canBearFruit {get; init;} = true;
 
     public Bush(PlantType type, Position position, Terrain terrain) : base(type, position, GrowthProcess.Planted, terrain)
     {
