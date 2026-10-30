@@ -382,6 +382,7 @@ class Mycel : Vegetation
                 MushroomList[^1].Position = MushroomList[^1].Position; // To trigger Clamped Setter
 
                 terrain.Grid![setPosition.X, setPosition.Y].Resource.Type = Resource;
+                terrain.Grid![setPosition.X, setPosition.Y].Resource.Status = GrowthProcess.Planted;
                 //Console.Write("has been added");
             }
         }

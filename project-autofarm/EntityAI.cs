@@ -47,6 +47,9 @@ partial class Human : Entity
             }       
             else if (Profession is Profession.Forager)
             {
+                Console.Write($"prof: {Profession} special: {Specialisation} mode: {Mode}");
+
+
                 if (terrain.BushList.Count(bush => bush.Status is GrowthProcess.Ripe)
                     > Terrain.BushMaxQty / 3)
                 {
@@ -91,11 +94,10 @@ partial class Human : Entity
                     await PlantTree(terrain,randomFactor: 50);
                 }
             }
-            if (Profession is Profession.Forager)
-            {   
-                if (Mode is ProcessingMode.Harvesting)
-                    await DoForaging(terrain);
-            }
+            if (Profession is Profession.Forager
+            && Mode is ProcessingMode.Harvesting)
+                await DoForaging(terrain);
+            
                 //Console.Write($"{Profession} is working!");
         }
         if (Status is Status.Exhausted)
@@ -118,13 +120,10 @@ partial class Human : Entity
         }
     }
 
-    public void CallToWork(object? sender, EventArgs e)
-    {
-        Status = Status.Working;
-    }
-
     public override async Task ScanFor(Terrain terrain)
     {
+        int scanDuration = Random.Shared.Next(2000, 6000);
+
         for (int y = 0; y < Terrain.MaxSizeY; y++)
         {
             int start = y % 2 == 0 ? 0 : Terrain.MaxSizeX - 1;
@@ -135,19 +134,19 @@ partial class Human : Entity
             {
                 if (terrain.Grid![x,y].Resource.Type == TargetResource)
                 {
-                    if (terrain.Grid![x,y].Resource.Status is GrowthProcess.Fallow)
-                    {
-                        TargetMemory.Add(new Position(terrain.Grid[x,y].Position.X, terrain.Grid[x,y].Position.Y));
-                    }
-                    else if (terrain.Grid![x,y].Resource.Status is GrowthProcess.Ripe or GrowthProcess.Mature or GrowthProcess.Young)
+                    if (terrain.Grid![x,y].Resource.Status is GrowthProcess.Ripe/*  or GrowthProcess.Mature or GrowthProcess.Young */)
                     {
                         TargetMemory.Add(new Position(terrain.Grid[x,y].Position.X, terrain.Grid[x,y].Position.Y));                            
+                    }
+                    else if (terrain.Grid![x,y].Resource.Status is GrowthProcess.Harvested)
+                    {
+                        TargetMemory.Add(new Position(terrain.Grid[x,y].Position.X, terrain.Grid[x,y].Position.Y));
                     }
                     else if (terrain.Grid![x,y].Resource.Status is GrowthProcess.Plowed)
                     {
                         TargetMemory.Add(new Position(terrain.Grid[x,y].Position.X, terrain.Grid[x,y].Position.Y));
                     }
-                    else if (terrain.Grid![x,y].Resource.Status is GrowthProcess.Harvested)
+                    else if (terrain.Grid![x,y].Resource.Status is GrowthProcess.Fallow)
                     {
                         TargetMemory.Add(new Position(terrain.Grid[x,y].Position.X, terrain.Grid[x,y].Position.Y));
                     }
@@ -158,7 +157,15 @@ partial class Human : Entity
             if (Profession is Profession.Forester or Profession.Forager 
                 && Mode is ProcessingMode.Harvesting)
                     TargetMemory.Shuffle();
-        }        
+
+            if (Profession is Profession.Forager)
+            {
+                Console.Write($"{Profession} in {Mode}-mode is scanning");
+                Console.Write($"and has {TargetMemory.Count} targets");
+            }
+                
+        }
+        await Task.Delay(scanDuration);     
     }
 
     public override async Task MoveTo(Terrain terrain)
@@ -195,6 +202,12 @@ partial class Human : Entity
             && Position == chosenTarget
             && TargetMemory.Any())
                 TargetMemory.RemoveAt(0); 
+
+        if (Profession is Profession.Forager)
+        {
+            Console.Write($"{Profession} is moving");
+        }
+        
     }
 
     public async Task DoFarmWork(Terrain terrain)
@@ -301,7 +314,7 @@ partial class Human : Entity
                 Status = Status.Exhausted;
                 TargetMemory.Clear();
             }
-            else await ScanFor(terrain);
+            //else await ScanFor(terrain);
         }
     }
 
@@ -313,65 +326,70 @@ partial class Human : Entity
             && terrain.Grid![Position.X,Position.Y].Resource.Type == TargetResource
             && terrain.Grid![Position.X, Position.Y].Resource.Status is GrowthProcess.Ripe)
         {
-            
-            
-            
+            if (terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Type == TargetResource)
             {
-                Position = new Position(Position.X - 1, Position.Y);
-                await Task.Delay(SpeedWorking);
-
-                if (Specialisation is Specialisation.BlueBerries)
+                if (terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Status is GrowthProcess.Ripe)
+            
+                if (Profession is Profession.Forager)
                 {
-                    Bush bush = terrain.BushList.FirstOrDefault(bush
-                        => bush.Position.X == TargetPosition.X
-                        && bush.Position.Y == TargetPosition.Y
-                        && bush.Status is GrowthProcess.Ripe)
-                            ?? throw new InvalidOperationException("bush not found");
+                    Console.Write($"{Profession} is foraging");
+                    Position = new Position(Position.X - 1, Position.Y);
+                    await Task.Delay(SpeedWorking);
 
-                    
-                        lock (terrain.BushListLock)
-                        {
-                            bush.Status = GrowthProcess.Mature;
-                            Stamina--;
-                            if (terrain.BushList.Any(bush => bush.Status is GrowthProcess.Ripe))
-                                Status = Status.Exhausted;
-                        }
-                    
-                }
-                if (Specialisation is Specialisation.Mushrooms)
-                {
-                    foreach (Tree tree in terrain.TreeList)
-
-                    if (tree.Mycel is not null)
+                    if (Specialisation is Specialisation.BlueBerries)
                     {
-                        Mushroom mushroom = tree.Mycel.MushroomList.FirstOrDefault(mushroom
-                            => mushroom.Position.X == TargetPosition.X
-                            && mushroom.Position.Y == TargetPosition.Y
-                            && mushroom.Status is GrowthProcess.Ripe)
-                                ?? throw new InvalidOperationException("mushroom not found");
+                        Bush bush = terrain.BushList.FirstOrDefault(bush
+                            => bush.Position.X == TargetPosition.X
+                            && bush.Position.Y == TargetPosition.Y
+                            && bush.Status is GrowthProcess.Ripe)
+                                ?? throw new InvalidOperationException("bush not found");
 
-                        lock (terrain.TreeListLock)
-                        {
-                            //tree.Mycel.MushroomList
-                            mushroom.Parent.MushroomList.Remove(mushroom);
-                            Stamina--;
-                            if (terrain.TreeList.Any(tree 
-                                => tree.Mycel!.MushroomList.Any(mushroom 
-                                => mushroom.Status is GrowthProcess.Ripe)))
+                        
+                            lock (terrain.BushListLock)
+                            {
+                                bush.Status = GrowthProcess.Mature;
+                                Stamina--;
+                                if (terrain.BushList.Any(bush => bush.Status is GrowthProcess.Ripe))
                                     Status = Status.Exhausted;
+                            }
+                        
+                    }
+                    if (Specialisation is Specialisation.Mushrooms)
+                    {
+                        foreach (Tree tree in terrain.TreeList)
+
+                        if (tree.Mycel is not null)
+                        {
+                            Mushroom mushroom = tree.Mycel.MushroomList.FirstOrDefault(mushroom
+                                => mushroom.Position.X == TargetPosition.X
+                                && mushroom.Position.Y == TargetPosition.Y
+                                && mushroom.Status is GrowthProcess.Ripe)
+                                    ?? throw new InvalidOperationException("mushroom not found");
+
+                            lock (terrain.TreeListLock)
+                            {
+                                //tree.Mycel.MushroomList
+                                mushroom.Parent.MushroomList.Remove(mushroom);
+                                Stamina--;
+                                if (terrain.TreeList.Any(tree 
+                                    => tree.Mycel!.MushroomList.Any(mushroom 
+                                    => mushroom.Status is GrowthProcess.Ripe)))
+                                        Status = Status.Exhausted;
+                            }
                         }
                     }
                 }
-            }
 
-            if (TargetMemory.Count == 0)
-            {
-                Status = Status.Exhausted;
-                TargetMemory.Clear();                 
+                if (TargetMemory.Count == 0)
+                {
+                    Status = Status.Exhausted;
+                    TargetMemory.Clear();                 
+                }
             }
             
         }
     }
+    
 }
 
 partial class Animal
