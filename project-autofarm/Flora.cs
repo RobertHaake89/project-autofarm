@@ -1,3 +1,5 @@
+using System.Security.Cryptography.X509Certificates;
+
 namespace ProjectAutofarm;
 
 public enum PlantType
@@ -381,7 +383,7 @@ class Mycel : Vegetation
                 new Mushroom(this,new Position(setPosition.X, setPosition.Y), terrain));
                 MushroomList[^1].Position = MushroomList[^1].Position; // To trigger Clamped Setter
 
-                terrain.Grid![setPosition.X, setPosition.Y].Resource.Type = Resource;
+                terrain.Grid![setPosition.X, setPosition.Y].Resource.Type = MushroomList[^1].Resource;
                 terrain.Grid![setPosition.X, setPosition.Y].Resource.Status = GrowthProcess.Planted;
                 //Console.Write("has been added");
             }
@@ -408,7 +410,8 @@ class Mushroom : Vegetation
     
     public Mushroom(Mycel parent, Position position, Terrain terrain) : base(PlantType.Mushroom, position, GrowthProcess.Planted, terrain)
     {
-        Parent = parent;      
+        Parent = parent;
+        Resource = ResourceType.Mushrooms;
     }
 
     public async Task GiveGrowthChance(int randomFactor)
