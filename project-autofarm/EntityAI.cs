@@ -331,24 +331,25 @@ partial class Human : Entity
             && terrain.Grid![Position.X, Position.Y].Resource.Status is GrowthProcess.Ripe)
         {
             Console.Write($"{Profession} is foraging");
-            Position = new Position(Position.X - 1, Position.Y);
+            //Position = new Position(Position.X - 1, Position.Y);
             await Task.Delay(SpeedWorking);
 
             if (Specialisation is Specialisation.BlueBerries)
-            {
-                Bush bush = terrain.BushList.FirstOrDefault(bush
-                    => bush.Position.X == TargetPosition.X
-                    && bush.Position.Y == TargetPosition.Y
-                    && bush.Status is GrowthProcess.Ripe)
-                        ?? throw new InvalidOperationException("bush not found");
-
-                
+            {                
                     lock (terrain.BushListLock)
                     {
+                        Bush bush = terrain.BushList.FirstOrDefault(bush
+                            => bush.Position.X == TargetPosition.X
+                            && bush.Position.Y == TargetPosition.Y
+                            && bush.Status is GrowthProcess.Ripe)
+                                ?? throw new InvalidOperationException("bush not found");
+
                         bush.Status = GrowthProcess.Mature;
+                        terrain.Grid![TargetPosition.X, TargetPosition.Y].Resource.Status = GrowthProcess.Mature;
+
                         Stamina--;
-                        if (terrain.BushList.Any(bush => bush.Status is GrowthProcess.Ripe))
-                            Status = Status.Exhausted;
+                        /* if (terrain.BushList.Any(bush => bush.Status is GrowthProcess.Ripe))
+                            Status = Status.Exhausted; */
                     }
                 
             }
